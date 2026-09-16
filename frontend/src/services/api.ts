@@ -22,20 +22,38 @@ console.log('🌐 CSRF URL:', CSRF_URL);
 // ✅ FONCTIONS COOKIES
 // ============================================
 
-export function getCookie(name: string): string | null {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) {
-        const rawCookie = parts.pop()?.split(';').shift();
-        if (!rawCookie) return null;
+/**
+ * Toutes les valeurs portant ce nom de cookie.
+ *
+ * Il peut y en avoir plusieurs : le navigateur autorise deux cookies de même
+ * nom s'ils diffèrent par le domaine ou le chemin (par exemple un ancien
+ * XSRF-TOKEN posé sur `.bluefin-immo.com` et le nouveau sur le domaine exact).
+ * Il les envoie alors tous les deux, sans dire lequel est lequel.
+ */
+function getCookies(name: string): string[] {
+    return document.cookie
+        .split(';')
+        .map((part) => part.trim())
+        .filter((part) => part.startsWith(`${name}=`))
+        .map((part) => {
+            const raw = part.slice(name.length + 1);
+            try {
+                return decodeURIComponent(raw);
+            } catch {
+                return raw;
+            }
+        })
+        .filter(Boolean);
+}
 
-        try {
-            return decodeURIComponent(rawCookie);
-        } catch {
-            return rawCookie;
-        }
-    }
-    return null;
+export function getCookie(name: string): string | null {
+    // Le doublon est précisément le cas qui cassait : l'ancienne version
+    // découpait `document.cookie` et renvoyait null dès qu'un nom apparaissait
+    // deux fois. Le jeton CSRF devenait alors introuvable, la requête partait
+    // sans en-tête, Laravel répondait « CSRF token mismatch » - et la logique
+    // de reprise abandonnait, faute de jeton à renvoyer.
+    const values = getCookies(name);
+    return values.length ? values[values.length - 1] : null;
 }
 
 export function deleteCookie(name: string): void {
@@ -94,13 +112,19 @@ const addCsrfToken = async (config: any) => {
         return config;
     }
 
-    const cookieToken = getCookie('XSRF-TOKEN');
-    if (cookieToken) {
-        return config;
+    let cookieToken = getCookie('XSRF-TOKEN');
+    if (!cookieToken) {
+        await refreshCsrfToken();
+        cookieToken = getCookie('XSRF-TOKEN');
     }
 
-    const refreshed = await refreshCsrfToken();
-    if (refreshed) return config;
+    // On pose l'en-tête nous-mêmes plutôt que de compter sur le comportement
+    // automatique d'axios : celui-ci ne lit qu'un seul cookie, et ne s'applique
+    // pas dans toutes les configurations d'origine.
+    if (cookieToken) {
+        config.headers = config.headers || {};
+        config.headers['X-XSRF-TOKEN'] = cookieToken;
+    }
 
     return config;
 };
@@ -119,6 +143,19 @@ v1Api.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
+/**
+ * Remplace le message brut de Laravel (« CSRF token mismatch. »), incompréhensible
+ * pour un visiteur, par une consigne utile. Ce message s'affiche tel quel sous
+ * les champs des formulaires (voir errorFromServer dans SignupWizard).
+ */
+const withSessionMessage = (error: any) => {
+    if (error?.response?.data) {
+        error.response.data.message =
+            'Votre session a expiré. Rechargez la page, puis réessayez. Si le problème persiste, autorisez les cookies pour ce site.';
+    }
+    return error;
+};
+
 const attachCsrfRetryInterceptor = (api: typeof publicApi) => {
     api.interceptors.response.use(
         (response) => response,
@@ -131,17 +168,28 @@ const attachCsrfRetryInterceptor = (api: typeof publicApi) => {
 
             if (error?.response?.status === 419 && originalRequest && !originalRequest._retry) {
                 originalRequest._retry = true;
-                const refreshed = await refreshCsrfToken();
-                if (!refreshed) {
-                    return Promise.reject(error);
-                }
 
-                const token = getCookie('XSRF-TOKEN');
+                // Reprise forcee : l'ancien jeton est jeté avant d'en demander
+                // un neuf, et on le repose explicitement sur la requête rejouée.
+                const refreshed = await refreshCsrfToken(true);
+                const token = refreshed ? getCookie('XSRF-TOKEN') : null;
                 if (!token) {
-                    return Promise.reject(error);
+                    return Promise.reject(withSessionMessage(error));
                 }
 
-                return api.request(originalRequest);
+                originalRequest.headers = { ...(originalRequest.headers || {}), 'X-XSRF-TOKEN': token };
+                try {
+                    return await api.request(originalRequest);
+                } catch (retryError: any) {
+                    // Le jeton était neuf et il est encore refusé : ce n'est
+                    // plus un simple jeton périmé. Message lisible plutôt que
+                    // le « CSRF token mismatch » brut de Laravel.
+                    return Promise.reject(withSessionMessage(retryError));
+                }
+            }
+
+            if (error?.response?.status === 419) {
+                return Promise.reject(withSessionMessage(error));
             }
 
             return Promise.reject(error);
@@ -164,35 +212,70 @@ export function getCsrfToken(): string {
 // ✅ CSRF TOKEN
 // ============================================
 
-export async function refreshCsrfToken(): Promise<boolean> {
-    console.log('🔄 [CSRF] Début refresh avec fetch...');
+/**
+ * Efface les cookies CSRF présents dans le navigateur, sur toutes les
+ * combinaisons de domaine et de chemin plausibles.
+ *
+ * Nécessaire avant de redemander un jeton : un cookie périmé (session expirée,
+ * clé d'application changée, reliquat d'un ancien déploiement) n'est pas
+ * remplacé par le nouveau s'il a été posé sur un autre domaine ou un autre
+ * chemin — les deux coexistent et le serveur en reçoit un qu'il ne sait pas
+ * déchiffrer.
+ */
+function clearCsrfCookies(): void {
+    const host = window.location.hostname;
+    const parts = host.split('.');
+    const domains = ['', host, `.${host}`];
+    if (parts.length > 2) {
+        const parent = parts.slice(-2).join('.');
+        domains.push(parent, `.${parent}`);
+    }
+    for (const path of ['/', '/api', '/sanctum']) {
+        for (const domain of domains) {
+            document.cookie =
+                `XSRF-TOKEN=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=${path}` +
+                (domain ? `; domain=${domain}` : '');
+        }
+    }
+}
+
+/**
+ * Demande un nouveau jeton CSRF au backend.
+ *
+ * `force` sert à la reprise après un 419 : on jette d'abord le jeton courant,
+ * sans quoi on risque de renvoyer exactement celui que le serveur vient de
+ * refuser, et de boucler sur la même erreur.
+ */
+export async function refreshCsrfToken(force = false): Promise<boolean> {
+    if (force) {
+        clearCsrfCookies();
+    }
 
     try {
         const response = await fetch(CSRF_URL, {
             method: 'GET',
             credentials: 'include',
+            cache: 'no-store',
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
             },
         });
 
-        console.log('✅ [CSRF] Status reçu:', response.status);
-        console.log('📋 Headers:', Object.fromEntries(response.headers));
-
         if (!response.ok) {
-            console.warn('⚠️ Réponse non OK');
+            console.warn('[CSRF] Réponse inattendue du serveur :', response.status);
         }
 
-        const token = getCookie('XSRF-TOKEN');
-        console.log('🔑 Token après fetch:', token ? 'OUI' : 'NON');
-
-        return response.ok;
+        // Ce qui compte n'est pas le code de réponse mais la présence effective
+        // du cookie : un 204 sans cookie (cookies bloqués par le navigateur,
+        // domaine non autorisé) doit être traité comme un échec.
+        return Boolean(getCookie('XSRF-TOKEN'));
     } catch (error: any) {
-        console.error('❌ [CSRF] Erreur fetch:', error.message || error);
+        console.error('[CSRF] Impossible de récupérer le jeton :', error?.message || error);
         return false;
     }
 }
+
 
 // ============================================
 // ✅ EXPORT PAR DÉFAUT
