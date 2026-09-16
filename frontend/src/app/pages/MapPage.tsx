@@ -179,8 +179,8 @@ export function MapPage({ onNavigate }: { onNavigate?: (route: any) => void }) {
               <MapPin className="w-4 h-4 text-[#00c9a7]" />
               {current.precise ? current.label : `${current.listings.length} annonce${current.listings.length > 1 ? 's' : ''} à ${current.label}`}
             </p>
-            <button onClick={() => setSelected(null)} aria-label="Fermer" className="p-1.5 rounded-full hover:bg-gray-100">
-              <X className="w-5 h-5 text-gray-500" />
+            <button onClick={() => setSelected(null)} aria-label="Fermer" className="p-1.5 rounded-full hover:bg-[#e8faf6]">
+              <X className="w-5 h-5 text-[#5b6b7a]" />
             </button>
           </div>
           <div className="flex gap-4 overflow-x-auto pl-4 scroll-pl-4 snap-x snap-mandatory pb-1">
@@ -193,7 +193,7 @@ export function MapPage({ onNavigate }: { onNavigate?: (route: any) => void }) {
       )}
 
       {!isLoading && unplaced.length > 0 && !current && (
-        <p className="absolute bottom-3 left-3 right-3 z-[400] text-center text-[11px] text-slate-600 bg-white/90 rounded-xl px-3 py-1.5">
+        <p className="absolute bottom-3 left-3 right-3 z-[400] text-center text-[11px] text-[#5b6b7a] bg-white/90 rounded-xl px-3 py-1.5">
           {unplaced.length} annonce{unplaced.length > 1 ? 's' : ''} dans une ville non reconnue n’apparai{unplaced.length > 1 ? 'ssent' : 't'} pas sur la carte.
         </p>
       )}

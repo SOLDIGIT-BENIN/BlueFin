@@ -42,8 +42,8 @@ export function FooterPage({ onNavigate }: PageProps) {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="sticky top-0 z-40 bg-white border-b border-gray-100 px-5 py-4">
-        <button onClick={() => onNavigate?.({ name: 'home' })} className="text-sm text-gray-500 mb-4 flex items-center gap-2">
+      <div className="sticky top-0 z-40 bg-white border-b border-[#e2f5f2] px-5 py-4">
+        <button onClick={() => onNavigate?.({ name: 'home' })} className="text-sm text-[#5b6b7a] mb-4 flex items-center gap-2">
           <ArrowLeft className="w-4 h-4" /> Retour
         </button>
         <h1 className="text-2xl text-[#0F2940]">Pied de page du site</h1>
@@ -56,10 +56,10 @@ export function FooterPage({ onNavigate }: PageProps) {
             <div className="w-12 h-12 bg-[#00c9a7] rounded-xl flex items-center justify-center mb-4">
               <span className="text-xl font-bold text-white">B</span>
             </div>
-            <p className="text-gray-600 text-sm mb-4">
+            <p className="text-[#5b6b7a] text-sm mb-4">
               Blufin-Immo est la première plateforme de location de logements courte durée au Bénin et en Afrique de l'Ouest.
             </p>
-            <p className="text-xs text-gray-400">© 2026 Blufin-Immo SARL</p>
+            <p className="text-xs text-[#5b6b7a]">© 2026 Blufin-Immo SARL</p>
           </div>
 
           {/* Liens de navigation */}
@@ -70,11 +70,11 @@ export function FooterPage({ onNavigate }: PageProps) {
                 {section.links.map((link, linkIdx) => (
                   <li key={linkIdx}>
                     {link.action ? (
-                      <button onClick={link.action} className="text-gray-500 hover:text-[#00c9a7] text-sm transition">
+                      <button onClick={link.action} className="text-[#5b6b7a] hover:text-[#00c9a7] text-sm transition">
                         {link.label}
                       </button>
                     ) : (
-                      <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#00c9a7] text-sm transition">
+                      <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-[#5b6b7a] hover:text-[#00c9a7] text-sm transition">
                         {link.label}
                       </a>
                     )}
@@ -86,7 +86,7 @@ export function FooterPage({ onNavigate }: PageProps) {
         </div>
 
         {/* Moyens de paiement */}
-        <div className="border-t border-gray-200 pt-8 mb-8">
+        <div className="border-t border-[#e2f5f2] pt-8 mb-8">
           <h3 className="text-center font-semibold text-[#0F2940] mb-4">Moyens de paiement acceptés</h3>
           <div className="flex justify-center gap-8">
             {paymentMethods.map((method, idx) => {
@@ -94,7 +94,7 @@ export function FooterPage({ onNavigate }: PageProps) {
               return (
                 <div key={idx} className="flex items-center gap-2">
                   <Icon className="w-5 h-5 text-[#00c9a7]" />
-                  <span className="text-sm text-gray-600">{method.name}</span>
+                  <span className="text-sm text-[#5b6b7a]">{method.name}</span>
                 </div>
               );
             })}
@@ -104,14 +104,14 @@ export function FooterPage({ onNavigate }: PageProps) {
         {/* Newsletter */}
         <div className="bg-[#f4fffe] rounded-2xl p-6 text-center">
           <h3 className="font-semibold text-[#0F2940] mb-2">Restez informé</h3>
-          <p className="text-gray-500 text-sm mb-4">Recevez nos offres spéciales et actualités</p>
+          <p className="text-[#5b6b7a] text-sm mb-4">Recevez nos offres spéciales et actualités</p>
           <div className="flex max-w-md mx-auto gap-2">
             <input 
               type="email" 
               placeholder="Votre email" 
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00c9a7]"
+              className="flex-1 px-4 py-2 border border-[#c9f0e8] rounded-lg focus:ring-2 focus:ring-[#00c9a7]"
             />
-            <button className="bg-[#00c9a7] text-[#0F2940] px-6 py-2 rounded-lg font-semibold hover:bg-[#00b892] transition">
+            <button className="bg-[#00c9a7] text-[#0F2940] px-6 py-2 rounded-lg font-semibold hover:bg-[#00b396] transition">
               S'inscrire
             </button>
           </div>

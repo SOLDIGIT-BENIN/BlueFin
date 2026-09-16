@@ -45,9 +45,9 @@ export function AdminHostPaymentsPage(_props: { onNavigate?: unknown }) {
   const [search, setSearch] = useState('');
   const [dialog, setDialog] = useState<ActionDialog>(null);
 
-  const card = isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200';
-  const muted = isDark ? 'text-slate-400' : 'text-slate-500';
-  const strong = isDark ? 'text-white' : 'text-slate-800';
+  const card = isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]';
+  const muted = isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]';
+  const strong = isDark ? 'text-white' : 'text-[#0f2940]';
 
   const statsQuery = useQuery({
     queryKey: ['host-payouts', 'stats'],
@@ -103,7 +103,7 @@ export function AdminHostPaymentsPage(_props: { onNavigate?: unknown }) {
   const hosts = hostsQuery.data?.data ?? [];
 
   return (
-    <div className={`min-h-screen ${isDark ? 'bg-slate-900' : 'bg-slate-50'} p-4 md:p-6 lg:p-8`}>
+    <div className={`min-h-screen ${isDark ? 'bg-[#0f2940]' : 'bg-[#f4fffe]'} p-4 md:p-6 lg:p-8`}>
       <div className="max-w-7xl mx-auto space-y-6">
         {/* En-tête */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
@@ -159,12 +159,12 @@ export function AdminHostPaymentsPage(_props: { onNavigate?: unknown }) {
 
         {/* Onglets + filtres */}
         <div className={`border rounded-2xl ${card}`}>
-          <div className={`flex flex-col md:flex-row md:items-center gap-3 p-3 border-b ${isDark ? 'border-slate-700' : 'border-slate-100'}`}>
-            <div className={`inline-flex p-1 rounded-xl ${isDark ? 'bg-slate-900' : 'bg-slate-100'}`}>
+          <div className={`flex flex-col md:flex-row md:items-center gap-3 p-3 border-b ${isDark ? 'border-[#1c3b56]' : 'border-[#e2f5f2]'}`}>
+            <div className={`inline-flex p-1 rounded-xl ${isDark ? 'bg-[#0f2940]' : 'bg-[#e8faf6]'}`}>
               {([['payouts', 'Versements'], ['hosts', 'Hôtes et soldes']] as const).map(([key, label]) => (
                 <button key={key} onClick={() => setTab(key)}
                   className={`px-4 py-1.5 rounded-lg text-sm font-medium transition ${tab === key
-                    ? (isDark ? 'bg-slate-700 text-white' : 'bg-white text-slate-900 shadow-sm')
+                    ? (isDark ? 'bg-[#1c3b56] text-white' : 'bg-white text-[#0f2940] shadow-sm')
                     : muted}`}>
                   {label}
                 </button>
@@ -174,11 +174,11 @@ export function AdminHostPaymentsPage(_props: { onNavigate?: unknown }) {
               <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${muted}`} />
               <input value={search} onChange={(e) => setSearch(e.target.value)}
                 placeholder={tab === 'payouts' ? 'Hôte, téléphone ou référence…' : 'Nom, e-mail ou téléphone…'}
-                className={`w-full pl-9 pr-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-[#00c9a7] ${isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200'}`} />
+                className={`w-full pl-9 pr-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-[#00c9a7] ${isDark ? 'bg-[#0f2940] border-[#1c3b56] text-white' : 'bg-[#f4fffe] border-[#e2f5f2]'}`} />
             </div>
             {tab === 'payouts' && (
               <select value={status} onChange={(e) => setStatus(e.target.value as StatusFilter)}
-                className={`px-3 py-2 rounded-xl text-sm border ${isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200'}`}>
+                className={`px-3 py-2 rounded-xl text-sm border ${isDark ? 'bg-[#0f2940] border-[#1c3b56] text-white' : 'bg-[#f4fffe] border-[#e2f5f2]'}`}>
                 <option value="open">À verser</option>
                 <option value="completed">Versés</option>
                 <option value="failed">Annulés</option>
@@ -213,29 +213,29 @@ function Stat({ icon: Icon, label, value, hint, tone, isDark }: {
   tone: 'amber' | 'teal' | 'green' | 'slate'; isDark: boolean;
 }) {
   const tones = {
-    amber: 'text-amber-600 bg-amber-50',
+    amber: 'text-[#a87c10] bg-[#fffaeb]',
     teal: 'text-[#00806b] bg-[#f4fffe]',
     green: 'text-emerald-600 bg-emerald-50',
-    slate: 'text-slate-600 bg-slate-100',
+    slate: 'text-[#5b6b7a] bg-[#e8faf6]',
   };
   return (
-    <div className={`border rounded-2xl p-4 ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>
+    <div className={`border rounded-2xl p-4 ${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'}`}>
       <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${tones[tone]}`}>
         <Icon className="w-4 h-4" />
       </div>
-      <p className={`text-xs mt-3 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{label}</p>
-      <p className={`text-lg font-bold mt-0.5 tabular-nums ${isDark ? 'text-white' : 'text-slate-900'}`}>{value}</p>
-      <p className={`text-xs mt-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{hint}</p>
+      <p className={`text-xs mt-3 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>{label}</p>
+      <p className={`text-lg font-bold mt-0.5 tabular-nums ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>{value}</p>
+      <p className={`text-xs mt-1 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>{hint}</p>
     </div>
   );
 }
 
 function StatusBadge({ payout }: { payout: HostPayout }) {
   const styles: Record<string, string> = {
-    pending: 'bg-amber-100 text-amber-800',
-    processing: 'bg-amber-100 text-amber-800',
+    pending: 'bg-[#fff3cd] text-[#4a3400]',
+    processing: 'bg-[#fff3cd] text-[#4a3400]',
     completed: 'bg-emerald-100 text-emerald-800',
-    failed: 'bg-slate-200 text-slate-700',
+    failed: 'bg-[#e2f5f2] text-[#1c3b56]',
   };
   return (
     <span className="inline-flex flex-col items-start gap-1">
@@ -250,7 +250,7 @@ function TableState({ loading, error, empty, colSpan, isDark }: {
 }) {
   return (
     <tr>
-      <td colSpan={colSpan} className={`px-4 py-10 text-center text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+      <td colSpan={colSpan} className={`px-4 py-10 text-center text-sm ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>
         {loading ? <Loader2 className="w-6 h-6 animate-spin mx-auto text-[#00c9a7]" />
           : error ? <span className="text-red-600">{errorMessage(error)}</span>
           : empty}
@@ -262,18 +262,18 @@ function TableState({ loading, error, empty, colSpan, isDark }: {
 function PayoutsTable({ payouts, loading, error, isDark, onAction }: {
   payouts: HostPayout[]; loading: boolean; error: unknown; isDark: boolean; onAction: (d: ActionDialog) => void;
 }) {
-  const th = `px-4 py-3 text-left text-xs font-medium uppercase tracking-wide ${isDark ? 'text-slate-400' : 'text-slate-500'}`;
-  const td = `px-4 py-3 text-sm ${isDark ? 'text-slate-200' : 'text-slate-700'}`;
+  const th = `px-4 py-3 text-left text-xs font-medium uppercase tracking-wide ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`;
+  const td = `px-4 py-3 text-sm ${isDark ? 'text-[#c9f0e8]' : 'text-[#1c3b56]'}`;
   return (
     <table className="w-full min-w-[900px]">
-      <thead className={isDark ? 'bg-slate-900/40' : 'bg-slate-50'}>
+      <thead className={isDark ? 'bg-[#0f2940]/40' : 'bg-[#f4fffe]'}>
         <tr>
           <th className={th}>Hôte</th><th className={th}>Montant</th><th className={th}>Envoyer sur</th>
           <th className={th}>Créé le</th><th className={th}>Statut</th><th className={th}>Suivi</th>
           <th className={`${th} text-right`}>Actions</th>
         </tr>
       </thead>
-      <tbody className={`divide-y ${isDark ? 'divide-slate-700' : 'divide-slate-100'}`}>
+      <tbody className={`divide-y ${isDark ? 'divide-[#1c3b56]' : 'divide-[#e2f5f2]'}`}>
         {loading || error || payouts.length === 0
           ? <TableState loading={loading} error={error} colSpan={7} isDark={isDark}
               empty="Aucun versement dans cette vue. « Préparer les versements dus » crée ceux des hôtes ayant un solde." />
@@ -297,7 +297,7 @@ function PayoutsTable({ payouts, loading, error, isDark, onAction }: {
               <td className={`${td} text-xs`}>
                 {p.status === 'completed' && <>Réf. <span className="font-mono">{p.payment_reference}</span><br />{dateFr(p.processed_at)}{p.paid_by && ` · ${p.paid_by}`}</>}
                 {p.status === 'failed' && <span title={p.failure_reason ?? ''}>Motif : {p.failure_reason}</span>}
-                {p.undo_count > 0 && <p className="text-amber-600">Remis en attente {p.undo_count} fois</p>}
+                {p.undo_count > 0 && <p className="text-[#a87c10]">Remis en attente {p.undo_count} fois</p>}
               </td>
               <td className={`${td} text-right whitespace-nowrap`}>
                 {(p.status === 'pending' || p.status === 'processing') && (
@@ -307,14 +307,14 @@ function PayoutsTable({ payouts, loading, error, isDark, onAction }: {
                       <CheckCircle className="w-3.5 h-3.5" /> Marquer versé
                     </button>
                     <button onClick={() => onAction({ kind: 'cancel', payout: p })} title="Annuler ce versement"
-                      className={`p-1.5 rounded-lg ${isDark ? 'hover:bg-slate-700' : 'hover:bg-slate-100'}`}>
+                      className={`p-1.5 rounded-lg ${isDark ? 'hover:bg-[#1c3b56]' : 'hover:bg-[#e8faf6]'}`}>
                       <Ban className="w-4 h-4" />
                     </button>
                   </div>
                 )}
                 {p.status === 'completed' && (
                   <button onClick={() => onAction({ kind: 'undo', payout: p })}
-                    className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs ${isDark ? 'hover:bg-slate-700' : 'hover:bg-slate-100'}`}>
+                    className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs ${isDark ? 'hover:bg-[#1c3b56]' : 'hover:bg-[#e8faf6]'}`}>
                     <Undo2 className="w-3.5 h-3.5" /> Remettre en attente
                   </button>
                 )}
@@ -331,18 +331,18 @@ function HostsTable({ hosts, loading, error, isDark, onEditAccount, onGenerate, 
   onEditAccount: (h: HostWithBalance) => void; onGenerate: (h: HostWithBalance) => void;
   generating: boolean; minimum: number;
 }) {
-  const th = `px-4 py-3 text-left text-xs font-medium uppercase tracking-wide ${isDark ? 'text-slate-400' : 'text-slate-500'}`;
-  const td = `px-4 py-3 text-sm ${isDark ? 'text-slate-200' : 'text-slate-700'}`;
+  const th = `px-4 py-3 text-left text-xs font-medium uppercase tracking-wide ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`;
+  const td = `px-4 py-3 text-sm ${isDark ? 'text-[#c9f0e8]' : 'text-[#1c3b56]'}`;
   return (
     <table className="w-full min-w-[900px]">
-      <thead className={isDark ? 'bg-slate-900/40' : 'bg-slate-50'}>
+      <thead className={isDark ? 'bg-[#0f2940]/40' : 'bg-[#f4fffe]'}>
         <tr>
           <th className={th}>Hôte</th><th className={th}>Gagné (net)</th><th className={th}>Déjà versé</th>
           <th className={th}>En attente</th><th className={th}>Dû</th><th className={th}>Coordonnées</th>
           <th className={`${th} text-right`}>Actions</th>
         </tr>
       </thead>
-      <tbody className={`divide-y ${isDark ? 'divide-slate-700' : 'divide-slate-100'}`}>
+      <tbody className={`divide-y ${isDark ? 'divide-[#1c3b56]' : 'divide-[#e2f5f2]'}`}>
         {loading || error || hosts.length === 0
           ? <TableState loading={loading} error={error} colSpan={7} isDark={isDark} empty="Aucun hôte trouvé." />
           : hosts.map((h) => (
@@ -366,12 +366,12 @@ function HostsTable({ hosts, loading, error, isDark, onEditAccount, onGenerate, 
                 {h.account
                   ? <><p>{h.account.payment_method === 'mobile_money' ? 'Mobile Money' : 'Virement'}</p>
                       <p className="text-xs font-mono opacity-80">{h.account.destination}</p></>
-                  : <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">À renseigner</span>}
+                  : <span className="text-xs px-2 py-0.5 rounded-full bg-[#fff3cd] text-[#4a3400]">À renseigner</span>}
               </td>
               <td className={`${td} text-right whitespace-nowrap`}>
                 <div className="inline-flex gap-1.5">
                   <button onClick={() => onEditAccount(h)}
-                    className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs border ${isDark ? 'border-slate-600 hover:bg-slate-700' : 'border-slate-200 hover:bg-slate-50'}`}>
+                    className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs border ${isDark ? 'border-[#5b6b7a] hover:bg-[#1c3b56]' : 'border-[#e2f5f2] hover:bg-[#f4fffe]'}`}>
                     <Pencil className="w-3.5 h-3.5" /> Coordonnées
                   </button>
                   <button onClick={() => onGenerate(h)}
@@ -397,13 +397,13 @@ function Modal({ title, subtitle, isDark, onClose, children }: {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4" role="dialog" aria-modal="true">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className={`relative w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl p-6 shadow-xl ${isDark ? 'bg-slate-800 text-white' : 'bg-white text-slate-800'}`}>
+      <div className={`relative w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl p-6 shadow-xl ${isDark ? 'bg-[#0f2940] text-white' : 'bg-white text-[#0f2940]'}`}>
         <div className="flex justify-between items-start gap-4 mb-4">
           <div>
             <h2 className="text-lg font-bold">{title}</h2>
-            {subtitle && <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{subtitle}</p>}
+            {subtitle && <p className={`text-sm ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>{subtitle}</p>}
           </div>
-          <button onClick={onClose} aria-label="Fermer" className={`p-1.5 rounded-lg ${isDark ? 'hover:bg-slate-700' : 'hover:bg-slate-100'}`}>
+          <button onClick={onClose} aria-label="Fermer" className={`p-1.5 rounded-lg ${isDark ? 'hover:bg-[#1c3b56]' : 'hover:bg-[#e8faf6]'}`}>
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -414,7 +414,7 @@ function Modal({ title, subtitle, isDark, onClose, children }: {
 }
 
 const inputClass = (isDark: boolean) =>
-  `w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-[#00c9a7] ${isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-300'}`;
+  `w-full px-3 py-2 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-[#00c9a7] ${isDark ? 'bg-[#0f2940] border-[#1c3b56] text-white' : 'bg-white border-[#c9f0e8]'}`;
 
 function PayoutActionDialog({ dialog, isDark, onClose, onDone }: {
   dialog: Exclude<ActionDialog, null | { kind: 'account' }>; isDark: boolean; onClose: () => void; onDone: () => void;
@@ -458,7 +458,7 @@ function PayoutActionDialog({ dialog, isDark, onClose, onDone }: {
   return (
     <Modal title={config.title} subtitle={`${payout.host?.name ?? ''} · ${fcfa(payout.amount)}`} isDark={isDark} onClose={onClose}>
       {dialog.kind === 'mark-paid' && (
-        <div className={`mb-4 p-3 rounded-xl text-sm ${isDark ? 'bg-slate-900' : 'bg-[#f4fffe]'}`}>
+        <div className={`mb-4 p-3 rounded-xl text-sm ${isDark ? 'bg-[#0f2940]' : 'bg-[#f4fffe]'}`}>
           <p>Envoyer <strong>{fcfa(payout.amount)}</strong> par {payout.method === 'mobile_money' ? 'Mobile Money' : 'virement'} à :</p>
           <p className="font-mono mt-1">{payout.destination || '—'}</p>
           {payout.beneficiary && <p className="text-xs mt-1 opacity-80">au nom de {payout.beneficiary}</p>}
@@ -468,9 +468,9 @@ function PayoutActionDialog({ dialog, isDark, onClose, onDone }: {
         <label className="block text-sm font-medium mb-1.5">{config.label}</label>
         <input autoFocus value={value} onChange={(e) => setValue(e.target.value)} placeholder={config.placeholder} className={inputClass(isDark)} />
         <div className="flex justify-end gap-2 mt-5">
-          <button type="button" onClick={onClose} className={`px-4 py-2 rounded-xl text-sm ${isDark ? 'hover:bg-slate-700' : 'hover:bg-slate-100'}`}>Retour</button>
+          <button type="button" onClick={onClose} className={`px-4 py-2 rounded-xl text-sm ${isDark ? 'hover:bg-[#1c3b56]' : 'hover:bg-[#e8faf6]'}`}>Retour</button>
           <button type="submit" disabled={mutation.isPending || value.trim().length < config.min}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white disabled:opacity-50 ${dialog.kind === 'mark-paid' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-slate-700 hover:bg-slate-800'}`}>
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white disabled:opacity-50 ${dialog.kind === 'mark-paid' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-[#1c3b56] hover:bg-[#0f2940]'}`}>
             {mutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />} {config.button}
           </button>
         </div>
@@ -546,7 +546,7 @@ function AccountDialog({ host, isDark, onClose, onSaved }: {
           </>
         )}
         <div className="flex justify-end gap-2 pt-2">
-          <button type="button" onClick={onClose} className={`px-4 py-2 rounded-xl text-sm ${isDark ? 'hover:bg-slate-700' : 'hover:bg-slate-100'}`}>Retour</button>
+          <button type="button" onClick={onClose} className={`px-4 py-2 rounded-xl text-sm ${isDark ? 'hover:bg-[#1c3b56]' : 'hover:bg-[#e8faf6]'}`}>Retour</button>
           <button type="submit" disabled={mutation.isPending}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white bg-[#00c9a7] hover:bg-[#00b396] disabled:opacity-50">
             {mutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />} Enregistrer

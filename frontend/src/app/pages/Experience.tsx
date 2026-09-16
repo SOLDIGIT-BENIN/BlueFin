@@ -1199,7 +1199,7 @@ export default function Experiences() {
         <div className="flex justify-between items-start">
           <div>
             <h3 className="font-semibold text-[#0F2940]">{exp.title}</h3>
-            {showLocation && <p className="text-sm text-gray-500 mt-1">{exp.location}</p>}
+            {showLocation && <p className="text-sm text-[#5b6b7a] mt-1">{exp.location}</p>}
           </div>
           {exp.rating && (
             <div className="flex items-center gap-1">
@@ -1208,11 +1208,11 @@ export default function Experiences() {
             </div>
           )}
         </div>
-        {exp.date && <p className="text-sm text-gray-600 mt-1">{exp.date}</p>}
+        {exp.date && <p className="text-sm text-[#5b6b7a] mt-1">{exp.date}</p>}
         {exp.price && (
           <p className="mt-2 font-medium text-[#0F2940]">
             À partir de {exp.price} €{" "}
-            <span className="font-normal text-gray-500">{exp.priceType || "par voyageur"}</span>
+            <span className="font-normal text-[#5b6b7a]">{exp.priceType || "par voyageur"}</span>
           </p>
         )}
       </div>
@@ -1222,51 +1222,51 @@ export default function Experiences() {
   return (
     <div className="min-h-screen bg-white">
       {/* Barre de recherche sticky (identique à avant) */}
-      <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md shadow-md border-b border-gray-100">
+      <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md shadow-md border-b border-[#e2f5f2]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-center">
             <div className="relative w-full max-w-5xl">
-              <div className="bg-white rounded-full shadow-xl border border-gray-200 hover:shadow-2xl transition-all duration-300">
+              <div className="bg-white rounded-full shadow-xl border border-[#e2f5f2] hover:shadow-2xl transition-all duration-300">
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-1 p-2">
                   {/* Destination */}
                   <div className="relative flex-[1.5]">
                     <button
                       onClick={() => setActiveTab(activeTab === "destination" ? null : "destination")}
                       className={`w-full text-left px-5 sm:px-7 py-3.5 rounded-full transition-all ${
-                        activeTab === "destination" ? "bg-gray-50 shadow-inner" : "hover:bg-gray-50"
+                        activeTab === "destination" ? "bg-[#f4fffe] shadow-inner" : "hover:bg-[#f4fffe]"
                       }`}
                     >
-                      <div className="text-xs font-medium text-gray-700">Destination</div>
-                      <div className="text-sm text-gray-900 truncate">
+                      <div className="text-xs font-medium text-[#1c3b56]">Destination</div>
+                      <div className="text-sm text-[#0f2940] truncate">
                         {destination || "Ville ou expérience au Bénin"}
                       </div>
                     </button>
                     {activeTab === "destination" && (
                       <>
                         <div className="fixed inset-0 z-40" onClick={() => setActiveTab(null)}></div>
-                        <div className="absolute top-full left-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 z-50">
+                        <div className="absolute top-full left-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-[#e2f5f2] z-50">
                           <div className="p-4">
                             <div className="flex items-center justify-between mb-4">
                               <h3 className="text-lg font-semibold">Où souhaitez-vous aller ?</h3>
-                              <button onClick={() => setActiveTab(null)} className="p-1 rounded-full hover:bg-gray-100"><X className="w-5 h-5" /></button>
+                              <button onClick={() => setActiveTab(null)} className="p-1 rounded-full hover:bg-[#e8faf6]"><X className="w-5 h-5" /></button>
                             </div>
                             <input
                               type="text"
                               placeholder="Rechercher une destination au Bénin"
-                              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
+                              className="w-full px-4 py-3 border border-[#e2f5f2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
                               value={destination}
                               onChange={(e) => setDestination(e.target.value)}
                             />
                             <div className="mt-4 space-y-2 max-h-96 overflow-y-auto">
-                              <div className="font-semibold text-sm text-gray-500 mb-2">Destinations populaires au Bénin</div>
+                              <div className="font-semibold text-sm text-[#5b6b7a] mb-2">Destinations populaires au Bénin</div>
                               {["Cotonou", "Porto-Novo", "Ouidah", "Grand-Popo", "Abomey", "Parakou", "Natitingou", "Dassa-Zoumè", "Bohicon", "Lokossa", "Savalou", "Kétou", "Pobè"].map((place) => (
                                 <button
                                   key={place}
                                   onClick={() => { setDestination(place); setActiveTab(null); }}
-                                  className="w-full text-left px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors"
+                                  className="w-full text-left px-4 py-3 rounded-xl hover:bg-[#f4fffe] transition-colors"
                                 >
                                   <div className="font-medium">{place}</div>
-                                  <div className="text-sm text-gray-500">Expériences disponibles</div>
+                                  <div className="text-sm text-[#5b6b7a]">Expériences disponibles</div>
                                 </button>
                               ))}
                             </div>
@@ -1275,29 +1275,29 @@ export default function Experiences() {
                       </>
                     )}
                   </div>
-                  <div className="hidden sm:block w-px h-8 bg-gray-200"></div>
-                  <div className="sm:hidden h-px w-full bg-gray-200"></div>
+                  <div className="hidden sm:block w-px h-8 bg-[#e2f5f2]"></div>
+                  <div className="sm:hidden h-px w-full bg-[#e2f5f2]"></div>
 
                   {/* Dates */}
                   <div className="relative flex-1">
-                    <button onClick={() => setActiveTab(activeTab === "dates" ? null : "dates")} className="w-full text-left px-5 sm:px-7 py-3.5 rounded-full transition-all hover:bg-gray-50">
-                      <div className="text-xs font-medium text-gray-700">Dates</div>
-                      <div className="text-sm text-gray-900">{checkIn && checkOut ? `${checkIn} → ${checkOut}` : "Quand ?"}</div>
+                    <button onClick={() => setActiveTab(activeTab === "dates" ? null : "dates")} className="w-full text-left px-5 sm:px-7 py-3.5 rounded-full transition-all hover:bg-[#f4fffe]">
+                      <div className="text-xs font-medium text-[#1c3b56]">Dates</div>
+                      <div className="text-sm text-[#0f2940]">{checkIn && checkOut ? `${checkIn} → ${checkOut}` : "Quand ?"}</div>
                     </button>
                   </div>
-                  <div className="hidden sm:block w-px h-8 bg-gray-200"></div>
-                  <div className="sm:hidden h-px w-full bg-gray-200"></div>
+                  <div className="hidden sm:block w-px h-8 bg-[#e2f5f2]"></div>
+                  <div className="sm:hidden h-px w-full bg-[#e2f5f2]"></div>
 
                   {/* Voyageurs */}
                   <div className="relative flex-1">
-                    <button onClick={() => setActiveTab(activeTab === "guests" ? null : "guests")} className="w-full text-left px-5 sm:px-7 py-3.5 rounded-full transition-all hover:bg-gray-50">
-                      <div className="text-xs font-medium text-gray-700">Voyageurs</div>
-                      <div className="text-sm text-gray-900 truncate">{guestLabel()}</div>
+                    <button onClick={() => setActiveTab(activeTab === "guests" ? null : "guests")} className="w-full text-left px-5 sm:px-7 py-3.5 rounded-full transition-all hover:bg-[#f4fffe]">
+                      <div className="text-xs font-medium text-[#1c3b56]">Voyageurs</div>
+                      <div className="text-sm text-[#0f2940] truncate">{guestLabel()}</div>
                     </button>
                   </div>
 
                   {/* Bouton recherche */}
-                  <button className="bg-[#00c9a7] text-[#0F2940] rounded-full p-4 hover:bg-[#00b892] transition-colors ml-0 sm:ml-2 mt-2 sm:mt-0">
+                  <button className="bg-[#00c9a7] text-[#0F2940] rounded-full p-4 hover:bg-[#00b396] transition-colors ml-0 sm:ml-2 mt-2 sm:mt-0">
                     <Search className="w-5 h-5" />
                   </button>
                 </div>
@@ -1308,7 +1308,7 @@ export default function Experiences() {
       </div>
 
       {/* Hero / Bannière */}
-      <section className="relative bg-gradient-to-r from-[#0F2940] to-[#1a3f5c] py-16 text-white">
+      <section className="relative bg-[#0f2940] py-16 text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Expériences béninoises</h1>
           <p className="text-xl text-white/80 max-w-2xl mx-auto">
@@ -1324,7 +1324,7 @@ export default function Experiences() {
             <h2 className="text-2xl font-semibold text-[#0F2940]">Expériences recommandées</h2>
             <button className="text-[#00c9a7] text-sm font-medium hover:underline">Tout afficher</button>
           </div>
-          <p className="text-gray-600 mb-6">Organisées par des hôtes locaux du Bénin</p>
+          <p className="text-[#5b6b7a] mb-6">Organisées par des hôtes locaux du Bénin</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {originalsExperiences.map((exp) => (
               <ExperienceCard key={exp.id} exp={exp} onSelect={() => setSelectedExperience(exp)} />
@@ -1352,17 +1352,17 @@ export default function Experiences() {
       {selectedExperience && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 p-4 text-[#0F2940]">
           <div className="mx-auto max-w-6xl bg-white rounded-[32px] shadow-2xl overflow-hidden">
-            <div className="flex flex-col gap-4 border-b border-gray-200 p-6 lg:flex-row lg:items-start lg:justify-between">
+            <div className="flex flex-col gap-4 border-b border-[#e2f5f2] p-6 lg:flex-row lg:items-start lg:justify-between">
               <div className="max-w-3xl">
-                <p className="text-sm text-gray-500">{selectedExperience.location}</p>
+                <p className="text-sm text-[#5b6b7a]">{selectedExperience.location}</p>
                 <h2 className="text-3xl font-semibold text-[#0F2940] mt-2">{selectedExperience.title}</h2>
-                <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-[#5b6b7a]">
                   <span>{selectedExperience.rating?.toFixed(1) ?? "5.0"} · 1 401 évaluations</span>
                   <span>Hôte : {selectedExperience.hostType ?? "Local"}</span>
                   <span>{selectedExperience.priceType ? `À partir de ${selectedExperience.price} ${selectedExperience.priceType}` : "Expérience locale"}</span>
                 </div>
               </div>
-              <button onClick={() => setSelectedExperience(null)} className="rounded-full border border-gray-200 bg-white p-3 text-gray-700 hover:bg-gray-100"><X className="w-5 h-5" /></button>
+              <button onClick={() => setSelectedExperience(null)} className="rounded-full border border-[#e2f5f2] bg-white p-3 text-[#1c3b56] hover:bg-[#e8faf6]"><X className="w-5 h-5" /></button>
             </div>
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-[2fr_1fr] p-6">
               <div className="space-y-6">
@@ -1376,7 +1376,7 @@ export default function Experiences() {
                   <h3 className="text-xl font-semibold text-[#0F2940] mb-4">Au programme</h3>
                   <div className="space-y-3">
                     {getProgramSteps(selectedExperience).map((step: string, idx: number) => (
-                      <div key={idx} className="rounded-3xl border border-gray-200 bg-gray-50 p-4">
+                      <div key={idx} className="rounded-3xl border border-[#e2f5f2] bg-[#f4fffe] p-4">
                         <p className="font-semibold">{`Étape ${idx + 1}`}</p>
                         <p className="mt-2 text-sm">{step}</p>
                       </div>
@@ -1388,24 +1388,24 @@ export default function Experiences() {
                   <h3 className="text-xl font-semibold text-[#0F2940] mb-4">Avis des voyageurs</h3>
                   <div className="space-y-4">
                     {selectedExperience.reviews.map((review: any, idx: number) => (
-                      <div key={idx} className="rounded-3xl border border-gray-200 p-4">
+                      <div key={idx} className="rounded-3xl border border-[#e2f5f2] p-4">
                         <div className="flex items-center justify-between gap-3">
                           <div>
                             <p className="font-semibold text-[#0F2940]">{review.name}</p>
-                            <p className="text-sm text-gray-500">{review.location} · {review.daysAgo}</p>
+                            <p className="text-sm text-[#5b6b7a]">{review.location} · {review.daysAgo}</p>
                           </div>
                           <span className="rounded-full bg-[#00c9a7]/10 px-3 py-1 text-sm text-[#0F2940]">{review.rating.toFixed(1)}</span>
                         </div>
-                        <p className="mt-3 text-sm text-gray-700">{review.text}</p>
+                        <p className="mt-3 text-sm text-[#1c3b56]">{review.text}</p>
                       </div>
                     ))}
                   </div>
                 </div>
               </div>
-              <aside className="space-y-6 rounded-3xl border border-gray-200 bg-[#f8fafb] p-6">
-                <div><p className="text-sm font-semibold text-gray-700">À savoir</p><ul className="mt-4 space-y-3 text-sm text-gray-600"><li>Durée : 2 à 3 heures</li><li>Langue : Français</li><li>Âge minimum : 12 ans</li><li>Petit groupe local sécurisé</li></ul></div>
-                <div className="rounded-3xl bg-white p-4 shadow-sm"><p className="text-sm text-gray-500">Lieu de rendez-vous</p><p className="mt-2 font-medium text-[#0F2940]">{selectedExperience.location}</p></div>
-                <button className="w-full rounded-full bg-[#00c9a7] px-5 py-3 text-sm font-semibold text-[#0F2940] hover:bg-[#00b892]">Réserver cette expérience</button>
+              <aside className="space-y-6 rounded-3xl border border-[#e2f5f2] bg-[#f4fffe] p-6">
+                <div><p className="text-sm font-semibold text-[#1c3b56]">À savoir</p><ul className="mt-4 space-y-3 text-sm text-[#5b6b7a]"><li>Durée : 2 à 3 heures</li><li>Langue : Français</li><li>Âge minimum : 12 ans</li><li>Petit groupe local sécurisé</li></ul></div>
+                <div className="rounded-3xl bg-white p-4 shadow-sm"><p className="text-sm text-[#5b6b7a]">Lieu de rendez-vous</p><p className="mt-2 font-medium text-[#0F2940]">{selectedExperience.location}</p></div>
+                <button className="w-full rounded-full bg-[#00c9a7] px-5 py-3 text-sm font-semibold text-[#0F2940] hover:bg-[#00b396]">Réserver cette expérience</button>
               </aside>
             </div>
           </div>

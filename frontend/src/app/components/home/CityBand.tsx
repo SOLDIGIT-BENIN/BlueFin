@@ -74,7 +74,7 @@ export function CityBand({
       )}
 
       <div className="absolute left-4 right-4 bottom-3.5 text-white">
-        <p className="text-[9.5px] font-bold uppercase tracking-[0.18em] text-[#ffc93c]">
+        <p className="eyebrow text-[9.5px] text-[#f4fffe]/85">
           {editorial.kicker}
         </p>
         <h3 className="font-display text-[40px] leading-none mt-1.5 mb-1.5">{city}</h3>

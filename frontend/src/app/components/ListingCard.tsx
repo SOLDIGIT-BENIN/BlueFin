@@ -85,7 +85,7 @@ export function ListingCard({ onNavigate }: ListingCardProps) {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00c9a7] mx-auto mb-4"></div>
-          <p className="text-gray-500">Chargement du logement...</p>
+          <p className="text-[#5b6b7a]">Chargement du logement...</p>
         </div>
       </div>
     );
@@ -97,12 +97,12 @@ export function ListingCard({ onNavigate }: ListingCardProps) {
         <div className="text-center p-8 max-w-md">
           <div className="text-6xl mb-4">🔍</div>
           <h1 className="text-2xl font-semibold text-[#0F2940] mb-2">Logement introuvable</h1>
-          <p className="text-gray-500 mb-4">
+          <p className="text-[#5b6b7a] mb-4">
             {error || "Le logement que vous recherchez n'existe pas ou a été supprimé."}
           </p>
           <button 
             onClick={() => navigate('/')}
-            className="px-6 py-3 bg-[#00c9a7] text-[#0F2940] rounded-full font-semibold hover:bg-[#00b892] transition-colors"
+            className="px-6 py-3 bg-[#00c9a7] text-[#0F2940] rounded-full font-semibold hover:bg-[#00b396] transition-colors"
           >
             Retour à l'accueil
           </button>

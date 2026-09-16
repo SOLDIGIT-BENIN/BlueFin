@@ -26,7 +26,7 @@ export function MobileSearchBar() {
           value={destination}
           onChange={(e) => setDestination(e.target.value)}
           placeholder="📍 Où allez-vous au Bénin ? (Cotonou, Ouidah...)"
-          className="flex-1 bg-transparent outline-none text-[#0f2940] placeholder:text-[#6b7280] text-sm"
+          className="flex-1 bg-transparent outline-none text-[#0f2940] placeholder:text-[#5b6b7a] text-sm"
         />
         <button
           type="button"

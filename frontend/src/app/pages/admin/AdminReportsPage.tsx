@@ -154,7 +154,7 @@ export function AdminReportsPage() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Rapport Bluefin-Immo',
+          title: 'Rapport Bluefin Immo',
           text: `Rapport ${selectedPeriod}`,
           url: window.location.href,
         });
@@ -177,24 +177,24 @@ export function AdminReportsPage() {
   });
 
   return (
-    <div className="p-3 sm:p-4 md:p-6 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+    <div className="p-3 sm:p-4 md:p-6 bg-gradient-to-br from-[#f4fffe] to-[#e8faf6] min-h-screen">
       {/* En-tête */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#0f2940] to-[#00c9a7] bg-clip-text text-transparent">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#0f2940]">
             Rapports & analyses
           </h1>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1">Analysez la performance de votre plateforme</p>
+          <p className="text-xs sm:text-sm text-[#5b6b7a] mt-1">Analysez la performance de votre plateforme</p>
         </div>
         
         <div className="flex gap-2">
-          <button onClick={handlePrint} className="p-2 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition" title="Imprimer">
+          <button onClick={handlePrint} className="p-2 bg-white border border-[#e2f5f2] rounded-xl hover:bg-[#f4fffe] transition" title="Imprimer">
             <Printer className="w-4 h-4" />
           </button>
-          <button onClick={handleShare} className="p-2 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition" title="Partager">
+          <button onClick={handleShare} className="p-2 bg-white border border-[#e2f5f2] rounded-xl hover:bg-[#f4fffe] transition" title="Partager">
             <Share2 className="w-4 h-4" />
           </button>
-          <button onClick={() => refetch()} className="p-2 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition" title="Rafraîchir">
+          <button onClick={() => refetch()} className="p-2 bg-white border border-[#e2f5f2] rounded-xl hover:bg-[#f4fffe] transition" title="Rafraîchir">
             <RefreshCw className="w-4 h-4" />
           </button>
         </div>
@@ -210,16 +210,16 @@ export function AdminReportsPage() {
           </div>
           {selectedPeriod === 'custom' && (
             <div className="flex flex-col sm:flex-row gap-2">
-              <input type="date" value={customStartDate} onChange={(e) => setCustomStartDate(e.target.value)} className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7]" />
-              <span className="text-gray-400 self-center hidden sm:inline">→</span>
-              <input type="date" value={customEndDate} onChange={(e) => setCustomEndDate(e.target.value)} className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7]" />
+              <input type="date" value={customStartDate} onChange={(e) => setCustomStartDate(e.target.value)} className="px-3 py-2 border border-[#e2f5f2] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7]" />
+              <span className="text-[#5b6b7a] self-center hidden sm:inline">→</span>
+              <input type="date" value={customEndDate} onChange={(e) => setCustomEndDate(e.target.value)} className="px-3 py-2 border border-[#e2f5f2] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7]" />
             </div>
           )}
         </div>
       </div>
 
       {/* Onglets */}
-      <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-200 pb-3">
+      <div className="flex flex-wrap gap-2 mb-6 border-b border-[#e2f5f2] pb-3">
         <TabButton active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} label="📊 Vue d'ensemble" />
         <TabButton active={activeTab === 'financial'} onClick={() => setActiveTab('financial')} label="💰 Financier" />
         <TabButton active={activeTab === 'users'} onClick={() => setActiveTab('users')} label="👥 Utilisateurs" />
@@ -294,28 +294,28 @@ export function AdminReportsPage() {
 const DataModal = ({ title, data, onClose, searchTerm, setSearchTerm, statusFilter, setStatusFilter, type }: any) => (
   <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
     <div className="bg-white rounded-2xl max-w-5xl w-full max-h-[85vh] flex flex-col">
-      <div className="sticky top-0 bg-white border-b border-gray-100 p-4 rounded-t-2xl flex justify-between items-center">
+      <div className="sticky top-0 bg-white border-b border-[#e2f5f2] p-4 rounded-t-2xl flex justify-between items-center">
         <h3 className="text-xl font-semibold text-[#0F2940]">{title}</h3>
-        <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100 transition">
+        <button onClick={onClose} className="p-2 rounded-full hover:bg-[#e8faf6] transition">
           <X className="w-5 h-5" />
         </button>
       </div>
       
-      <div className="p-4 border-b border-gray-100 flex flex-wrap gap-3">
+      <div className="p-4 border-b border-[#e2f5f2] flex flex-wrap gap-3">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5b6b7a]" />
           <input
             type="text"
             placeholder="Rechercher..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
+            className="w-full pl-9 pr-3 py-2 border border-[#e2f5f2] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
+          className="px-3 py-2 border border-[#e2f5f2] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
         >
           <option value="all">Tous les statuts</option>
           <option value="active">Actif</option>
@@ -327,10 +327,10 @@ const DataModal = ({ title, data, onClose, searchTerm, setSearchTerm, statusFilt
       
       <div className="flex-1 overflow-y-auto p-4">
         {data.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">Aucune donnée disponible</div>
+          <div className="text-center py-12 text-[#5b6b7a]">Aucune donnée disponible</div>
         ) : (
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 sticky top-0">
+            <thead className="bg-[#f4fffe] sticky top-0">
               <tr>
                 {type === 'property' && (
                   <>
@@ -367,7 +367,7 @@ const DataModal = ({ title, data, onClose, searchTerm, setSearchTerm, statusFilt
             </thead>
             <tbody>
               {data.map((item: any, idx: number) => (
-                <tr key={idx} className="border-b hover:bg-gray-50">
+                <tr key={idx} className="border-b hover:bg-[#f4fffe]">
                   {type === 'property' && (
                     <>
                       <td className="p-3 font-mono text-xs">#{item.id}</td>
@@ -379,7 +379,7 @@ const DataModal = ({ title, data, onClose, searchTerm, setSearchTerm, statusFilt
                       <td className="p-3">
                         {item.is_published ? 
                           <span className="text-green-600 flex items-center gap-1"><CheckCircle className="w-4 h-4" /> Publié</span> : 
-                          <span className="text-yellow-600 flex items-center gap-1"><Clock className="w-4 h-4" /> En attente</span>
+                          <span className="text-[#a87c10] flex items-center gap-1"><Clock className="w-4 h-4" /> En attente</span>
                         }
                       </td>
                     </>
@@ -423,10 +423,10 @@ const StatusBadge = ({ status }: any) => {
   const config: any = {
     active: { color: 'bg-green-100 text-green-700', label: 'Actif' },
     published: { color: 'bg-green-100 text-green-700', label: 'Publié' },
-    pending: { color: 'bg-yellow-100 text-yellow-700', label: 'En attente' },
+    pending: { color: 'bg-[#fff3cd] text-[#6b4e06]', label: 'En attente' },
     cancelled: { color: 'bg-red-100 text-red-700', label: 'Annulé' },
     confirmed: { color: 'bg-green-100 text-green-700', label: 'Confirmé' },
-    completed: { color: 'bg-blue-100 text-blue-700', label: 'Terminé' },
+    completed: { color: 'bg-[#e8faf6] text-[#0f2940]', label: 'Terminé' },
   };
   const current = config[status] || config.pending;
   return <span className={`px-2 py-1 rounded-full text-xs font-medium ${current.color}`}>{current.label}</span>;
@@ -434,9 +434,9 @@ const StatusBadge = ({ status }: any) => {
 
 const UserTypeBadge = ({ type }: any) => {
   const config: any = {
-    voyageur: { color: 'bg-blue-100 text-blue-700', label: 'Voyageur' },
+    voyageur: { color: 'bg-[#e8faf6] text-[#0f2940]', label: 'Voyageur' },
     hote: { color: 'bg-green-100 text-green-700', label: 'Hôte' },
-    admin: { color: 'bg-purple-100 text-purple-700', label: 'Admin' },
+    admin: { color: 'bg-[#e8faf6] text-[#0f2940]', label: 'Admin' },
   };
   const current = config[type] || config.voyageur;
   return <span className={`px-2 py-1 rounded-full text-xs font-medium ${current.color}`}>{current.label}</span>;
@@ -471,7 +471,7 @@ const OverviewTab = ({ report, chartData, onViewUsers, onViewBookings, onViewPro
               <stop offset="95%" stopColor="#00c9a7" stopOpacity={0}/>
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e2f5f2" />
           <XAxis dataKey="name" tick={{ fontSize: 12 }} />
           <YAxis tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`} />
           <Tooltip formatter={(value) => `${value.toLocaleString()} FCFA`} />
@@ -484,25 +484,25 @@ const OverviewTab = ({ report, chartData, onViewUsers, onViewBookings, onViewPro
       <div className="bg-white rounded-xl p-4 shadow-sm">
         <h4 className="font-semibold text-sm mb-3"> Aujourd'hui</h4>
         <div className="space-y-2 text-sm">
-          <div className="flex justify-between"><span className="text-gray-500">Nouveaux utilisateurs</span><span className="font-semibold">{report.new_users || 0}</span></div>
-          <div className="flex justify-between"><span className="text-gray-500">Nouvelles propriétés</span><span className="font-semibold">{report.new_properties || 0}</span></div>
-          <div className="flex justify-between"><span className="text-gray-500">Réservations</span><span className="font-semibold">{report.bookings_count || 0}</span></div>
-          <div className="flex justify-between"><span className="text-gray-500">Chiffre d'affaires</span><span className="font-semibold text-[#00c9a7]">{(report.revenue || 0).toLocaleString()} FCFA</span></div>
+          <div className="flex justify-between"><span className="text-[#5b6b7a]">Nouveaux utilisateurs</span><span className="font-semibold">{report.new_users || 0}</span></div>
+          <div className="flex justify-between"><span className="text-[#5b6b7a]">Nouvelles propriétés</span><span className="font-semibold">{report.new_properties || 0}</span></div>
+          <div className="flex justify-between"><span className="text-[#5b6b7a]">Réservations</span><span className="font-semibold">{report.bookings_count || 0}</span></div>
+          <div className="flex justify-between"><span className="text-[#5b6b7a]">Chiffre d'affaires</span><span className="font-semibold text-[#00c9a7]">{(report.revenue || 0).toLocaleString()} FCFA</span></div>
         </div>
       </div>
       <div className="bg-white rounded-xl p-4 shadow-sm">
         <h4 className="font-semibold text-sm mb-3"> Total général</h4>
         <div className="space-y-2 text-sm">
-          <button onClick={() => onViewUsers?.()} className="flex justify-between w-full hover:bg-gray-50 p-1 rounded transition">
-            <span className="text-gray-500">Total utilisateurs</span><span className="font-semibold">{report.total_users || 0}</span>
+          <button onClick={() => onViewUsers?.()} className="flex justify-between w-full hover:bg-[#f4fffe] p-1 rounded transition">
+            <span className="text-[#5b6b7a]">Total utilisateurs</span><span className="font-semibold">{report.total_users || 0}</span>
           </button>
-          <button onClick={() => onViewProperties?.()} className="flex justify-between w-full hover:bg-gray-50 p-1 rounded transition">
-            <span className="text-gray-500">Total propriétés</span><span className="font-semibold">{report.total_properties || 0}</span>
+          <button onClick={() => onViewProperties?.()} className="flex justify-between w-full hover:bg-[#f4fffe] p-1 rounded transition">
+            <span className="text-[#5b6b7a]">Total propriétés</span><span className="font-semibold">{report.total_properties || 0}</span>
           </button>
-          <button onClick={() => onViewBookings?.()} className="flex justify-between w-full hover:bg-gray-50 p-1 rounded transition">
-            <span className="text-gray-500">Total réservations</span><span className="font-semibold">{report.total_bookings || 0}</span>
+          <button onClick={() => onViewBookings?.()} className="flex justify-between w-full hover:bg-[#f4fffe] p-1 rounded transition">
+            <span className="text-[#5b6b7a]">Total réservations</span><span className="font-semibold">{report.total_bookings || 0}</span>
           </button>
-          <div className="flex justify-between"><span className="text-gray-500">CA total</span><span className="font-semibold text-[#00c9a7]">{(report.total_revenue || 0).toLocaleString()} FCFA</span></div>
+          <div className="flex justify-between"><span className="text-[#5b6b7a]">CA total</span><span className="font-semibold text-[#00c9a7]">{(report.total_revenue || 0).toLocaleString()} FCFA</span></div>
         </div>
       </div>
     </div>
@@ -521,7 +521,7 @@ const PropertiesTab = ({ report, onViewAll }: any) => (
       <PropertyStatCard title="Publiées" value={report.published_properties || 0} icon={<Zap className="w-5 h-5" />} color="purple" />
     </div>
     
-    <button onClick={onViewAll} className="w-full bg-white rounded-xl p-4 shadow-sm text-[#00c9a7] hover:bg-gray-50 transition flex items-center justify-center gap-2">
+    <button onClick={onViewAll} className="w-full bg-white rounded-xl p-4 shadow-sm text-[#00c9a7] hover:bg-[#f4fffe] transition flex items-center justify-center gap-2">
       <Eye className="w-4 h-4" /> Voir toutes les propriétés
     </button>
   </div>
@@ -538,7 +538,7 @@ const UsersTab = ({ report, onViewAll }: any) => (
       <UserStatCard title="Voyageurs" value={report.total_travelers || 0} icon={<Users className="w-5 h-5" />} color="purple" />
       <UserStatCard title="Nouveaux aujourd'hui" value={report.new_users || 0} icon={<Users className="w-5 h-5" />} color="orange" />
     </div>
-    <button onClick={onViewAll} className="w-full bg-white rounded-xl p-4 shadow-sm text-[#00c9a7] hover:bg-gray-50 transition flex items-center justify-center gap-2">
+    <button onClick={onViewAll} className="w-full bg-white rounded-xl p-4 shadow-sm text-[#00c9a7] hover:bg-[#f4fffe] transition flex items-center justify-center gap-2">
       <Eye className="w-4 h-4" /> Voir tous les utilisateurs
     </button>
   </div>
@@ -553,11 +553,11 @@ const FinancialTab = ({ report, chartData }: any) => (
         <p className="text-2xl font-bold mt-1">{report.total_revenue?.toLocaleString() || 0} FCFA</p>
         <p className="text-white/60 text-xs mt-2">Depuis la création</p>
       </div>
-      <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-white">
+      <div className="bg-[#00c9a7] rounded-xl p-4 text-white">
         <p className="text-white/80 text-sm">Réservations</p>
         <p className="text-2xl font-bold mt-1">{report.total_bookings || 0}</p>
       </div>
-      <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-4 text-white">
+      <div className="bg-[#00c9a7] rounded-xl p-4 text-white">
         <p className="text-white/80 text-sm">CA aujourd'hui</p>
         <p className="text-2xl font-bold mt-1">{(report.revenue || 0).toLocaleString()} FCFA</p>
       </div>
@@ -579,24 +579,24 @@ const FinancialTab = ({ report, chartData }: any) => (
 
 // Composants auxiliaires
 const PeriodButton = ({ active, onClick, label }: any) => (
-  <button onClick={onClick} className={`px-4 py-2 rounded-xl text-sm font-medium transition ${active ? 'bg-[#00c9a7] text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+  <button onClick={onClick} className={`px-4 py-2 rounded-xl text-sm font-medium transition ${active ? 'bg-[#00c9a7] text-white shadow-md' : 'bg-[#e8faf6] text-[#5b6b7a] hover:bg-[#e2f5f2]'}`}>
     {label}
   </button>
 );
 
 const TabButton = ({ active, onClick, label }: any) => (
-  <button onClick={onClick} className={`px-4 py-2 rounded-lg text-sm font-medium transition ${active ? 'bg-[#00c9a7] text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
+  <button onClick={onClick} className={`px-4 py-2 rounded-lg text-sm font-medium transition ${active ? 'bg-[#00c9a7] text-white' : 'text-[#5b6b7a] hover:bg-[#e8faf6]'}`}>
     {label}
   </button>
 );
 
 const ExportButton = ({ onClick, icon, label, color }: any) => {
-  const colors = { green: 'bg-green-50 text-green-600 hover:bg-green-100', blue: 'bg-blue-50 text-blue-600 hover:bg-blue-100', red: 'bg-red-50 text-red-600 hover:bg-red-100' };
+  const colors = { green: 'bg-green-50 text-green-600 hover:bg-green-100', blue: 'bg-[#f4fffe] text-[#00806b] hover:bg-[#e8faf6]', red: 'bg-red-50 text-red-600 hover:bg-red-100' };
   return <button onClick={onClick} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition ${colors[color]}`}>{icon}{label}</button>;
 };
 
 const KPICard = ({ title, value, icon, color }: any) => {
-  const colors = { green: 'from-green-500 to-green-600', blue: 'from-blue-500 to-blue-600', purple: 'from-purple-500 to-purple-600', orange: 'from-orange-500 to-orange-600' };
+  const colors = { green: 'from-green-500 to-green-600', blue: 'from-[#00c9a7] to-[#00b396]', purple: 'from-[#0f2940] to-[#1c3b56]', orange: 'from-[#ffc93c] to-[#e0ac1f]' };
   return (
     <div className={`bg-gradient-to-br ${colors[color]} rounded-xl p-4 text-white transform hover:scale-105 transition-all duration-300`}>
       <div className="flex justify-between items-start">
@@ -609,7 +609,7 @@ const KPICard = ({ title, value, icon, color }: any) => {
 };
 
 const UserStatCard = ({ title, value, icon, color }: any) => {
-  const colors = { blue: 'from-blue-500 to-blue-600', green: 'from-green-500 to-green-600', purple: 'from-purple-500 to-purple-600', orange: 'from-orange-500 to-orange-600' };
+  const colors = { blue: 'from-[#00c9a7] to-[#00b396]', green: 'from-green-500 to-green-600', purple: 'from-[#0f2940] to-[#1c3b56]', orange: 'from-[#ffc93c] to-[#e0ac1f]' };
   return (
     <div className={`bg-gradient-to-br ${colors[color]} rounded-xl p-4 text-white`}>
       <div className="flex justify-between items-center"><div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">{icon}</div></div>
@@ -620,7 +620,7 @@ const UserStatCard = ({ title, value, icon, color }: any) => {
 };
 
 const PropertyStatCard = ({ title, value, icon, color }: any) => {
-  const colors = { green: 'from-green-500 to-green-600', blue: 'from-blue-500 to-blue-600', yellow: 'from-yellow-500 to-yellow-600', purple: 'from-purple-500 to-purple-600' };
+  const colors = { green: 'from-green-500 to-green-600', blue: 'from-[#00c9a7] to-[#00b396]', yellow: 'from-[#ffc93c] to-[#e0ac1f]', purple: 'from-[#0f2940] to-[#1c3b56]' };
   return (
     <div className={`bg-gradient-to-br ${colors[color]} rounded-xl p-4 text-white`}>
       <div className="flex justify-between items-center"><div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">{icon}</div></div>
@@ -633,12 +633,12 @@ const PropertyStatCard = ({ title, value, icon, color }: any) => {
 const LoadingSkeleton = () => (
   <div className="p-3 sm:p-4 md:p-6">
     <div className="animate-pulse">
-      <div className="h-6 sm:h-8 bg-gray-200 rounded w-48 mb-4"></div>
-      <div className="bg-gray-200 rounded-xl h-16 mb-6"></div>
+      <div className="h-6 sm:h-8 bg-[#e2f5f2] rounded w-48 mb-4"></div>
+      <div className="bg-[#e2f5f2] rounded-xl h-16 mb-6"></div>
       <div className="grid grid-cols-4 gap-4 mb-6">
-        {[...Array(4)].map((_, i) => <div key={i} className="bg-gray-200 rounded-xl h-28"></div>)}
+        {[...Array(4)].map((_, i) => <div key={i} className="bg-[#e2f5f2] rounded-xl h-28"></div>)}
       </div>
-      <div className="bg-gray-200 rounded-xl h-80 mb-6"></div>
+      <div className="bg-[#e2f5f2] rounded-xl h-80 mb-6"></div>
     </div>
   </div>
 );

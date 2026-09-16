@@ -25,10 +25,10 @@ const Login: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="min-h-screen flex items-center justify-center bg-[#f4fffe]">
             <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow">
                 <div>
-                    <h2 className="text-center text-3xl font-bold text-gray-900">
+                    <h2 className="text-center text-3xl font-bold text-[#0f2940]">
                         Connexion Bluefin Immo
                     </h2>
                 </div>
@@ -39,33 +39,33 @@ const Login: React.FC = () => {
                         </div>
                     )}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">
+                        <label className="block text-sm font-medium text-[#1c3b56]">
                             Email
                         </label>
                         <input
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                            className="mt-1 block w-full border border-[#c9f0e8] rounded-md shadow-sm p-2"
                             required
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">
+                        <label className="block text-sm font-medium text-[#1c3b56]">
                             Mot de passe
                         </label>
                         <input
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                            className="mt-1 block w-full border border-[#c9f0e8] rounded-md shadow-sm p-2"
                             required
                         />
                     </div>
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50"
+                        className="w-full bg-[#00b396] text-white py-2 px-4 rounded-md hover:bg-[#009c84] disabled:opacity-50"
                     >
                         {loading ? 'Connexion...' : 'Se connecter'}
                     </button>

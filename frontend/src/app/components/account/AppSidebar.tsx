@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import type { User as AuthUser } from '../../../contexts/AuthContext';
 import type { Route } from '../../router';
-import Logo from '../../assets/Bluefin Immo_01.jpg.jpeg';
+import { BluefinLogo, BluefinMark } from '../brand/BluefinLogo';
 
 type Item = { label: string; icon: typeof Home; route: Route; match: (name: string) => boolean };
 
@@ -71,14 +71,15 @@ export function AppSidebar({
           menu profil en haut à droite, sans doublon ici). */}
       <button
         onClick={() => onNavigate({ name: 'home' })}
-        title={collapsed ? 'Bluefin-Immo — accueil' : undefined}
+        title={collapsed ? 'Bluefin Immo — accueil' : undefined}
         className={`flex items-center gap-3 h-[81px] border-b border-[#e2f5f2] group ${collapsed ? 'justify-center' : 'px-4'}`}
       >
-        <img src={Logo} alt="Bluefin-Immo" className="w-11 h-11 object-contain rounded-xl shadow-md group-hover:shadow-lg transition-shadow shrink-0" />
-        {!collapsed && (
+        {collapsed ? (
+          <BluefinMark className="h-6 w-auto" title="Bluefin Immo" />
+        ) : (
           <span className="min-w-0 text-left">
-            <span className="block font-bold text-lg text-[#0f2940] leading-tight">Bluefin-Immo</span>
-            <span className="block text-xs text-[#00c9a7]">L'hébergement au Bénin</span>
+            <BluefinLogo orientation="horizontal" markClassName="h-7 w-auto" wordmarkClassName="h-[0.78rem] w-auto" />
+            <span className="block text-[11px] text-[var(--bluefin-text-muted)] mt-1">L'hébergement au Bénin</span>
           </span>
         )}
       </button>
@@ -94,7 +95,7 @@ export function AppSidebar({
               title={collapsed ? label : undefined}
               aria-current={active ? 'page' : undefined}
               className={`w-full flex items-center gap-3 rounded-xl py-2.5 text-sm transition-colors ${collapsed ? 'justify-center px-0' : 'px-3'} ${
-                active ? 'bg-[#f4fffe] text-[#005c4d] font-semibold' : 'text-slate-600 hover:bg-slate-50 hover:text-[#0f2940]'
+                active ? 'bg-[#f4fffe] text-[#005c4d] font-semibold' : 'text-[#5b6b7a] hover:bg-[#f4fffe] hover:text-[#0f2940]'
               }`}
             >
               <Icon className={`w-5 h-5 shrink-0 ${active ? 'text-[#00806b]' : ''}`} strokeWidth={active ? 2.3 : 1.9} />
@@ -118,7 +119,7 @@ export function AppSidebar({
           onClick={onToggle}
           aria-label={collapsed ? 'Déplier la barre latérale' : 'Replier la barre latérale'}
           aria-expanded={!collapsed}
-          className={`w-full flex items-center gap-3 rounded-xl py-2.5 text-sm text-slate-500 hover:bg-slate-50 ${collapsed ? 'justify-center px-0' : 'px-3'}`}
+          className={`w-full flex items-center gap-3 rounded-xl py-2.5 text-sm text-[#5b6b7a] hover:bg-[#f4fffe] ${collapsed ? 'justify-center px-0' : 'px-3'}`}
         >
           {collapsed ? <ChevronsRight className="w-5 h-5" /> : <><ChevronsLeft className="w-5 h-5" /><span>Replier</span></>}
         </button>

@@ -57,7 +57,7 @@ export function UserAvatar({ user, size = 36, showStatus = true }: { user: User;
   return (
     <span className="relative inline-flex shrink-0" style={{ width: size, height: size }}>
       {photo && !broken ? (
-        <img src={photo} alt="" onError={() => setBroken(true)}
+        <img src={photo} alt={`Photo de profil de ${user.first_name} ${user.last_name}`} onError={() => setBroken(true)}
           className="w-full h-full rounded-full object-cover ring-2 ring-white" />
       ) : (
         <span className="w-full h-full rounded-full bg-[#0f2940] text-white font-semibold flex items-center justify-center ring-2 ring-white"
@@ -107,26 +107,26 @@ export function ProfileMenu({
       >
         <UserAvatar user={user} size={34} />
         <span className="text-sm font-medium text-[#0f2940] max-w-[120px] truncate">{user.first_name}</span>
-        <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-4 h-4 text-[#5b6b7a] transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
 
       {open && (
-        <div role="menu" className="absolute right-0 mt-2 w-64 rounded-2xl bg-white shadow-xl border border-gray-100 py-2 z-50">
-          <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-3">
+        <div role="menu" className="absolute right-0 mt-2 w-64 rounded-2xl bg-white shadow-xl border border-[#e2f5f2] py-2 z-50">
+          <div className="px-4 py-3 border-b border-[#e2f5f2] flex items-center gap-3">
             <UserAvatar user={user} size={40} />
             <div className="min-w-0">
               <p className="text-sm font-semibold text-[#0f2940] truncate">{user.first_name} {user.last_name}</p>
-              <p className="text-xs text-gray-500 truncate">{user.email}</p>
+              <p className="text-xs text-[#5b6b7a] truncate">{user.email}</p>
               <p className="text-[11px] text-emerald-600 mt-0.5">{roleLabel(user)} · connecté</p>
             </div>
           </div>
           {accountLinks(user).map(({ label, icon: Icon, route }) => (
             <button key={label} role="menuitem" type="button" onClick={() => go(route)}
               className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#0f2940] hover:bg-[#f4fffe]">
-              <Icon className="w-4 h-4 text-gray-500" /> {label}
+              <Icon className="w-4 h-4 text-[#5b6b7a]" /> {label}
             </button>
           ))}
-          <div className="h-px bg-gray-100 my-1" />
+          <div className="h-px bg-[#e8faf6] my-1" />
           <button role="menuitem" type="button" onClick={() => { setOpen(false); onLogout(); }}
             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50">
             <LogOut className="w-4 h-4" /> Se déconnecter

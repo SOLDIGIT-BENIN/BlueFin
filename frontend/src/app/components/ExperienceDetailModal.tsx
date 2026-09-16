@@ -135,28 +135,28 @@ const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
   const dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
   return (
-    <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+    <div className="bg-white rounded-xl p-4 shadow-sm border border-[#e2f5f2]">
       <div className="flex items-center justify-between mb-4">
         <button
           onClick={() => setCurrentDate(new Date(year, month - 2, 1))}
-          className="p-2 rounded-lg hover:bg-gray-100 transition"
+          className="p-2 rounded-lg hover:bg-[#e8faf6] transition"
         >
-          <ChevronLeft className="w-5 h-5 text-gray-600" />
+          <ChevronLeft className="w-5 h-5 text-[#5b6b7a]" />
         </button>
-        <h3 className="font-semibold text-gray-800">
+        <h3 className="font-semibold text-[#0f2940]">
           {monthNames[month - 1]} {year}
         </h3>
         <button
           onClick={() => setCurrentDate(new Date(year, month, 1))}
-          className="p-2 rounded-lg hover:bg-gray-100 transition"
+          className="p-2 rounded-lg hover:bg-[#e8faf6] transition"
         >
-          <ChevronRight className="w-5 h-5 text-gray-600" />
+          <ChevronRight className="w-5 h-5 text-[#5b6b7a]" />
         </button>
       </div>
 
       <div className="grid grid-cols-7 gap-1 mb-2">
         {dayNames.map((day) => (
-          <div key={day} className="text-center text-xs font-medium text-gray-500 py-1">
+          <div key={day} className="text-center text-xs font-medium text-[#5b6b7a] py-1">
             {day}
           </div>
         ))}
@@ -169,18 +169,18 @@ const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
           const isInRange = isDateInRange(date);
           const isCurrentMonthDay = isCurrentMonth(date);
           
-          let bgColor = 'hover:bg-gray-50';
-          let textColor = 'text-gray-800';
+          let bgColor = 'hover:bg-[#f4fffe]';
+          let textColor = 'text-[#0f2940]';
           let cursor = 'cursor-pointer';
           
           if (!isCurrentMonthDay) {
-            textColor = 'text-gray-300';
+            textColor = 'text-[#9fb3c4]';
             cursor = 'cursor-default';
             bgColor = '';
           } else if (isPast) {
-            textColor = 'text-gray-300';
+            textColor = 'text-[#9fb3c4]';
             cursor = 'cursor-not-allowed';
-            bgColor = 'bg-gray-50';
+            bgColor = 'bg-[#f4fffe]';
           } else if (isSelected) {
             bgColor = 'bg-[#00c9a7] text-white';
             textColor = 'text-white';
@@ -208,19 +208,19 @@ const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
       <div className="mt-4 flex flex-wrap items-center gap-3 text-xs">
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded bg-[#00c9a7]"></div>
-          <span className="text-gray-600">Sélectionné</span>
+          <span className="text-[#5b6b7a]">Sélectionné</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded bg-[#00c9a7]/20"></div>
-          <span className="text-gray-600">Plage</span>
+          <span className="text-[#5b6b7a]">Plage</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 rounded bg-gray-50 border border-gray-200"></div>
-          <span className="text-gray-600">Passé</span>
+          <div className="w-3 h-3 rounded bg-[#f4fffe] border border-[#e2f5f2]"></div>
+          <span className="text-[#5b6b7a]">Passé</span>
         </div>
       </div>
       
-      <div className="mt-3 text-xs text-gray-400 text-center">
+      <div className="mt-3 text-xs text-[#5b6b7a] text-center">
         {selectedStart && !selectedEnd && 'Sélectionnez la date de fin'}
         {selectedStart && selectedEnd && `${selectedStart} → ${selectedEnd}`}
       </div>
@@ -583,17 +583,17 @@ const formatImageUrl = (path: any): string => {
         <div className="min-h-screen pb-20">
           {/* Header */}
           <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b px-3 sm:px-4 py-3 flex justify-between items-center">
-            <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100 transition-all">
+            <button onClick={onClose} className="p-2 rounded-full hover:bg-[#e8faf6] transition-all">
               <ArrowLeft className="w-5 h-5" />
             </button>
             <h1 className="text-sm sm:text-base font-semibold text-[#0F2940] truncate max-w-[50%]">
               {experience.name || experience.title}
             </h1>
             <div className="flex gap-2">
-              <button className="p-2 rounded-full hover:bg-gray-100 transition-all">
+              <button className="p-2 rounded-full hover:bg-[#e8faf6] transition-all">
                 <Share2 className="w-5 h-5" />
               </button>
-              <button className="p-2 rounded-full hover:bg-gray-100 transition-all">
+              <button className="p-2 rounded-full hover:bg-[#e8faf6] transition-all">
                 <Heart className="w-5 h-5" />
               </button>
             </div>
@@ -629,21 +629,21 @@ const formatImageUrl = (path: any): string => {
               <div className="flex-1 space-y-6 sm:space-y-8">
                 {/* Titre */}
                 <div className="border-b pb-4">
-                  <div className="text-xs sm:text-sm text-gray-500">
+                  <div className="text-xs sm:text-sm text-[#5b6b7a]">
                     Expérience · {experience.location || 'Bénin'}
                   </div>
                   <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-[#0F2940] mt-1">
                     {experience.name || experience.title}
                   </h1>
                   <div className="flex items-center gap-2 mt-2">
-                    <Star className="w-4 h-4 fill-current text-yellow-400" />
+                    <Star className="w-4 h-4 fill-current text-[#ffc93c]" />
                     <span className="font-medium text-sm text-[#0F2940]">
                       {typeof rating === 'number' && rating > 0 ? rating.toFixed(1) : 'Nouveau'}
                     </span>
                     {reviews > 0 && (
                       <>
-                        <span className="text-gray-300">·</span>
-                        <span className="text-gray-500 text-sm">{reviews} commentaires</span>
+                        <span className="text-[#9fb3c4]">·</span>
+                        <span className="text-[#5b6b7a] text-sm">{reviews} commentaires</span>
                       </>
                     )}
                   </div>
@@ -658,14 +658,14 @@ const formatImageUrl = (path: any): string => {
                     <div className="font-semibold text-[#0F2940] text-base sm:text-lg">
                       Hôte : {host}
                     </div>
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-[#5b6b7a]">
                       Taux de réponse {responseRate}%
                     </div>
                   </div>
                 </div>
 
                 {/* Description */}
-                <div className="text-sm sm:text-base text-gray-700 leading-relaxed">
+                <div className="text-sm sm:text-base text-[#1c3b56] leading-relaxed">
                   {experience.description || 'Aucune description disponible'}
                 </div>
 
@@ -675,12 +675,12 @@ const formatImageUrl = (path: any): string => {
                     <h3 className="font-semibold text-lg text-[#0F2940]">
                       Programme de l'expérience
                     </h3>
-                    <span className="text-sm text-gray-400">{steps.length}</span>
+                    <span className="text-sm text-[#5b6b7a]">{steps.length}</span>
                   </div>
                   
                   <div className="space-y-3">
                     {(showAllSteps ? steps : steps.slice(0, 3)).map((step: any, index: number) => (
-                      <div key={index} className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl hover:shadow-md transition-shadow">
+                      <div key={index} className="flex items-start gap-3 p-3 bg-[#f4fffe] rounded-xl hover:shadow-md transition-shadow">
                         {step.image && (
                           <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
                             <img 
@@ -697,7 +697,7 @@ const formatImageUrl = (path: any): string => {
                             </span>
                             <span className="text-sm font-semibold text-[#0F2940]">Étape {index + 1}</span>
                           </div>
-                          <p className="text-sm text-gray-700">{step.description || step}</p>
+                          <p className="text-sm text-[#1c3b56]">{step.description || step}</p>
                         </div>
                       </div>
                     ))}
@@ -716,16 +716,16 @@ const formatImageUrl = (path: any): string => {
 
               {/* Colonne droite - Réservation avec calendrier */}
               <div className="lg:w-96 xl:w-[420px] flex-shrink-0">
-                <div className="sticky top-24 bg-white border border-gray-200 rounded-2xl p-5 shadow-lg">
+                <div className="sticky top-24 bg-white border border-[#e2f5f2] rounded-2xl p-5 shadow-lg">
                   {/* Prix */}
                   <div className="mb-4">
                     <div className="flex items-baseline gap-1">
                       <span className="text-2xl font-bold text-[#0F2940]">
                         {price.toLocaleString()} FCFA
                       </span>
-                      <span className="text-sm text-gray-500">/ personne</span>
+                      <span className="text-sm text-[#5b6b7a]">/ personne</span>
                     </div>
-                    <div className="text-sm text-gray-400">
+                    <div className="text-sm text-[#5b6b7a]">
                       ≈ {Math.round(price / 655.957).toFixed(2)} €
                     </div>
                   </div>
@@ -743,7 +743,7 @@ const formatImageUrl = (path: any): string => {
 
                     <div className="grid grid-cols-2 border-t">
                       <div className="p-3">
-                        <div className="text-xs font-bold text-gray-500 uppercase">Arrivée</div>
+                        <div className="text-xs font-bold text-[#5b6b7a] uppercase">Arrivée</div>
                         <input 
                           type="date" 
                           value={checkIn} 
@@ -756,7 +756,7 @@ const formatImageUrl = (path: any): string => {
                         />
                       </div>
                       <div className="p-3 border-l">
-                        <div className="text-xs font-bold text-gray-500 uppercase">Départ</div>
+                        <div className="text-xs font-bold text-[#5b6b7a] uppercase">Départ</div>
                         <input 
                           type="date" 
                           value={checkOut} 
@@ -783,55 +783,55 @@ const formatImageUrl = (path: any): string => {
 
                     {/* Participants */}
                     <div className="p-3 border-t">
-                      <div className="text-xs font-bold text-gray-500 uppercase mb-2">Participants</div>
+                      <div className="text-xs font-bold text-[#5b6b7a] uppercase mb-2">Participants</div>
                       
                       <div className="flex justify-between items-center py-1">
                         <div>
                           <span className="text-sm">Personnes</span>
-                          <p className="text-[10px] text-gray-400">À partir de 1 personne</p>
+                          <p className="text-[10px] text-[#5b6b7a]">À partir de 1 personne</p>
                         </div>
                         <div className="flex gap-3">
                           <button 
                             onClick={() => setParticipants(Math.max(1, participants - 1))} 
-                            className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors"
+                            className="w-7 h-7 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors"
                           >
                             -
                           </button>
                           <span className="min-w-[20px] text-center">{participants}</span>
                           <button 
                             onClick={() => setParticipants(Math.min(maxParticipants, participants + 1))} 
-                            className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors"
+                            className="w-7 h-7 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors"
                           >
                             +
                           </button>
                         </div>
                       </div>
                       
-                      <p className="text-xs text-gray-400 mt-2">Max {maxParticipants} personnes</p>
+                      <p className="text-xs text-[#5b6b7a] mt-2">Max {maxParticipants} personnes</p>
                     </div>
                   </div>
 
                   {/* Détails du prix */}
                   <div className="space-y-2 mb-4 text-sm">
-                    <div className="flex justify-between text-gray-600">
+                    <div className="flex justify-between text-[#5b6b7a]">
                       <span>{price.toLocaleString()} FCFA × {nights} jours</span>
                       <div className="text-right">
                         <div>{subtotalFormatted.fCFA}</div>
-                        <div className="text-xs text-gray-400">{subtotalFormatted.euro}</div>
+                        <div className="text-xs text-[#5b6b7a]">{subtotalFormatted.euro}</div>
                       </div>
                     </div>
-                    <div className="flex justify-between text-gray-600">
+                    <div className="flex justify-between text-[#5b6b7a]">
                       <span>Frais de service</span>
                       <div className="text-right">
                         <div>{serviceFeeFormatted.fCFA}</div>
-                        <div className="text-xs text-gray-400">{serviceFeeFormatted.euro}</div>
+                        <div className="text-xs text-[#5b6b7a]">{serviceFeeFormatted.euro}</div>
                       </div>
                     </div>
-                    <div className="flex justify-between font-bold pt-2 border-t border-gray-200">
+                    <div className="flex justify-between font-bold pt-2 border-t border-[#e2f5f2]">
                       <span className="text-[#0F2940]">Total</span>
                       <div className="text-right">
                         <div className="text-[#00c9a7]">{totalFormatted.fCFA}</div>
-                        <div className="text-xs font-normal text-gray-400">{totalFormatted.euro}</div>
+                        <div className="text-xs font-normal text-[#5b6b7a]">{totalFormatted.euro}</div>
                       </div>
                     </div>
                   </div>
@@ -842,8 +842,8 @@ const formatImageUrl = (path: any): string => {
                     disabled={availabilityStatus !== 'available'} 
                     className={`w-full py-3.5 rounded-xl font-semibold text-sm sm:text-base transition-all ${
                       availabilityStatus === 'available' 
-                        ? 'bg-[#00c9a7] text-white hover:bg-[#00b892] shadow-lg hover:shadow-xl' 
-                        : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                        ? 'bg-[#00c9a7] text-white hover:bg-[#00b396] shadow-lg hover:shadow-xl' 
+                        : 'bg-[#e2f5f2] text-[#5b6b7a] cursor-not-allowed'
                     }`}
                   >
                     {availabilityStatus === 'available' ? 'Réserver' : availabilityStatus === 'idle' ? 'Sélectionnez des dates' : 'Non disponible'}

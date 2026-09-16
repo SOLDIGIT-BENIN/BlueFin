@@ -35,8 +35,8 @@ export function PromoCarousel({ onNavigate }: { onNavigate?: (route: any) => voi
       className="w-full text-left block mx-4 mb-3 rounded-2xl bg-[#0f2940] px-4 py-3.5 flex items-center gap-3 relative"
       style={{ width: 'calc(100% - 2rem)' }}
     >
-      <span className="w-8 h-8 rounded-xl bg-[#ffc93c]/20 flex items-center justify-center flex-shrink-0">
-        <Icon className="w-4 h-4 text-[#ffc93c]" />
+      <span className="w-8 h-8 rounded-xl bg-[#00c9a7]/20 flex items-center justify-center flex-shrink-0">
+        <Icon className="w-4 h-4 text-[#00c9a7]" />
       </span>
       <span className="text-sm text-white leading-snug pr-6">{slide.text}</span>
       <span
@@ -54,7 +54,7 @@ export function PromoCarousel({ onNavigate }: { onNavigate?: (route: any) => voi
         {SLIDES.map((_, i) => (
           <span
             key={i}
-            className={`h-1 rounded-full transition-all ${i === index ? 'w-4 bg-[#ffc93c]' : 'w-1 bg-white/30'}`}
+            className={`h-1 rounded-full transition-all ${i === index ? 'w-4 bg-[#00c9a7]' : 'w-1 bg-white/30'}`}
           />
         ))}
       </span>

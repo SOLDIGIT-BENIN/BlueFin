@@ -1,28 +1,38 @@
 /**
- * Polices de Bluefin-Immo — charte d'origine, deux familles :
- * Plus Jakarta Sans (texte) et EB Garamond (titres, graisse 600).
+ * Polices de Bluefin Immo — deux familles :
+ * Plus Jakarta Sans (texte) et Montserrat (titres, graisses 700/800).
+ *
+ * La charte graphique décrit la typographie de la marque comme « une
+ * sans-serif (linéale) moderne, géométrique et en lettres capitales »
+ * (Nexa, la police du logo). Nexa est une police commerciale : elle n'est
+ * pas distribuable ici. Montserrat en est l'équivalent libre le plus proche
+ * en capitales — même construction géométrique, même O circulaire, même
+ * assise. La pile déclare quand même `Nexa` en premier : si les fichiers de
+ * la police achetée sont un jour déposés dans /public/fonts et déclarés en
+ * @font-face, tout le site bascule dessus sans autre modification.
  *
  * Chargées via un <link> dans index.html, pas par @import ici : un @import
  * CSS bloque le rendu et s'exécute plus tard qu'un <link> dans le <head>.
  *
- * Historique : ce fichier importait aussi « Didot » (qui n'existe pas sur
- * Google Fonts — la requête échouait à chaque chargement) et « Bodoni Moda »
- * (jamais utilisée nulle part). Les deux ont été retirées. La refonte a un
- * temps utilisé Instrument Serif avant le retour à la charte.
+ * Historique : ce fichier a successivement chargé « Didot » (inexistante sur
+ * Google Fonts), « Bodoni Moda » (jamais utilisée), « Instrument Serif » puis
+ * « EB Garamond ». Le serif a été abandonné à l'arrivée de la charte : un
+ * titre en serif contredit la typographie géométrique du logo.
  */
 
 @layer base {
   :root {
     --font-primary: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --font-display: 'EB Garamond', Garamond, Georgia, 'Times New Roman', serif;
+    --font-display: 'Nexa', 'Montserrat', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
 
   body {
     font-family: var(--font-primary);
   }
 
-  /* Graisse 600, comme dans la charte d'origine (EB Garamond la possède :
-     pas de graisse synthétique). */
+  /* Titres : géométrique, graisse forte et interlettrage resserré — c'est
+     le dessin du mot BLUEFIN du logo. Montserrat possède réellement les
+     graisses 700 et 800 : aucune graisse synthétique. */
   h1,
   h2,
   h3,
@@ -30,7 +40,16 @@
   h5,
   h6 {
     font-family: var(--font-display);
-    font-weight: 600;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  /* Les grands titres montent à 800 et se resserrent davantage, comme la
+     signature du logo. */
+  h1,
+  h2 {
+    font-weight: 800;
+    letter-spacing: -0.02em;
   }
 
   /* Tailles de repli sur mobile, pour les éléments qui ne portent aucune

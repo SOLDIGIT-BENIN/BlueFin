@@ -78,11 +78,11 @@ export function PaymentMethodModal({ isOpen, onClose, onSuccess }: PaymentMethod
       case 'BANK_TRANSFER':
         return (
           <div className="space-y-4">
-            <div className="bg-[#f0fdfb] p-4 rounded-xl border border-[#00c9a7]/20">
+            <div className="bg-[#f4fffe] p-4 rounded-xl border border-[#00c9a7]/20">
               <label className="block text-sm font-medium text-[#0f2940] mb-1">
                 Nom du bénéficiaire <span className="text-red-500">*</span>
               </label>
-              <p className="text-xs text-[#6b7280] mb-2">
+              <p className="text-xs text-[#5b6b7a] mb-2">
                 👤 Ce nom apparaîtra sur les virements reçus
               </p>
               <input
@@ -153,11 +153,11 @@ export function PaymentMethodModal({ isOpen, onClose, onSuccess }: PaymentMethod
       case 'MOBILE_MONEY':
         return (
           <div className="space-y-4">
-            <div className="bg-[#f0fdfb] p-4 rounded-xl border border-[#00c9a7]/20">
+            <div className="bg-[#f4fffe] p-4 rounded-xl border border-[#00c9a7]/20">
               <label className="block text-sm font-medium text-[#0f2940] mb-1">
                 Nom du bénéficiaire <span className="text-red-500">*</span>
               </label>
-              <p className="text-xs text-[#6b7280] mb-2">
+              <p className="text-xs text-[#5b6b7a] mb-2">
                 👤 Ce nom apparaîtra sur les transactions Mobile Money
               </p>
               <input
@@ -206,11 +206,11 @@ export function PaymentMethodModal({ isOpen, onClose, onSuccess }: PaymentMethod
       case 'PAYPAL':
         return (
           <div className="space-y-4">
-            <div className="bg-[#f0fdfb] p-4 rounded-xl border border-[#00c9a7]/20">
+            <div className="bg-[#f4fffe] p-4 rounded-xl border border-[#00c9a7]/20">
               <label className="block text-sm font-medium text-[#0f2940] mb-1">
                 Nom du bénéficiaire <span className="text-red-500">*</span>
               </label>
-              <p className="text-xs text-[#6b7280] mb-2">
+              <p className="text-xs text-[#5b6b7a] mb-2">
                 👤 Ce nom apparaîtra sur les transactions PayPal
               </p>
               <input
@@ -260,7 +260,7 @@ export function PaymentMethodModal({ isOpen, onClose, onSuccess }: PaymentMethod
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-[#e8faf6] rounded-full transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -274,7 +274,7 @@ export function PaymentMethodModal({ isOpen, onClose, onSuccess }: PaymentMethod
             <p className="text-lg font-semibold text-[#0f2940]">
               Moyen de paiement enregistré !
             </p>
-            <p className="text-sm text-[#6b7280] mt-2">
+            <p className="text-sm text-[#5b6b7a] mt-2">
               Vous recevrez vos paiements chaque lundi
             </p>
           </div>
@@ -297,7 +297,7 @@ export function PaymentMethodModal({ isOpen, onClose, onSuccess }: PaymentMethod
                     onClick={() => setPaymentMethod(option.value as any)}
                     className={`p-3 rounded-xl border-2 text-center transition-all ${
                       paymentMethod === option.value
-                        ? 'border-[#00c9a7] bg-[#f0fdfb] shadow-sm'
+                        ? 'border-[#00c9a7] bg-[#f4fffe] shadow-sm'
                         : 'border-[#e2f5f2] hover:border-[#00c9a7]'
                     }`}
                   >
@@ -314,8 +314,8 @@ export function PaymentMethodModal({ isOpen, onClose, onSuccess }: PaymentMethod
             {renderPaymentForm()}
 
             {/* Résumé des infos */}
-            <div className="mt-4 p-3 bg-[#f0fdfb] rounded-xl border border-[#00c9a7]/20">
-              <p className="text-xs text-[#6b7280]">
+            <div className="mt-4 p-3 bg-[#f4fffe] rounded-xl border border-[#00c9a7]/20">
+              <p className="text-xs text-[#5b6b7a]">
                 <span className="font-semibold">💡 Information :</span> Vous recevrez le transfert de vos réservations 
                 <span className="font-medium text-[#0f2940]"> chaque lundi</span> sur le moyen de paiement sélectionné.
               </p>
@@ -326,14 +326,14 @@ export function PaymentMethodModal({ isOpen, onClose, onSuccess }: PaymentMethod
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-2 border border-[#e2f5f2] rounded-xl text-[#6b7280] hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-2 border border-[#e2f5f2] rounded-xl text-[#5b6b7a] hover:bg-[#f4fffe] transition-colors"
               >
                 Annuler
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting || !formData.fullName}
-                className="flex-1 px-4 py-2 bg-[#00c9a7] text-white rounded-xl hover:bg-[#00b898] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-2 bg-[#00c9a7] text-white rounded-xl hover:bg-[#00b396] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <>
@@ -346,7 +346,7 @@ export function PaymentMethodModal({ isOpen, onClose, onSuccess }: PaymentMethod
               </button>
             </div>
 
-            <p className="text-xs text-[#6b7280] text-center mt-4">
+            <p className="text-xs text-[#5b6b7a] text-center mt-4">
               🔒 Vos informations sont sécurisées et ne seront utilisées que pour les paiements.
             </p>
           </form>

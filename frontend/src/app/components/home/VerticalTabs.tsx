@@ -31,7 +31,7 @@ export function VerticalTabs({
             className={`flex-shrink-0 flex items-center gap-1.5 pl-1 pr-3 h-8 rounded-full border transition-all ${
               isActive
                 ? 'bg-[#00c9a7] border-[#00c9a7] text-white'
-                : 'bg-transparent border-gray-200 text-[#0f2940]/80 hover:border-[#00c9a7]/50'
+                : 'bg-transparent border-[#e2f5f2] text-[#0f2940]/80 hover:border-[#00c9a7]/50'
             }`}
           >
             <span

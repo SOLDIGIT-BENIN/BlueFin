@@ -107,8 +107,8 @@ export function AdminSidebar({ isOpen = true, onClose }: AdminSidebarProps) {
       className={`
         fixed top-4 left-4 z-[9999] p-2.5 rounded-xl shadow-lg
         ${isDark 
-          ? 'bg-slate-800 border-slate-700 text-white hover:bg-slate-700' 
-          : 'bg-white border-gray-200 text-gray-800 hover:bg-gray-50'
+          ? 'bg-[#0f2940] border-[#1c3b56] text-white hover:bg-[#1c3b56]' 
+          : 'bg-white border-[#e2f5f2] text-[#0f2940] hover:bg-[#f4fffe]'
         }
         border transition-all duration-300 
         ${mobileMenuOpen ? 'scale-90' : 'hover:scale-105'}
@@ -162,8 +162,8 @@ export function AdminSidebar({ isOpen = true, onClose }: AdminSidebarProps) {
             : '-translate-x-full lg:translate-x-0'
         }
         ${isDark 
-          ? 'bg-slate-800/95 border-slate-700/50' 
-          : 'bg-white border-gray-200'
+          ? 'bg-[#0f2940]/95 border-[#1c3b56]/50' 
+          : 'bg-white border-[#e2f5f2]'
         }
         border-r shadow-2xl
         ${isMobile ? 'mt-0' : ''}
@@ -171,17 +171,17 @@ export function AdminSidebar({ isOpen = true, onClose }: AdminSidebarProps) {
         {/* Logo et titre */}
         <div className={`
           flex items-center justify-between px-4 py-4 border-b
-          ${isDark ? 'border-slate-700/50' : 'border-gray-200'}
+          ${isDark ? 'border-[#1c3b56]/50' : 'border-[#e2f5f2]'}
         `}>
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
               <span className="text-white font-bold text-sm">B</span>
             </div>
             <div>
-              <span className={`font-bold text-base ${isDark ? 'text-white' : 'text-gray-800'}`}>
-                Bluefin-Immo
+              <span className={`font-bold text-base ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>
+                Bluefin Immo
               </span>
-              <p className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>
+              <p className={`text-[10px] ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>
                 Administration
               </p>
             </div>
@@ -190,9 +190,9 @@ export function AdminSidebar({ isOpen = true, onClose }: AdminSidebarProps) {
           {isMobile && (
             <button
               onClick={closeMobileMenu}
-              className={`p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700/50 transition lg:hidden`}
+              className={`p-1.5 rounded-lg hover:bg-[#e8faf6] dark:hover:bg-[#1c3b56]/50 transition lg:hidden`}
             >
-              <X className={`w-5 h-5 ${isDark ? 'text-slate-400' : 'text-gray-500'}`} />
+              <X className={`w-5 h-5 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`} />
             </button>
           )}
         </div>
@@ -210,7 +210,7 @@ export function AdminSidebar({ isOpen = true, onClose }: AdminSidebarProps) {
               badgeColor = 'bg-red-500';
             } else if (item.label === 'Paiements' && pendingPaymentsCount > 0) {
               badge = pendingPaymentsCount;
-              badgeColor = 'bg-amber-500';
+              badgeColor = 'bg-[#ffc93c]';
             }
 
             return (
@@ -227,8 +227,8 @@ export function AdminSidebar({ isOpen = true, onClose }: AdminSidebarProps) {
                     ${active 
                       ? 'bg-emerald-500/10 text-emerald-500 shadow-lg shadow-emerald-500/10 border border-emerald-500/20' 
                       : isDark 
-                        ? 'text-slate-400 hover:bg-slate-700/50 hover:text-white' 
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                        ? 'text-[#5b6b7a] hover:bg-[#1c3b56]/50 hover:text-white' 
+                        : 'text-[#5b6b7a] hover:bg-[#e8faf6] hover:text-[#0f2940]'
                     }
                   `;
                 }}
@@ -252,7 +252,7 @@ export function AdminSidebar({ isOpen = true, onClose }: AdminSidebarProps) {
         {/* Section inférieure */}
         <div className={`
           px-3 py-4 border-t space-y-2
-          ${isDark ? 'border-slate-700/50' : 'border-gray-200'}
+          ${isDark ? 'border-[#1c3b56]/50' : 'border-[#e2f5f2]'}
         `}>
           <button
             onClick={handleLogout}
@@ -269,7 +269,7 @@ export function AdminSidebar({ isOpen = true, onClose }: AdminSidebarProps) {
           </button>
 
           <div className="pt-2 text-center">
-            <p className={`text-[10px] ${isDark ? 'text-slate-500' : 'text-gray-400'}`}>
+            <p className={`text-[10px] ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>
               Version 2.0.0 • {new Date().getFullYear()}
             </p>
           </div>

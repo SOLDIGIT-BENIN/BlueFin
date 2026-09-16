@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Star, Users, Bed, Home, Bath, Wifi, Wind, Zap, Droplet, Lock, MapPin, ChevronLeft, Share, Heart, Check } from 'lucide-react';
 import { BookingWidget } from './BookingWidget';
 import { useFavorites } from '../hooks/useFavorites';
+import { CertifiedBadge } from './brand/CertifiedBadge';
 
 interface ListingDetailProps {
   property: any; // Le property formaté
@@ -71,7 +72,7 @@ export function ListingDetail({ property, onBack, onOpenBooking, isAuthenticated
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-8">
         {/* Desktop back + title */}
         <div className="hidden lg:block mb-6">
-          <button onClick={onBack} className="flex items-center gap-1.5 text-sm text-[#6b7280] hover:text-[#0f2940] transition-colors mb-4">
+          <button onClick={onBack} className="flex items-center gap-1.5 text-sm text-[#5b6b7a] hover:text-[#0f2940] transition-colors mb-4">
             <ChevronLeft className="w-4 h-4" /> Retour aux résultats
           </button>
           <h1 className="text-3xl font-bold text-[#0f2940] mb-2">{property.title}</h1>
@@ -79,10 +80,10 @@ export function ListingDetail({ property, onBack, onOpenBooking, isAuthenticated
             <div className="flex items-center gap-1">
               <Star className="w-4 h-4 fill-[#00c9a7] text-[#00c9a7]" />
               <span className="font-medium">{property.rating}</span>
-              <span className="text-[#6b7280]">({property.reviews} avis)</span>
+              <span className="text-[#5b6b7a]">({property.reviews} avis)</span>
             </div>
-            <span className="text-[#6b7280]">·</span>
-            <span className="text-[#6b7280]">{property.location}, Bénin</span>
+            <span className="text-[#5b6b7a]">·</span>
+            <span className="text-[#5b6b7a]">{property.location}, Bénin</span>
           </div>
         </div>
 
@@ -93,10 +94,10 @@ export function ListingDetail({ property, onBack, onOpenBooking, isAuthenticated
             <div className="flex items-center gap-1">
               <Star className="w-3.5 h-3.5 fill-[#00c9a7] text-[#00c9a7]" />
               <span className="font-medium">{property.rating}</span>
-              <span className="text-[#6b7280]">({property.reviews} avis)</span>
+              <span className="text-[#5b6b7a]">({property.reviews} avis)</span>
             </div>
-            <span className="text-[#6b7280]">·</span>
-            <span className="text-[#6b7280] text-xs">{property.location}</span>
+            <span className="text-[#5b6b7a]">·</span>
+            <span className="text-[#5b6b7a] text-xs">{property.location}</span>
           </div>
         </div>
 
@@ -131,7 +132,7 @@ export function ListingDetail({ property, onBack, onOpenBooking, isAuthenticated
           <div className="flex gap-2 mt-2 overflow-x-auto scrollbar-hide">
             {photos.slice(0, 5).map((photo, i) => (
               <button key={i} onClick={() => setActivePhoto(i)} className={`flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 transition-colors bg-[#f4fffe] ${i === activePhoto ? 'border-[#00c9a7]' : 'border-transparent'}`}>
-                <img src={photo} alt="" className="w-full h-full object-cover" />
+                <img src={photo} alt={`Photo ${i + 1} de la propriété`} className="w-full h-full object-cover" />
               </button>
             ))}
           </div>
@@ -146,17 +147,17 @@ export function ListingDetail({ property, onBack, onOpenBooking, isAuthenticated
                 <h2 className="text-base lg:text-xl font-bold text-[#0f2940] mb-1">
                   {property.type} entier hébergé par {property.host}
                 </h2>
-                <div className="flex items-center gap-1.5 text-sm text-[#6b7280] flex-wrap">
+                <div className="flex items-center gap-1.5 text-sm text-[#5b6b7a] flex-wrap">
                   <span>{totalGuests} voyageurs</span> · <span>{property.bedrooms} chambres</span> · <span>{property.beds} lits</span> · <span>{property.baths} sdb</span>
                 </div>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
-                <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-gradient-to-br from-[#00c9a7] to-[#0f2940] flex items-center justify-center text-white font-bold shadow-md">
+                <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-[#0f2940] flex items-center justify-center text-white font-bold shadow-md">
                   {hostInitial}
                 </div>
                 <div className="flex flex-col gap-1">
                   {property.superhost && <div className="px-2.5 py-0.5 bg-[#00c9a7] text-white text-xs font-medium rounded-full">Superhost</div>}
-                  {property.bluefin_certified && <div className="px-2.5 py-0.5 bg-[#0f2940] text-white text-xs font-medium rounded-full">Certifié</div>}
+                  {property.bluefin_certified && <CertifiedBadge size="md" />}
                 </div>
               </div>
             </div>
@@ -165,19 +166,19 @@ export function ListingDetail({ property, onBack, onOpenBooking, isAuthenticated
             <div className="grid grid-cols-2 gap-3 lg:gap-4 pb-6 border-b border-[#e2f5f2]">
               <div className="flex items-start gap-2 lg:gap-3">
                 <Users className="w-5 h-5 text-[#0f2940]" />
-                <div><div className="font-medium">{totalGuests} voyageurs</div><div className="text-xs text-[#6b7280]">Capacité max</div></div>
+                <div><div className="font-medium">{totalGuests} voyageurs</div><div className="text-xs text-[#5b6b7a]">Capacité max</div></div>
               </div>
               <div className="flex items-start gap-2 lg:gap-3">
                 <Bed className="w-5 h-5 text-[#0f2940]" />
-                <div><div className="font-medium">{property.beds} lits</div><div className="text-xs text-[#6b7280]">Confortables</div></div>
+                <div><div className="font-medium">{property.beds} lits</div><div className="text-xs text-[#5b6b7a]">Confortables</div></div>
               </div>
               <div className="flex items-start gap-2 lg:gap-3">
                 <Home className="w-5 h-5 text-[#0f2940]" />
-                <div><div className="font-medium">Logement entier</div><div className="text-xs text-[#6b7280]">Espace privé</div></div>
+                <div><div className="font-medium">Logement entier</div><div className="text-xs text-[#5b6b7a]">Espace privé</div></div>
               </div>
               <div className="flex items-start gap-2 lg:gap-3">
                 <Bath className="w-5 h-5 text-[#0f2940]" />
-                <div><div className="font-medium">{property.baths} sdb</div><div className="text-xs text-[#6b7280]">Modernes</div></div>
+                <div><div className="font-medium">{property.baths} sdb</div><div className="text-xs text-[#5b6b7a]">Modernes</div></div>
               </div>
             </div>
 
@@ -192,7 +193,7 @@ export function ListingDetail({ property, onBack, onOpenBooking, isAuthenticated
                       <div className="w-8 h-8 lg:w-10 lg:h-10 bg-[#00c9a7]/20 rounded-lg flex items-center justify-center">
                         <Icon className="w-4 h-4 lg:w-5 lg:h-5 text-[#00c9a7]" />
                       </div>
-                      <div><div className="font-medium text-sm">{amenity}</div><div className="text-xs text-[#6b7280]">Inclus</div></div>
+                      <div><div className="font-medium text-sm">{amenity}</div><div className="text-xs text-[#5b6b7a]">Inclus</div></div>
                     </div>
                   );
                 })}
@@ -201,7 +202,7 @@ export function ListingDetail({ property, onBack, onOpenBooking, isAuthenticated
                     <div className="w-8 h-8 lg:w-10 lg:h-10 bg-[#00c9a7]/20 rounded-lg flex items-center justify-center">
                       <Zap className="w-4 h-4 lg:w-5 lg:h-5 text-[#00c9a7]" />
                     </div>
-                    <div><div className="font-medium text-sm">Groupe électrogène</div><div className="text-xs text-[#6b7280]">Sécurité électrique</div></div>
+                    <div><div className="font-medium text-sm">Groupe électrogène</div><div className="text-xs text-[#5b6b7a]">Sécurité électrique</div></div>
                   </div>
                 )}
                 {hasWaterTank && (
@@ -209,7 +210,7 @@ export function ListingDetail({ property, onBack, onOpenBooking, isAuthenticated
                     <div className="w-8 h-8 lg:w-10 lg:h-10 bg-[#00c9a7]/20 rounded-lg flex items-center justify-center">
                       <Droplet className="w-4 h-4 lg:w-5 lg:h-5 text-[#00c9a7]" />
                     </div>
-                    <div><div className="font-medium text-sm">Citerne d'eau</div><div className="text-xs text-[#6b7280]">Eau 24/7</div></div>
+                    <div><div className="font-medium text-sm">Citerne d'eau</div><div className="text-xs text-[#5b6b7a]">Eau 24/7</div></div>
                   </div>
                 )}
               </div>
@@ -224,8 +225,8 @@ export function ListingDetail({ property, onBack, onOpenBooking, isAuthenticated
             {/* Localisation */}
             <div>
               <h3 className="font-bold text-base lg:text-lg text-[#0f2940] mb-3">Emplacement</h3>
-              <div className="bg-gradient-to-br from-[#f4fffe] to-[#e8fffb] rounded-2xl h-48 lg:h-64 flex items-center justify-center border border-[#e2f5f2]">
-                <div className="text-center text-[#6b7280]">
+              <div className="bg-gradient-to-br from-[#f4fffe] to-[#f4fffe] rounded-2xl h-48 lg:h-64 flex items-center justify-center border border-[#e2f5f2]">
+                <div className="text-center text-[#5b6b7a]">
                   <MapPin className="w-10 h-10 mx-auto mb-2 text-[#00c9a7]" />
                   <p className="font-medium text-[#0f2940]">{property.location}</p>
                   <p className="text-sm">Bénin</p>
@@ -252,7 +253,7 @@ export function ListingDetail({ property, onBack, onOpenBooking, isAuthenticated
         <div>
           <div className="flex items-baseline gap-1">
             <span className="text-lg font-bold text-[#0f2940]">{property.priceNumber.toLocaleString()} FCFA</span>
-            <span className="text-sm text-[#6b7280]">/nuit</span>
+            <span className="text-sm text-[#5b6b7a]">/nuit</span>
           </div>
           <div className="flex items-center gap-1 text-xs text-[#00c9a7]">
             <Star className="w-3 h-3 fill-[#00c9a7]" />

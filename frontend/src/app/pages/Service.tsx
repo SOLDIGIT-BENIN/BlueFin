@@ -177,7 +177,7 @@ export default function Services() {
   const getServiceReviews = (service: any) => generateServiceReviews(service.title, service.location);
 
   const ServiceCard = ({ service }: { service: any }) => (
-    <div className="group cursor-pointer bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1" onClick={() => setSelectedService(service)}>
+    <div className="group cursor-pointer bg-white rounded-2xl overflow-hidden shadow-sm border border-[#e2f5f2] hover:shadow-xl transition-all duration-300 hover:-translate-y-1" onClick={() => setSelectedService(service)}>
       <div className="relative h-48 overflow-hidden">
         <img src={encodeURI(service.images[0])} alt={service.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
         <div className="absolute top-3 right-3 bg-white/90 backdrop-blur rounded-full px-2 py-1 text-xs font-semibold text-[#00c9a7]">{service.sousCategorie}</div>
@@ -188,11 +188,11 @@ export default function Services() {
           <h3 className="font-semibold text-[#0F2940] text-base leading-tight line-clamp-2">{service.title}</h3>
           <div className="flex items-center gap-1 ml-2"><Star className="w-3 h-3 fill-current text-[#00c9a7]" /><span className="text-xs font-medium">{service.rating}</span></div>
         </div>
-        <p className="text-xs text-gray-500 mb-2">{service.duration}</p>
-        <p className="text-sm text-gray-600 line-clamp-2 mb-3">{service.description}</p>
+        <p className="text-xs text-[#5b6b7a] mb-2">{service.duration}</p>
+        <p className="text-sm text-[#5b6b7a] line-clamp-2 mb-3">{service.description}</p>
         <div className="flex justify-between items-center">
-          <div><span className="font-bold text-[#0F2940] text-lg">{service.price} €</span><span className="text-xs text-gray-500"> / {service.priceType}</span></div>
-          <button className="p-2 rounded-full hover:bg-gray-100 transition-colors"><Heart className="w-4 h-4 text-gray-400" /></button>
+          <div><span className="font-bold text-[#0F2940] text-lg">{service.price} €</span><span className="text-xs text-[#5b6b7a]"> / {service.priceType}</span></div>
+          <button className="p-2 rounded-full hover:bg-[#e8faf6] transition-colors"><Heart className="w-4 h-4 text-[#5b6b7a]" /></button>
         </div>
       </div>
     </div>
@@ -222,17 +222,17 @@ export default function Services() {
     return (
       <div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 p-4 text-[#0F2940]">
         <div className="mx-auto max-w-6xl bg-white rounded-[32px] shadow-2xl overflow-hidden">
-          <div className="flex flex-col gap-4 border-b border-gray-200 p-6 lg:flex-row lg:items-start lg:justify-between">
+          <div className="flex flex-col gap-4 border-b border-[#e2f5f2] p-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-3xl">
-              <p className="text-sm text-gray-500">{service.location}</p>
+              <p className="text-sm text-[#5b6b7a]">{service.location}</p>
               <h2 className="text-3xl font-semibold text-[#0F2940] mt-2">{service.title}</h2>
-              <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-gray-600">
+              <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-[#5b6b7a]">
                 <span>{service.rating} · {service.reviews} évaluations</span>
                 <span>Hôte : {service.hostType}</span>
                 <span>À partir de {service.price} € {service.priceType}</span>
               </div>
             </div>
-            <button onClick={onClose} className="rounded-full border border-gray-200 bg-white p-3 text-gray-700 hover:bg-gray-100"><X className="w-5 h-5" /></button>
+            <button onClick={onClose} className="rounded-full border border-[#e2f5f2] bg-white p-3 text-[#1c3b56] hover:bg-[#e8faf6]"><X className="w-5 h-5" /></button>
           </div>
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-[2fr_1fr] p-6">
             <div className="space-y-6">
@@ -247,14 +247,14 @@ export default function Services() {
                   {service.images.length > 1 && (<><button onClick={prevImage} className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur rounded-full p-2 hover:bg-white"><ChevronLeft className="w-6 h-6" /></button><button onClick={nextImage} className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur rounded-full p-2 hover:bg-white"><ChevronRight className="w-6 h-6" /></button></>)}
                 </div>
               </div>
-              <div><h3 className="text-xl font-semibold text-[#0F2940] mb-4">Description</h3><p className="text-gray-700 leading-relaxed">{service.longDescription || service.description}</p></div>
-              <div><h3 className="text-xl font-semibold text-[#0F2940] mb-4">Déroulement</h3><div className="space-y-3">{programSteps.map((step, idx) => (<div key={idx} className="rounded-3xl border border-gray-200 bg-gray-50 p-4"><p className="font-semibold">{`Étape ${idx + 1}`}</p><p className="mt-2 text-sm">{step}</p></div>))}</div></div>
-              <div><h3 className="text-xl font-semibold text-[#0F2940] mb-4">Avis des clients</h3><div className="space-y-4">{reviews.map((review, idx) => (<div key={idx} className="rounded-3xl border border-gray-200 p-4"><div className="flex items-center justify-between gap-3"><div><p className="font-semibold text-[#0F2940]">{review.name}</p><p className="text-sm text-gray-500">{review.location} · {review.daysAgo}</p></div><span className="rounded-full bg-[#00c9a7]/10 px-3 py-1 text-sm text-[#0F2940]">{review.rating.toFixed(1)}</span></div><p className="mt-3 text-sm text-gray-700">{review.text}</p></div>))}</div></div>
+              <div><h3 className="text-xl font-semibold text-[#0F2940] mb-4">Description</h3><p className="text-[#1c3b56] leading-relaxed">{service.longDescription || service.description}</p></div>
+              <div><h3 className="text-xl font-semibold text-[#0F2940] mb-4">Déroulement</h3><div className="space-y-3">{programSteps.map((step, idx) => (<div key={idx} className="rounded-3xl border border-[#e2f5f2] bg-[#f4fffe] p-4"><p className="font-semibold">{`Étape ${idx + 1}`}</p><p className="mt-2 text-sm">{step}</p></div>))}</div></div>
+              <div><h3 className="text-xl font-semibold text-[#0F2940] mb-4">Avis des clients</h3><div className="space-y-4">{reviews.map((review, idx) => (<div key={idx} className="rounded-3xl border border-[#e2f5f2] p-4"><div className="flex items-center justify-between gap-3"><div><p className="font-semibold text-[#0F2940]">{review.name}</p><p className="text-sm text-[#5b6b7a]">{review.location} · {review.daysAgo}</p></div><span className="rounded-full bg-[#00c9a7]/10 px-3 py-1 text-sm text-[#0F2940]">{review.rating.toFixed(1)}</span></div><p className="mt-3 text-sm text-[#1c3b56]">{review.text}</p></div>))}</div></div>
             </div>
-            <aside className="space-y-6 rounded-3xl border border-gray-200 bg-[#f8fafb] p-6">
-              <div><p className="text-sm font-semibold text-gray-700">À savoir</p><ul className="mt-4 space-y-3 text-sm text-gray-600"><li>Durée : {service.duration}</li><li>Langue : Français, Anglais sur demande</li><li>Service professionnel certifié</li><li>Annulation gratuite 24h avant</li></ul></div>
-              <div className="rounded-3xl bg-white p-4 shadow-sm"><p className="text-sm text-gray-500">Lieu du service</p><p className="mt-2 font-medium text-[#0F2940]">{service.location}</p></div>
-              <button className="w-full rounded-full bg-[#00c9a7] px-5 py-3 text-sm font-semibold text-[#0F2940] hover:bg-[#00b892] transition-colors">Réserver ce service</button>
+            <aside className="space-y-6 rounded-3xl border border-[#e2f5f2] bg-[#f4fffe] p-6">
+              <div><p className="text-sm font-semibold text-[#1c3b56]">À savoir</p><ul className="mt-4 space-y-3 text-sm text-[#5b6b7a]"><li>Durée : {service.duration}</li><li>Langue : Français, Anglais sur demande</li><li>Service professionnel certifié</li><li>Annulation gratuite 24h avant</li></ul></div>
+              <div className="rounded-3xl bg-white p-4 shadow-sm"><p className="text-sm text-[#5b6b7a]">Lieu du service</p><p className="mt-2 font-medium text-[#0F2940]">{service.location}</p></div>
+              <button className="w-full rounded-full bg-[#00c9a7] px-5 py-3 text-sm font-semibold text-[#0F2940] hover:bg-[#00b396] transition-colors">Réserver ce service</button>
             </aside>
           </div>
         </div>
@@ -265,34 +265,34 @@ export default function Services() {
   return (
     <div className="min-h-screen bg-white">
       {/* Barre de recherche sticky (fixe en haut) */}
-      <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md shadow-md border-b border-gray-100">
+      <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md shadow-md border-b border-[#e2f5f2]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-center">
             <div className="relative w-full max-w-5xl">
-              <div className="bg-white rounded-full shadow-xl border border-gray-200 hover:shadow-2xl transition-all duration-300">
+              <div className="bg-white rounded-full shadow-xl border border-[#e2f5f2] hover:shadow-2xl transition-all duration-300">
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-1 p-2">
                   {/* Destination */}
                   <div className="relative flex-[1.5]">
-                    <button onClick={() => setActiveTab(activeTab === "destination" ? null : "destination")} className={`w-full text-left px-5 sm:px-7 py-3.5 rounded-full transition-all ${activeTab === "destination" ? "bg-gray-50 shadow-inner" : "hover:bg-gray-50"}`}>
-                      <div className="text-xs font-medium text-gray-700">Destination</div>
-                      <div className="text-sm text-gray-900 truncate">{destination || "Rechercher une destination"}</div>
+                    <button onClick={() => setActiveTab(activeTab === "destination" ? null : "destination")} className={`w-full text-left px-5 sm:px-7 py-3.5 rounded-full transition-all ${activeTab === "destination" ? "bg-[#f4fffe] shadow-inner" : "hover:bg-[#f4fffe]"}`}>
+                      <div className="text-xs font-medium text-[#1c3b56]">Destination</div>
+                      <div className="text-sm text-[#0f2940] truncate">{destination || "Rechercher une destination"}</div>
                     </button>
-                    {activeTab === "destination" && (<><div className="fixed inset-0 z-40" onClick={() => setActiveTab(null)}></div><div className="absolute top-full left-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 z-50"><div className="p-4"><div className="flex items-center justify-between mb-4"><h3 className="text-lg font-semibold">Où souhaitez-vous un service ?</h3><button onClick={() => setActiveTab(null)} className="p-1 rounded-full hover:bg-gray-100"><X className="w-5 h-5" /></button></div><input type="text" placeholder="Rechercher une ville" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c9a7]" value={destination} onChange={(e) => setDestination(e.target.value)} /><div className="mt-4 space-y-2 max-h-96 overflow-y-auto"><div className="font-semibold text-sm text-gray-500 mb-2">Destinations populaires</div>{travelDestinations.map((place) => (<button key={place} onClick={() => { setDestination(place); setActiveTab(null); }} className="w-full text-left px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors"><div className="font-medium">{place}</div><div className="text-sm text-gray-500">Bénin</div></button>))}</div></div></div></>)}
+                    {activeTab === "destination" && (<><div className="fixed inset-0 z-40" onClick={() => setActiveTab(null)}></div><div className="absolute top-full left-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-[#e2f5f2] z-50"><div className="p-4"><div className="flex items-center justify-between mb-4"><h3 className="text-lg font-semibold">Où souhaitez-vous un service ?</h3><button onClick={() => setActiveTab(null)} className="p-1 rounded-full hover:bg-[#e8faf6]"><X className="w-5 h-5" /></button></div><input type="text" placeholder="Rechercher une ville" className="w-full px-4 py-3 border border-[#e2f5f2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c9a7]" value={destination} onChange={(e) => setDestination(e.target.value)} /><div className="mt-4 space-y-2 max-h-96 overflow-y-auto"><div className="font-semibold text-sm text-[#5b6b7a] mb-2">Destinations populaires</div>{travelDestinations.map((place) => (<button key={place} onClick={() => { setDestination(place); setActiveTab(null); }} className="w-full text-left px-4 py-3 rounded-xl hover:bg-[#f4fffe] transition-colors"><div className="font-medium">{place}</div><div className="text-sm text-[#5b6b7a]">Bénin</div></button>))}</div></div></div></>)}
                   </div>
-                  <div className="hidden sm:block w-px h-8 bg-gray-200"></div><div className="sm:hidden h-px w-full bg-gray-200"></div>
+                  <div className="hidden sm:block w-px h-8 bg-[#e2f5f2]"></div><div className="sm:hidden h-px w-full bg-[#e2f5f2]"></div>
                   {/* Dates */}
-                  <div className="relative flex-1"><button onClick={() => setActiveTab(activeTab === "dates" ? null : "dates")} className="w-full text-left px-5 sm:px-7 py-3.5 rounded-full transition-all hover:bg-gray-50"><div className="text-xs font-medium text-gray-700">Dates</div><div className="text-sm text-gray-900">{checkIn && checkOut ? `${checkIn} → ${checkOut}` : "Quand ?"}</div></button></div>
-                  <div className="hidden sm:block w-px h-8 bg-gray-200"></div><div className="sm:hidden h-px w-full bg-gray-200"></div>
+                  <div className="relative flex-1"><button onClick={() => setActiveTab(activeTab === "dates" ? null : "dates")} className="w-full text-left px-5 sm:px-7 py-3.5 rounded-full transition-all hover:bg-[#f4fffe]"><div className="text-xs font-medium text-[#1c3b56]">Dates</div><div className="text-sm text-[#0f2940]">{checkIn && checkOut ? `${checkIn} → ${checkOut}` : "Quand ?"}</div></button></div>
+                  <div className="hidden sm:block w-px h-8 bg-[#e2f5f2]"></div><div className="sm:hidden h-px w-full bg-[#e2f5f2]"></div>
                   {/* Type de service - SELECTEUR */}
                   <div className="relative flex-1">
-                    <button onClick={() => setServiceTypeOpen(!serviceTypeOpen)} className="w-full text-left px-5 sm:px-7 py-3.5 rounded-full transition-all hover:bg-gray-50">
-                      <div className="text-xs font-medium text-gray-700">Type de service</div>
-                      <div className="text-sm text-gray-900 truncate">{selectedServiceType || "Sélectionner"}</div>
+                    <button onClick={() => setServiceTypeOpen(!serviceTypeOpen)} className="w-full text-left px-5 sm:px-7 py-3.5 rounded-full transition-all hover:bg-[#f4fffe]">
+                      <div className="text-xs font-medium text-[#1c3b56]">Type de service</div>
+                      <div className="text-sm text-[#0f2940] truncate">{selectedServiceType || "Sélectionner"}</div>
                     </button>
-                    {serviceTypeOpen && (<><div className="fixed inset-0 z-40" onClick={() => setServiceTypeOpen(false)}></div><div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-gray-200 z-50"><div className="p-2"><div className="flex items-center justify-between p-2 border-b"><span className="font-semibold">Choisissez un type</span><button onClick={() => setServiceTypeOpen(false)}><X className="w-4 h-4" /></button></div><div className="py-2">{serviceCategories.filter(c => c !== "Tous").map((cat) => (<button key={cat} onClick={() => { setSelectedServiceType(cat); setSelectedCategory(cat); setServiceTypeOpen(false); }} className="w-full text-left px-4 py-2 rounded-xl hover:bg-gray-100 transition-colors text-sm">{cat}</button>))}</div></div></div></>)}
+                    {serviceTypeOpen && (<><div className="fixed inset-0 z-40" onClick={() => setServiceTypeOpen(false)}></div><div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-[#e2f5f2] z-50"><div className="p-2"><div className="flex items-center justify-between p-2 border-b"><span className="font-semibold">Choisissez un type</span><button onClick={() => setServiceTypeOpen(false)}><X className="w-4 h-4" /></button></div><div className="py-2">{serviceCategories.filter(c => c !== "Tous").map((cat) => (<button key={cat} onClick={() => { setSelectedServiceType(cat); setSelectedCategory(cat); setServiceTypeOpen(false); }} className="w-full text-left px-4 py-2 rounded-xl hover:bg-[#e8faf6] transition-colors text-sm">{cat}</button>))}</div></div></div></>)}
                   </div>
                   {/* Bouton recherche */}
-                  <button className="bg-[#00c9a7] text-[#0F2940] rounded-full p-4 hover:bg-[#00b892] transition-colors ml-0 sm:ml-2 mt-2 sm:mt-0"><Search className="w-5 h-5" /></button>
+                  <button className="bg-[#00c9a7] text-[#0F2940] rounded-full p-4 hover:bg-[#00b396] transition-colors ml-0 sm:ml-2 mt-2 sm:mt-0"><Search className="w-5 h-5" /></button>
                 </div>
               </div>
             </div>
@@ -301,7 +301,7 @@ export default function Services() {
       </div>
 
       {/* Hero / Bannière */}
-      <section className="relative bg-gradient-to-r from-[#0F2940] to-[#1a3f5c] py-16 text-white">
+      <section className="relative bg-[#0f2940] py-16 text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Services au Bénin</h1>
           <p className="text-xl text-white/80 max-w-2xl mx-auto">Tous les services dont vous avez besoin, partout au Bénin. Transport, ménage, assistance, bien-être et plus.</p>
@@ -309,20 +309,20 @@ export default function Services() {
       </section>
 
       {/* Filtres par catégorie */}
-      <div className="sticky top-[73px] z-20 bg-white border-b border-gray-200 py-3 overflow-x-auto">
+      <div className="sticky top-[73px] z-20 bg-white border-b border-[#e2f5f2] py-3 overflow-x-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex gap-2 sm:gap-4">
-            {serviceCategories.map((cat) => (<button key={cat} onClick={() => { setSelectedCategory(cat); setSelectedServiceType(cat === "Tous" ? "" : cat); }} className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${selectedCategory === cat ? "bg-[#00c9a7] text-[#0F2940] shadow-md" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}>{cat}</button>))}
+            {serviceCategories.map((cat) => (<button key={cat} onClick={() => { setSelectedCategory(cat); setSelectedServiceType(cat === "Tous" ? "" : cat); }} className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${selectedCategory === cat ? "bg-[#00c9a7] text-[#0F2940] shadow-md" : "bg-[#e8faf6] text-[#1c3b56] hover:bg-[#e2f5f2]"}`}>{cat}</button>))}
           </div>
         </div>
       </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {selectedCategory === "Tous" || selectedCategory === "Services aux voyageurs" ? (<div className="mb-12"><h2 className="text-2xl font-semibold text-[#0F2940] mb-2">Services aux voyageurs</h2><p className="text-gray-600 mb-6">Transferts, visites guidées, assistance, location – tout pour un séjour réussi.</p><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">{travelServices.map(service => (<ServiceCard key={service.id} service={service} />))}</div></div>) : null}
-        {selectedCategory === "Tous" || selectedCategory === "Services aux hôtes" ? (<div className="mb-12"><h2 className="text-2xl font-semibold text-[#0F2940] mb-2">Services aux hôtes & propriétaires</h2><p className="text-gray-600 mb-6">Gestion locative, ménage, photographie, maintenance – maximisez vos revenus.</p><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">{hostServices.map(service => (<ServiceCard key={service.id} service={service} />))}</div></div>) : null}
-        {selectedCategory === "Tous" || selectedCategory === "Services professionnels" ? (<div className="mb-12"><h2 className="text-2xl font-semibold text-[#0F2940] mb-2">Services professionnels</h2><p className="text-gray-600 mb-6">Coworking, salles de réunion, assistance virtuelle, conseil juridique.</p><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">{professionalServices.map(service => (<ServiceCard key={service.id} service={service} />))}</div></div>) : null}
-        {selectedCategory === "Tous" || selectedCategory === "Urgence & Assistance" ? (<div className="mb-12"><h2 className="text-2xl font-semibold text-[#0F2940] mb-2">Urgence & Assistance</h2><p className="text-gray-600 mb-6">Services d'urgence 24h/24 : médical, serrurier, dépannage, assistance consulaire.</p><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">{emergencyServices.map(service => (<ServiceCard key={service.id} service={service} />))}</div></div>) : null}
-        {selectedCategory === "Tous" || selectedCategory === "Services exclusifs" ? (<div className="mb-12"><h2 className="text-2xl font-semibold text-[#0F2940] mb-2">Services exclusifs</h2><p className="text-gray-600 mb-6">Bien-être, gastronomie, aventure, luxe – pour des moments d'exception.</p><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">{exclusiveServices.map(service => (<ServiceCard key={service.id} service={service} />))}</div></div>) : null}
+        {selectedCategory === "Tous" || selectedCategory === "Services aux voyageurs" ? (<div className="mb-12"><h2 className="text-2xl font-semibold text-[#0F2940] mb-2">Services aux voyageurs</h2><p className="text-[#5b6b7a] mb-6">Transferts, visites guidées, assistance, location – tout pour un séjour réussi.</p><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">{travelServices.map(service => (<ServiceCard key={service.id} service={service} />))}</div></div>) : null}
+        {selectedCategory === "Tous" || selectedCategory === "Services aux hôtes" ? (<div className="mb-12"><h2 className="text-2xl font-semibold text-[#0F2940] mb-2">Services aux hôtes & propriétaires</h2><p className="text-[#5b6b7a] mb-6">Gestion locative, ménage, photographie, maintenance – maximisez vos revenus.</p><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">{hostServices.map(service => (<ServiceCard key={service.id} service={service} />))}</div></div>) : null}
+        {selectedCategory === "Tous" || selectedCategory === "Services professionnels" ? (<div className="mb-12"><h2 className="text-2xl font-semibold text-[#0F2940] mb-2">Services professionnels</h2><p className="text-[#5b6b7a] mb-6">Coworking, salles de réunion, assistance virtuelle, conseil juridique.</p><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">{professionalServices.map(service => (<ServiceCard key={service.id} service={service} />))}</div></div>) : null}
+        {selectedCategory === "Tous" || selectedCategory === "Urgence & Assistance" ? (<div className="mb-12"><h2 className="text-2xl font-semibold text-[#0F2940] mb-2">Urgence & Assistance</h2><p className="text-[#5b6b7a] mb-6">Services d'urgence 24h/24 : médical, serrurier, dépannage, assistance consulaire.</p><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">{emergencyServices.map(service => (<ServiceCard key={service.id} service={service} />))}</div></div>) : null}
+        {selectedCategory === "Tous" || selectedCategory === "Services exclusifs" ? (<div className="mb-12"><h2 className="text-2xl font-semibold text-[#0F2940] mb-2">Services exclusifs</h2><p className="text-[#5b6b7a] mb-6">Bien-être, gastronomie, aventure, luxe – pour des moments d'exception.</p><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">{exclusiveServices.map(service => (<ServiceCard key={service.id} service={service} />))}</div></div>) : null}
       </main>
 
       {/* Modal de détail */}

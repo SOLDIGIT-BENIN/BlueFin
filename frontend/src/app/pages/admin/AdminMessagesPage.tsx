@@ -105,13 +105,13 @@ export function AdminMessagesPage() {
   };
 
   return (
-    <div className="p-3 sm:p-4 md:p-6 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+    <div className="p-3 sm:p-4 md:p-6 bg-gradient-to-br from-[#f4fffe] to-[#e8faf6] min-h-screen">
       {/* En-tête */}
       <div className="mb-6">
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#0f2940] to-[#00c9a7] bg-clip-text text-transparent">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#0f2940]">
           Surveillance des messages
         </h1>
-        <p className="text-xs sm:text-sm text-gray-500 mt-1">Analysez et modérez les conversations entre utilisateurs</p>
+        <p className="text-xs sm:text-sm text-[#5b6b7a] mt-1">Analysez et modérez les conversations entre utilisateurs</p>
       </div>
 
       {/* Statistiques */}
@@ -126,13 +126,13 @@ export function AdminMessagesPage() {
       <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm mb-6">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5b6b7a]" />
             <input
               type="text"
               placeholder="Rechercher par expéditeur, destinataire ou contenu..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
+              className="w-full pl-9 pr-3 py-2 border border-[#e2f5f2] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
             />
           </div>
           <div className="flex gap-2">
@@ -141,7 +141,7 @@ export function AdminMessagesPage() {
             <FilterButton active={filterType === 'flagged'} onClick={() => setFilterType('flagged')} label="Signalés" />
             <button
               onClick={() => refetch()}
-              className="px-3 py-2 bg-gray-100 rounded-xl hover:bg-gray-200 transition"
+              className="px-3 py-2 bg-[#e8faf6] rounded-xl hover:bg-[#e2f5f2] transition"
             >
               🔄
             </button>
@@ -155,8 +155,8 @@ export function AdminMessagesPage() {
         <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2">
           {filteredMessages.length === 0 ? (
             <div className="bg-white rounded-xl p-8 text-center">
-              <MessageCircle className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500 text-sm">Aucun message trouvé</p>
+              <MessageCircle className="w-12 h-12 text-[#9fb3c4] mx-auto mb-3" />
+              <p className="text-[#5b6b7a] text-sm">Aucun message trouvé</p>
             </div>
           ) : (
             filteredMessages.map((msg: any) => (
@@ -182,7 +182,7 @@ export function AdminMessagesPage() {
               getAvatarUrl={getAvatarUrl}
             />
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-gray-400 p-6">
+            <div className="flex-1 flex flex-col items-center justify-center text-[#5b6b7a] p-6">
               <MessageCircle className="w-16 h-16 mb-4 opacity-50" />
               <p className="text-center">Sélectionnez un message<br />pour voir les détails</p>
             </div>
@@ -236,11 +236,11 @@ const MessageCard = ({ message, isSelected, onClick, getFullName, getAvatarUrl }
           <div className="flex justify-between items-start gap-2">
             <div className="flex-1 min-w-0">
               {/* NOM DE L'EXPÉDITEUR */}
-              <p className={`text-sm truncate ${isUnread ? 'font-semibold text-[#0F2940]' : 'font-medium text-gray-700'}`}>
+              <p className={`text-sm truncate ${isUnread ? 'font-semibold text-[#0F2940]' : 'font-medium text-[#1c3b56]'}`}>
                 {senderName !== 'Expéditeur inconnu' ? senderName : (message.sender?.email || 'Expéditeur inconnu')}
               </p>
               {/* NOM DU DESTINATAIRE avec flèche */}
-              <p className="text-xs text-gray-400 truncate">
+              <p className="text-xs text-[#5b6b7a] truncate">
                 → {receiverName !== 'Destinataire inconnu' ? receiverName : (message.receiver?.email || 'Destinataire inconnu')}
               </p>
             </div>
@@ -250,11 +250,11 @@ const MessageCard = ({ message, isSelected, onClick, getFullName, getAvatarUrl }
             </div>
           </div>
           {/* Aperçu du message */}
-          <p className="text-xs text-gray-500 mt-1 line-clamp-2">{messagePreview || 'Aucun contenu'}</p>
+          <p className="text-xs text-[#5b6b7a] mt-1 line-clamp-2">{messagePreview || 'Aucun contenu'}</p>
           {/* Date */}
-          <p className="text-xs text-gray-400 mt-1">{formatDate(message.created_at)}</p>
+          <p className="text-xs text-[#5b6b7a] mt-1">{formatDate(message.created_at)}</p>
         </div>
-        <ChevronRight className={`w-4 h-4 flex-shrink-0 ${isUnread ? 'text-[#00c9a7]' : 'text-gray-400'}`} />
+        <ChevronRight className={`w-4 h-4 flex-shrink-0 ${isUnread ? 'text-[#00c9a7]' : 'text-[#5b6b7a]'}`} />
       </div>
     </div>
   );
@@ -292,9 +292,9 @@ const MessageDetail = ({ message, onClose, getFullName, getAvatarUrl }: any) => 
   
   return (
     <>
-      <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
+      <div className="p-4 border-b bg-[#f4fffe] flex justify-between items-center">
         <div className="flex items-center gap-3">
-          <button onClick={onClose} className="lg:hidden p-1 hover:bg-gray-200 rounded-lg transition">
+          <button onClick={onClose} className="lg:hidden p-1 hover:bg-[#e2f5f2] rounded-lg transition">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <img 
@@ -307,38 +307,38 @@ const MessageDetail = ({ message, onClose, getFullName, getAvatarUrl }: any) => 
           />
           <div>
             <p className="font-semibold text-[#0F2940]">{senderName || message.sender?.email || 'Expéditeur'}</p>
-            <p className="text-xs text-gray-500">{message.sender?.email || 'Email non disponible'}</p>
+            <p className="text-xs text-[#5b6b7a]">{message.sender?.email || 'Email non disponible'}</p>
           </div>
         </div>
-        <button onClick={onClose} className="hidden lg:block p-1 hover:bg-gray-200 rounded-lg transition">
+        <button onClick={onClose} className="hidden lg:block p-1 hover:bg-[#e2f5f2] rounded-lg transition">
           ✕
         </button>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {/* Informations de l'expéditeur */}
-        <div className="bg-gray-50 rounded-xl p-3">
+        <div className="bg-[#f4fffe] rounded-xl p-3">
           <div className="flex items-center gap-3 mb-2">
             <User className="w-4 h-4 text-[#00c9a7]" />
             <p className="font-semibold text-sm">Expéditeur</p>
           </div>
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm">
-              <span className="text-gray-500 w-24">Nom</span>
+              <span className="text-[#5b6b7a] w-24">Nom</span>
               <span className="font-medium text-[#0F2940]">{senderName || '-'}</span>
             </div>
             <div className="flex items-center gap-2 text-sm">
-              <span className="text-gray-500 w-24">Email</span>
+              <span className="text-[#5b6b7a] w-24">Email</span>
               <span className="font-medium truncate">{message.sender?.email || '-'}</span>
             </div>
             <div className="flex items-center gap-2 text-sm">
-              <span className="text-gray-500 w-24">Téléphone</span>
+              <span className="text-[#5b6b7a] w-24">Téléphone</span>
               <span className="font-medium">{message.sender?.phone || '-'}</span>
             </div>
             <div className="flex items-center gap-2 text-sm">
-              <span className="text-gray-500 w-24">Type</span>
+              <span className="text-[#5b6b7a] w-24">Type</span>
               <span className={`font-medium capitalize ${
-                message.sender?.user_type === 'hote' ? 'text-[#00c9a7]' : 'text-blue-600'
+                message.sender?.user_type === 'hote' ? 'text-[#00c9a7]' : 'text-[#00806b]'
               }`}>
                 {message.sender?.user_type === 'hote' ? 'Hôte' : message.sender?.user_type === 'voyageur' ? 'Voyageur' : '-'}
               </span>
@@ -347,24 +347,24 @@ const MessageDetail = ({ message, onClose, getFullName, getAvatarUrl }: any) => 
         </div>
 
         {/* Informations destinataire */}
-        <div className="bg-gray-50 rounded-xl p-3">
+        <div className="bg-[#f4fffe] rounded-xl p-3">
           <div className="flex items-center gap-3 mb-2">
             <User className="w-4 h-4 text-[#00c9a7]" />
             <p className="font-semibold text-sm">Destinataire</p>
           </div>
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm">
-              <span className="text-gray-500 w-24">Nom</span>
+              <span className="text-[#5b6b7a] w-24">Nom</span>
               <span className="font-medium text-[#0F2940]">{receiverName || '-'}</span>
             </div>
             <div className="flex items-center gap-2 text-sm">
-              <span className="text-gray-500 w-24">Email</span>
+              <span className="text-[#5b6b7a] w-24">Email</span>
               <span className="font-medium truncate">{message.receiver?.email || '-'}</span>
             </div>
             <div className="flex items-center gap-2 text-sm">
-              <span className="text-gray-500 w-24">Type</span>
+              <span className="text-[#5b6b7a] w-24">Type</span>
               <span className={`font-medium capitalize ${
-                message.receiver?.user_type === 'hote' ? 'text-[#00c9a7]' : 'text-blue-600'
+                message.receiver?.user_type === 'hote' ? 'text-[#00c9a7]' : 'text-[#00806b]'
               }`}>
                 {message.receiver?.user_type === 'hote' ? 'Hôte' : message.receiver?.user_type === 'voyageur' ? 'Voyageur' : '-'}
               </span>
@@ -373,15 +373,15 @@ const MessageDetail = ({ message, onClose, getFullName, getAvatarUrl }: any) => 
         </div>
 
         {/* Contenu du message */}
-        <div className="bg-gray-50 rounded-xl p-3">
+        <div className="bg-[#f4fffe] rounded-xl p-3">
           <div className="flex items-center gap-3 mb-2">
             <MessageCircle className="w-4 h-4 text-[#00c9a7]" />
             <p className="font-semibold text-sm">Contenu du message</p>
           </div>
-          <div className={`text-sm text-gray-700 leading-relaxed ${showFullMessage ? '' : 'max-h-32 overflow-hidden relative'}`}>
+          <div className={`text-sm text-[#1c3b56] leading-relaxed ${showFullMessage ? '' : 'max-h-32 overflow-hidden relative'}`}>
             <p className="whitespace-pre-wrap break-words">{messageContent}</p>
             {!showFullMessage && messageContent?.length > 200 && (
-              <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-gray-50 to-transparent"></div>
+              <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-[#f4fffe] to-transparent"></div>
             )}
           </div>
           {messageContent?.length > 200 && (
@@ -395,18 +395,18 @@ const MessageDetail = ({ message, onClose, getFullName, getAvatarUrl }: any) => 
         </div>
 
         {/* Métadonnées */}
-        <div className="bg-gray-50 rounded-xl p-3">
+        <div className="bg-[#f4fffe] rounded-xl p-3">
           <div className="flex items-center gap-3 mb-2">
             <Clock className="w-4 h-4 text-[#00c9a7]" />
             <p className="font-semibold text-sm">Métadonnées</p>
           </div>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-gray-500">Date d'envoi</span>
+              <span className="text-[#5b6b7a]">Date d'envoi</span>
               <span className="font-medium">{formatDateTime(message.created_at)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500">Lu le</span>
+              <span className="text-[#5b6b7a]">Lu le</span>
               <span className="font-medium">{message.read_at ? formatDateTime(message.read_at) : 'Non lu'}</span>
             </div>
           </div>
@@ -414,7 +414,7 @@ const MessageDetail = ({ message, onClose, getFullName, getAvatarUrl }: any) => 
 
         {/* Formulaire de réponse */}
         {showReplyForm && (
-          <div className="bg-gray-50 rounded-xl p-3">
+          <div className="bg-[#f4fffe] rounded-xl p-3">
             <div className="flex items-center gap-3 mb-2">
               <Reply className="w-4 h-4 text-[#00c9a7]" />
               <p className="font-semibold text-sm">Répondre à {senderName || message.sender?.email?.split('@')[0] || 'l\'utilisateur'}</p>
@@ -423,20 +423,20 @@ const MessageDetail = ({ message, onClose, getFullName, getAvatarUrl }: any) => 
               value={replyText}
               onChange={(e) => setReplyText(e.target.value)}
               placeholder="Écrivez votre réponse..."
-              className="w-full p-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7] resize-none"
+              className="w-full p-3 border border-[#e2f5f2] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7] resize-none"
               rows={4}
             />
             <div className="flex gap-2 mt-3">
               <button
                 onClick={handleReply}
-                className="flex-1 px-3 py-2 bg-[#00c9a7] text-white rounded-lg text-sm hover:bg-[#00b892] transition flex items-center justify-center gap-2"
+                className="flex-1 px-3 py-2 bg-[#00c9a7] text-white rounded-lg text-sm hover:bg-[#00b396] transition flex items-center justify-center gap-2"
               >
                 <Send className="w-4 h-4" />
                 Envoyer
               </button>
               <button
                 onClick={() => setShowReplyForm(false)}
-                className="px-3 py-2 border border-gray-300 text-gray-600 rounded-lg text-sm hover:bg-gray-100 transition"
+                className="px-3 py-2 border border-[#c9f0e8] text-[#5b6b7a] rounded-lg text-sm hover:bg-[#e8faf6] transition"
               >
                 Annuler
               </button>
@@ -446,10 +446,10 @@ const MessageDetail = ({ message, onClose, getFullName, getAvatarUrl }: any) => 
       </div>
 
       {/* Actions */}
-      <div className="p-4 border-t bg-gray-50 flex gap-2">
+      <div className="p-4 border-t bg-[#f4fffe] flex gap-2">
         <button
           onClick={() => setShowReplyForm(!showReplyForm)}
-          className="flex-1 px-3 py-2 bg-[#00c9a7] text-white rounded-lg text-sm hover:bg-[#00b892] transition flex items-center justify-center gap-2"
+          className="flex-1 px-3 py-2 bg-[#00c9a7] text-white rounded-lg text-sm hover:bg-[#00b396] transition flex items-center justify-center gap-2"
         >
           <Reply className="w-4 h-4" />
           Répondre
@@ -468,8 +468,8 @@ const MessageDetail = ({ message, onClose, getFullName, getAvatarUrl }: any) => 
 // Composant de carte statistique
 const StatCard = ({ icon, label, value, color }: any) => {
   const colors = {
-    blue: 'from-blue-500 to-blue-600',
-    yellow: 'from-yellow-500 to-yellow-600',
+    blue: 'from-[#00c9a7] to-[#00b396]',
+    yellow: 'from-[#ffc93c] to-[#e0ac1f]',
     red: 'from-red-500 to-red-600',
     green: 'from-green-500 to-green-600',
   };
@@ -492,7 +492,7 @@ const FilterButton = ({ active, onClick, label }: any) => (
   <button
     onClick={onClick}
     className={`px-3 py-2 rounded-xl text-sm transition ${
-      active ? 'bg-[#00c9a7] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+      active ? 'bg-[#00c9a7] text-white' : 'bg-[#e8faf6] text-[#5b6b7a] hover:bg-[#e2f5f2]'
     }`}
   >
     {label}
@@ -530,16 +530,16 @@ const formatDateTime = (date: string) => {
 const LoadingSkeleton = () => (
   <div className="p-3 sm:p-4 md:p-6">
     <div className="animate-pulse">
-      <div className="h-6 sm:h-8 bg-gray-200 rounded w-48 mb-4"></div>
+      <div className="h-6 sm:h-8 bg-[#e2f5f2] rounded w-48 mb-4"></div>
       <div className="grid grid-cols-4 gap-3 mb-6">
-        {[1, 2, 3, 4].map(i => <div key={i} className="bg-gray-200 rounded-xl h-20"></div>)}
+        {[1, 2, 3, 4].map(i => <div key={i} className="bg-[#e2f5f2] rounded-xl h-20"></div>)}
       </div>
-      <div className="bg-gray-200 rounded-xl h-12 mb-6"></div>
+      <div className="bg-[#e2f5f2] rounded-xl h-12 mb-6"></div>
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-3">
-          {[1, 2, 3].map(i => <div key={i} className="bg-gray-200 rounded-xl h-24"></div>)}
+          {[1, 2, 3].map(i => <div key={i} className="bg-[#e2f5f2] rounded-xl h-24"></div>)}
         </div>
-        <div className="bg-gray-200 rounded-xl h-[500px]"></div>
+        <div className="bg-[#e2f5f2] rounded-xl h-[500px]"></div>
       </div>
     </div>
   </div>

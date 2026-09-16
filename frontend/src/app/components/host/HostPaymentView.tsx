@@ -31,22 +31,22 @@ export function HostPaymentView({ hostId }: { hostId: string }) {
         <div className="bg-white rounded-2xl p-6 border border-[#e2f5f2]">
           <div className="flex items-center gap-2 mb-2">
             <DollarSign className="w-5 h-5 text-[#00c9a7]" />
-            <h3 className="text-sm font-medium text-[#6b7280]}>Total gagné</h3>
+            <h3 className="text-sm font-medium text-[#5b6b7a]">Total gagné</h3>
           </div>
           <p className="text-2xl font-bold text-[#0f2940]">
-            {paymentData.totalAllTime?.toLocaleString() || 0} €
+            {paymentData.totalAllTime?.toLocaleString('fr-FR') || 0} FCFA
           </p>
         </div>
 
         <div className="bg-white rounded-2xl p-6 border border-[#e2f5f2]">
           <div className="flex items-center gap-2 mb-2">
             <Calendar className="w-5 h-5 text-[#00c9a7]" />
-            <h3 className="text-sm font-medium text-[#6b7280]}>Cette semaine</h3>
+            <h3 className="text-sm font-medium text-[#5b6b7a]">Cette semaine</h3>
           </div>
           <p className="text-2xl font-bold text-[#0f2940]">
-            {paymentData.totalWeekAmount?.toLocaleString() || 0} €
+            {paymentData.totalWeekAmount?.toLocaleString('fr-FR') || 0} FCFA
           </p>
-          <p className="text-sm text-[#6b7280]">
+          <p className="text-sm text-[#5b6b7a]">
             {paymentData.weeklyReservations || 0} réservations
           </p>
         </div>
@@ -56,15 +56,15 @@ export function HostPaymentView({ hostId }: { hostId: string }) {
             {paymentData.isPaid ? (
               <CheckCircle className="w-5 h-5 text-green-600" />
             ) : (
-              <Clock className="w-5 h-5 text-yellow-600" />
+              <Clock className="w-5 h-5 text-[#a87c10]" />
             )}
-            <h3 className="text-sm font-medium text-[#6b7280]}>Statut</h3>
+            <h3 className="text-sm font-medium text-[#5b6b7a]">Statut</h3>
           </div>
           <p className="text-2xl font-bold text-[#0f2940]">
             {paymentData.isPaid ? '✅ Payé' : '⏳ En attente'}
           </p>
           {paymentData.nextPayoutDate && (
-            <p className="text-sm text-[#6b7280]">
+            <p className="text-sm text-[#5b6b7a]">
               Prochain paiement: {new Date(paymentData.nextPayoutDate).toLocaleDateString()}
             </p>
           )}
@@ -84,16 +84,16 @@ export function HostPaymentView({ hostId }: { hostId: string }) {
                 <p className="font-medium text-[#0f2940]">
                   Semaine du {new Date(payment.weekStartDate).toLocaleDateString()}
                 </p>
-                <p className="text-sm text-[#6b7280]">
+                <p className="text-sm text-[#5b6b7a]">
                   {payment.reservationsCount} réservations
                 </p>
               </div>
               <div className="text-right">
                 <p className="font-semibold text-[#0f2940]">
-                  {payment.amount.toLocaleString()} €
+                  {payment.amount.toLocaleString('fr-FR')} FCFA
                 </p>
                 <span className={`text-sm ${
-                  payment.isPaid ? 'text-green-600' : 'text-yellow-600'
+                  payment.isPaid ? 'text-green-600' : 'text-[#a87c10]'
                 }`}>
                   {payment.isPaid ? '✅ Payé' : '⏳ En attente'}
                 </span>

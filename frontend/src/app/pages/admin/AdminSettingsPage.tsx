@@ -62,11 +62,11 @@ export function AdminSettingsPage(_props: { onNavigate?: unknown }) {
     },
   });
 
-  const card = isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200';
-  const muted = isDark ? 'text-slate-400' : 'text-slate-500';
+  const card = isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]';
+  const muted = isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]';
 
   return (
-    <div className={`min-h-screen ${isDark ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-800'} p-4 md:p-6 lg:p-8`}>
+    <div className={`min-h-screen ${isDark ? 'bg-[#0f2940] text-white' : 'bg-[#f4fffe] text-[#0f2940]'} p-4 md:p-6 lg:p-8`}>
       <div className="max-w-3xl mx-auto space-y-6">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
@@ -87,7 +87,7 @@ export function AdminSettingsPage(_props: { onNavigate?: unknown }) {
 
         {settings.length > 0 && (
           <form onSubmit={(e) => { e.preventDefault(); if (changed.length) save.mutate(); }}
-            className={`border rounded-2xl divide-y ${card} ${isDark ? 'divide-slate-700' : 'divide-slate-100'}`}>
+            className={`border rounded-2xl divide-y ${card} ${isDark ? 'divide-[#1c3b56]' : 'divide-[#e2f5f2]'}`}>
             {settings.map((s) => {
               const meta = HELP[s.key];
               const isDefault = Number(draft[s.key]) === s.default;
@@ -103,7 +103,7 @@ export function AdminSettingsPage(_props: { onNavigate?: unknown }) {
                         disabled={!canEdit}
                         value={draft[s.key] ?? ''}
                         onChange={(e) => setDraft((d) => ({ ...d, [s.key]: e.target.value }))}
-                        className={`w-full px-3 py-2 rounded-xl text-sm border tabular-nums text-right focus:outline-none focus:ring-2 focus:ring-[#00c9a7] disabled:opacity-60 ${isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'}`} />
+                        className={`w-full px-3 py-2 rounded-xl text-sm border tabular-nums text-right focus:outline-none focus:ring-2 focus:ring-[#00c9a7] disabled:opacity-60 ${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#c9f0e8]'}`} />
                       <span className={`text-sm w-12 ${muted}`}>{meta?.unit}</span>
                     </div>
                     {canEdit && !isDefault && (

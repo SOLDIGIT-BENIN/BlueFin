@@ -57,7 +57,7 @@ export function LocationPicker({
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm font-medium text-[#0F2940]">Position sur la carte <span className="text-slate-400 font-normal">(recommandé)</span></p>
+        <p className="text-sm font-medium text-[#0F2940]">Position sur la carte <span className="text-[#5b6b7a] font-normal">(recommandé)</span></p>
         <div className="flex gap-2">
           <button type="button" onClick={useMyPosition}
             className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border border-[#e2f5f2] text-[#00806b] hover:bg-[#f4fffe]">
@@ -65,7 +65,7 @@ export function LocationPicker({
           </button>
           {value && (
             <button type="button" onClick={() => onChange(null, null)}
-              className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border border-slate-200 text-slate-500 hover:bg-slate-50">
+              className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border border-[#e2f5f2] text-[#5b6b7a] hover:bg-[#f4fffe]">
               <Trash2 className="w-3.5 h-3.5" /> Retirer
             </button>
           )}
@@ -83,7 +83,7 @@ export function LocationPicker({
           )}
         </MapContainer>
       </div>
-      <p className="text-xs text-slate-500">
+      <p className="text-xs text-[#5b6b7a]">
         {value ? 'Position enregistrée. Faites glisser le repère pour l’ajuster.' : 'Touchez la carte à l’emplacement du logement. Sans position, l’annonce apparaît au centre de sa ville.'}
       </p>
       {geoError && <p className="text-xs text-red-600">{geoError}</p>}

@@ -19,7 +19,8 @@ import { Navbar } from './components/Navbar';
 import { Seo } from './components/Seo';
 import { LEGAL_INFO, LEGAL_PLACEHOLDER } from './config/legalInfo';
 import { useFavorites } from './hooks/useFavorites';
-import LogoUrl from './assets/Bluefin Immo_01.jpg.jpeg';
+import { BluefinLogo } from './components/brand/BluefinLogo';
+import { CertifiedBadge } from './components/brand/CertifiedBadge';
 import { useInquiryMessages } from './hooks/useInquiryMessages';
 import { PaymentInfoModal } from './components/PaymentInfoModal';
 import { fedapayService } from '../services/fedapay.service';
@@ -746,274 +747,10 @@ const allProperties = [
 ];
 
 // ========== COMPOSANT GOOGLE LOGIN + FACE ID ==========
-const GoogleLoginModal = ({ onSuccess, onClose }: { onSuccess: (data: any) => void; onClose: () => void }) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [isFaceIdMode, setIsFaceIdMode] = useState(false);
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [faceIdError, setFaceIdError] = useState("");
-  const [loginMethod, setLoginMethod] = useState<"email" | "google">("email");
-
-  // Simuler la vérification Face ID
-  const handleFaceIdVerification = () => {
-    setIsVerifying(true);
-    setFaceIdError("");
-    
-    // Simulation de la caméra Face ID
-    setTimeout(() => {
-      // 90% de chance de succès pour la simulation
-      const success = Math.random() > 0.1;
-      if (success) {
-        onSuccess({ 
-          name: "Jean Dupont", 
-          email: email || "jean.dupont@email.com",
-          verified: true,
-          faceIdVerified: true
-        });
-      } else {
-        setFaceIdError("Reconnaissance faciale échouée. Veuillez réessayer.");
-      }
-      setIsVerifying(false);
-    }, 2000);
-  };
-
-  const handleEmailLogin = () => {
-    if (!email || !password) {
-      setFaceIdError("Veuillez remplir tous les champs");
-      return;
-    }
-    setIsFaceIdMode(true);
-  };
-
-  const handleGoogleLogin = () => {
-    setIsFaceIdMode(true);
-  };
-
-  // Composant de capture d'identité (simulation)
-  const IdentityCapture = () => {
-    const [identityFile, setIdentityFile] = useState<File | null>(null);
-    const [identityPreview, setIdentityPreview] = useState<string>("");
-    const [identityType, setIdentityType] = useState<"cni" | "passeport" | "permis">("cni");
-
-    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (file) {
-        setIdentityFile(file);
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setIdentityPreview(reader.result as string);
-        };
-        reader.readAsDataURL(file);
-      }
-    };
-
-    return (
-      <div className="space-y-4">
-        <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileUpload}
-            className="hidden"
-            id="identity-upload"
-          />
-          <label htmlFor="identity-upload" className="cursor-pointer block">
-            {identityPreview ? (
-              <div className="relative">
-                <img src={identityPreview} alt="Carte d'identité" className="mx-auto max-h-48 rounded-lg" />
-                <div className="absolute top-2 right-2 bg-green-500 rounded-full p-1">
-                  <CheckCircle className="w-5 h-5 text-white" />
-                </div>
-              </div>
-            ) : (
-              <div className="py-8">
-                <Camera className="w-12 h-12 mx-auto text-gray-400 mb-3" />
-                <p className="text-gray-600">Cliquez pour prendre une photo ou télécharger</p>
-                <p className="text-xs text-gray-400 mt-2">PNG, JPG jusqu'à 5MB</p>
-              </div>
-            )}
-          </label>
-        </div>
-
-        <div className="flex gap-3">
-          {[
-            { id: "cni", label: "Carte d'identité" },
-            { id: "passeport", label: "Passeport" },
-            { id: "permis", label: "Permis de conduire" }
-          ].map(type => (
-            <button
-              key={type.id}
-              onClick={() => setIdentityType(type.id as any)}
-              className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${
-                identityType === type.id 
-                  ? "bg-[#00c9a7] text-[#0F2940]" 
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
-            >
-              {type.label}
-            </button>
-          ))}
-        </div>
-
-        {identityFile && (
-          <button 
-            onClick={() => {
-              if (identityFile) {
-                // Simuler la validation de l'identité
-                setIsFaceIdMode(false);
-                onSuccess({ 
-                  name: "Jean Dupont", 
-                  email: email || "jean.dupont@email.com",
-                  verified: true,
-                  faceIdVerified: true,
-                  identityVerified: true,
-                  identityType: identityType
-                });
-              }
-            }}
-            className="w-full bg-[#00c9a7] text-[#0F2940] py-3 rounded-xl font-semibold hover:bg-[#00b892] transition"
-          >
-            Vérifier mon identité
-          </button>
-        )}
-      </div>
-    );
-  };
-
-  if (isFaceIdMode && !isVerifying) {
-    return (
-      <div className="fixed inset-0 z-50 bg-black/80 overflow-y-auto p-4">
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-[#0F2940]">Vérification d'identité</h2>
-              <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <p className="text-gray-600 text-center mb-6">
-              Pour devenir hôte, nous devons vérifier votre identité
-            </p>
-
-            <IdentityCapture />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (isFaceIdMode && isVerifying) {
-    return (
-      <div className="fixed inset-0 z-50 bg-black/80 overflow-y-auto p-4">
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="bg-white rounded-3xl max-w-md w-full p-8 text-center">
-            <div className="w-24 h-24 mx-auto bg-[#00c9a7]/10 rounded-full flex items-center justify-center mb-6">
-              <Fingerprint className="w-12 h-12 text-[#00c9a7] animate-pulse" />
-            </div>
-            <h2 className="text-xl font-semibold text-[#0F2940] mb-2">Vérification Face ID</h2>
-            <p className="text-gray-500 mb-4">Regardez la caméra pour confirmer votre identité</p>
-            <div className="w-32 h-32 mx-auto border-4 border-[#00c9a7] rounded-full animate-pulse mb-4"></div>
-            {faceIdError && (
-              <p className="text-red-500 text-sm mb-4">{faceIdError}</p>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="fixed inset-0 z-50 bg-black/80 overflow-y-auto p-4">
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="bg-white rounded-3xl max-w-md w-full p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-[#0F2940]">Connexion hôte</h2>
-            <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100">
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* Mode de connexion */}
-          <div className="flex gap-2 mb-6">
-            <button
-              onClick={() => setLoginMethod("email")}
-              className={`flex-1 py-2 rounded-lg font-medium transition ${
-                loginMethod === "email" 
-                  ? "bg-[#00c9a7] text-[#0F2940]" 
-                  : "bg-gray-100 text-gray-600"
-              }`}
-            >
-              Email
-            </button>
-            <button
-              onClick={() => setLoginMethod("google")}
-              className={`flex-1 py-2 rounded-lg font-medium transition ${
-                loginMethod === "google" 
-                  ? "bg-[#00c9a7] text-[#0F2940]" 
-                  : "bg-gray-100 text-gray-600"
-              }`}
-            >
-              Google
-            </button>
-          </div>
-
-          {loginMethod === "email" ? (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent"
-                  placeholder="exemple@email.com"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent"
-                    placeholder="••••••••"
-                  />
-                  <button
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-2.5 text-gray-500"
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-              </div>
-              <button
-                onClick={handleEmailLogin}
-                className="w-full bg-[#00c9a7] text-[#0F2940] py-3 rounded-xl font-semibold hover:bg-[#00b892] transition"
-              >
-                Se connecter
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={handleGoogleLogin}
-              className="w-full flex items-center justify-center gap-3 border border-gray-300 py-3 rounded-xl hover:bg-gray-50 transition"
-            >
-              <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
-              <span className="font-medium">Continuer avec Google</span>
-            </button>
-          )}
-
-          <p className="text-center text-xs text-gray-500 mt-6">
-            En continuant, vous acceptez nos conditions d'utilisation et la politique de confidentialité
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-};
+// Le composant GoogleLoginModal (268 lignes) a été supprimé : jamais monté nulle
+// part, il affichait un faux bouton « Continuer avec Google » qui ne faisait que
+// basculer sur une simulation de reconnaissance faciale. La vraie connexion Google
+// passe par components/auth/GoogleSignInButton.tsx (Firebase Authentication).
 
 // ========== FORMULAIRE D'INSCRIPTION HÔTE ==========
 const RegistrationForm = ({ userData, onComplete, onBack }: any) => {
@@ -1029,64 +766,64 @@ const RegistrationForm = ({ userData, onComplete, onBack }: any) => {
   return (
     <div className="fixed inset-0 z-50 bg-white overflow-y-auto">
       <div className="max-w-2xl mx-auto p-6">
-        <button onClick={onBack} className="flex items-center gap-2 text-gray-600 mb-6">
+        <button onClick={onBack} className="flex items-center gap-2 text-[#5b6b7a] mb-6">
           <ArrowLeft className="w-5 h-5" /> Retour
         </button>
         
         <h1 className="text-2xl font-semibold text-[#0F2940] mb-2">Complétez votre profil</h1>
-        <p className="text-gray-500 mb-8">Ces informations seront visibles par les voyageurs</p>
+        <p className="text-[#5b6b7a] mb-8">Ces informations seront visibles par les voyageurs</p>
 
         <div className="space-y-6">
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Prénom</label>
+              <label className="block text-sm font-medium text-[#1c3b56] mb-1">Prénom</label>
               <input
                 type="text"
                 value={formData.firstName}
                 onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00c9a7]"
+                className="w-full px-4 py-2 border border-[#c9f0e8] rounded-lg focus:ring-2 focus:ring-[#00c9a7]"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+              <label className="block text-sm font-medium text-[#1c3b56] mb-1">Nom</label>
               <input
                 type="text"
                 value={formData.lastName}
                 onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00c9a7]"
+                className="w-full px-4 py-2 border border-[#c9f0e8] rounded-lg focus:ring-2 focus:ring-[#00c9a7]"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
+            <label className="block text-sm font-medium text-[#1c3b56] mb-1">Téléphone</label>
             <input
               type="tel"
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00c9a7]"
+              className="w-full px-4 py-2 border border-[#c9f0e8] rounded-lg focus:ring-2 focus:ring-[#00c9a7]"
               placeholder="+229 XX XX XX XX"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Adresse</label>
+            <label className="block text-sm font-medium text-[#1c3b56] mb-1">Adresse</label>
             <input
               type="text"
               value={formData.address}
               onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00c9a7]"
+              className="w-full px-4 py-2 border border-[#c9f0e8] rounded-lg focus:ring-2 focus:ring-[#00c9a7]"
               placeholder="Votre adresse complète"
             />
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Ville</label>
+              <label className="block text-sm font-medium text-[#1c3b56] mb-1">Ville</label>
               <select
                 value={formData.city}
                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00c9a7]"
+                className="w-full px-4 py-2 border border-[#c9f0e8] rounded-lg focus:ring-2 focus:ring-[#00c9a7]"
               >
                 <option>Cotonou</option>
                 <option>Porto-Novo</option>
@@ -1095,11 +832,11 @@ const RegistrationForm = ({ userData, onComplete, onBack }: any) => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Pays</label>
+              <label className="block text-sm font-medium text-[#1c3b56] mb-1">Pays</label>
               <input
                 type="text"
                 value={formData.country}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
+                className="w-full px-4 py-2 border border-[#c9f0e8] rounded-lg bg-[#f4fffe]"
                 disabled
               />
             </div>
@@ -1107,7 +844,7 @@ const RegistrationForm = ({ userData, onComplete, onBack }: any) => {
 
           <button
             onClick={onComplete}
-            className="w-full bg-[#00c9a7] text-[#0F2940] py-3 rounded-xl font-semibold hover:bg-[#00b892] transition"
+            className="w-full bg-[#00c9a7] text-[#0F2940] py-3 rounded-xl font-semibold hover:bg-[#00b396] transition"
           >
             Continuer
           </button>
@@ -1129,28 +866,28 @@ const CommunityCommitment = ({ onAccept, onBack }: any) => {
   return (
     <div className="fixed inset-0 z-50 bg-white overflow-y-auto pb-24 lg:pb-0">
       <div className="max-w-2xl mx-auto p-6 pb-8">
-        <button onClick={onBack} className="flex items-center gap-2 text-gray-600 mb-6">
+        <button onClick={onBack} className="flex items-center gap-2 text-[#5b6b7a] mb-6">
           <ArrowLeft className="w-5 h-5" /> Retour
         </button>
         
         <div className="text-center mb-8">
           <Shield className="w-16 h-16 text-[#00c9a7] mx-auto mb-4" />
           <h1 className="text-2xl font-semibold text-[#0F2940]">Engagement communautaire</h1>
-          <p className="text-gray-500 mt-2">En devenant hôte, vous vous engagez à respecter nos valeurs</p>
+          <p className="text-[#5b6b7a] mt-2">En devenant hôte, vous vous engagez à respecter nos valeurs</p>
         </div>
 
         <div className="space-y-4 mb-8">
           {commitments.map((commitment, idx) => (
             <div key={idx} className="flex items-center gap-3 p-3 rounded-lg bg-[#f4fffe]">
               <CheckCircle className="w-5 h-5 text-[#00c9a7]" />
-              <span className="text-gray-700">{commitment}</span>
+              <span className="text-[#1c3b56]">{commitment}</span>
             </div>
           ))}
         </div>
 
         <button
           onClick={onAccept}
-          className="w-full bg-[#00c9a7] text-[#0F2940] py-3 rounded-xl font-semibold hover:bg-[#00b892] transition"
+          className="w-full bg-[#00c9a7] text-[#0F2940] py-3 rounded-xl font-semibold hover:bg-[#00b396] transition"
         >
           J'accepte et je continue
         </button>
@@ -1163,8 +900,8 @@ const CommunityCommitment = ({ onAccept, onBack }: any) => {
 const EasySteps = ({ onContinue, onQuit }: any) => {
   const steps = [
     { icon: Home, title: "Créez votre annonce", desc: "Décrivez votre logement en quelques étapes", color: "from-[#00c9a7] to-[#00b396]" },
-    { icon: Calendar, title: "Calendrier et tarifs", desc: "Définissez vos disponibilités et prix", color: "from-[#0f2940] to-[#1a3a52]" },
-    { icon: Users, title: "Accueillez les voyageurs", desc: "Recevez des réservations et gérez vos hôtes", color: "from-[#ff6b6b] to-[#ff5252]" }
+    { icon: Calendar, title: "Calendrier et tarifs", desc: "Définissez vos disponibilités et prix", color: "from-[#0f2940] to-[#1c3b56]" },
+    { icon: Users, title: "Accueillez les voyageurs", desc: "Recevez des réservations et gérez vos hôtes", color: "from-[#00806b] to-[#005c4d]" }
   ];
 
   return (
@@ -1172,7 +909,7 @@ const EasySteps = ({ onContinue, onQuit }: any) => {
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="max-w-4xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
           {/* Header avec bouton de fermeture */}
-          <div className="relative bg-gradient-to-r from-[#0f2940] to-[#1a3a52] px-6 py-8 text-center">
+          <div className="relative bg-[#0f2940] px-6 py-8 text-center">
             <button
               onClick={onQuit}
               className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors"
@@ -1194,7 +931,7 @@ const EasySteps = ({ onContinue, onQuit }: any) => {
                   <div key={idx} className="group text-center">
                     {/* Étape numéro */}
                     <div className="relative mb-4">
-                      <div className="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-gradient-to-r from-[#00c9a7] to-[#0f2940] text-white text-xs font-bold flex items-center justify-center">
+                      <div className="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-[#00c9a7] text-white text-xs font-bold flex items-center justify-center">
                         {idx + 1}
                       </div>
                       <div className={`w-20 h-20 mx-auto bg-gradient-to-r ${step.color} rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
@@ -1202,23 +939,23 @@ const EasySteps = ({ onContinue, onQuit }: any) => {
                       </div>
                     </div>
                     <h3 className="font-semibold text-[#0F2940] text-lg mb-2">{step.title}</h3>
-                    <p className="text-sm text-gray-500 leading-relaxed">{step.desc}</p>
+                    <p className="text-sm text-[#5b6b7a] leading-relaxed">{step.desc}</p>
                   </div>
                 );
               })}
             </div>
 
             {/* Boutons */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-slate-100">
+            <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-[#e2f5f2]">
               <button
                 onClick={onContinue}
-                className="flex-1 bg-gradient-to-r from-[#00c9a7] to-[#0f2940] text-white py-3 px-6 rounded-xl font-semibold hover:shadow-lg hover:scale-[1.02] transition-all duration-300"
+                className="flex-1 bg-[#00c9a7] text-white py-3 px-6 rounded-xl font-semibold hover:shadow-lg hover:scale-[1.02] transition-all duration-300"
               >
                 Créer mon annonce
               </button>
               <button
                 onClick={onQuit}
-                className="flex-1 border-2 border-slate-200 text-slate-600 py-3 px-6 rounded-xl font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all duration-300"
+                className="flex-1 border-2 border-[#e2f5f2] text-[#5b6b7a] py-3 px-6 rounded-xl font-semibold hover:bg-[#f4fffe] hover:border-[#c9f0e8] transition-all duration-300"
               >
                 Plus tard
               </button>
@@ -1274,21 +1011,21 @@ const PropertyForm = ({ onSaveAndQuit, userData, onGoToDashboard }: any) => {
           <div className="space-y-4">
             <h2 className="text-xl font-semibold text-[#0F2940]">Informations de base</h2>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Titre de l'annonce</label>
+              <label className="block text-sm font-medium text-[#1c3b56] mb-1">Titre de l'annonce</label>
               <input
                 type="text"
                 value={propertyData.title}
                 onChange={(e) => setPropertyData({ ...propertyData, title: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                className="w-full px-4 py-2 border border-[#c9f0e8] rounded-lg"
                 placeholder="Ex: Charmant appartement au cœur de Cotonou"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Type de logement</label>
+              <label className="block text-sm font-medium text-[#1c3b56] mb-1">Type de logement</label>
               <select
                 value={propertyData.type}
                 onChange={(e) => setPropertyData({ ...propertyData, type: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                className="w-full px-4 py-2 border border-[#c9f0e8] rounded-lg"
               >
                 <option value="appartement">Appartement</option>
                 <option value="maison">Maison</option>
@@ -1298,12 +1035,12 @@ const PropertyForm = ({ onSaveAndQuit, userData, onGoToDashboard }: any) => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <label className="block text-sm font-medium text-[#1c3b56] mb-1">Description</label>
               <textarea
                 rows={4}
                 value={propertyData.description}
                 onChange={(e) => setPropertyData({ ...propertyData, description: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                className="w-full px-4 py-2 border border-[#c9f0e8] rounded-lg"
                 placeholder="Décrivez votre logement..."
               />
             </div>
@@ -1315,43 +1052,43 @@ const PropertyForm = ({ onSaveAndQuit, userData, onGoToDashboard }: any) => {
             <h2 className="text-xl font-semibold text-[#0F2940]">Capacité et équipements</h2>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Voyageurs max</label>
+                <label className="block text-sm font-medium text-[#1c3b56] mb-1">Voyageurs max</label>
                 <input
                   type="number"
                   min={1}
                   value={propertyData.guests}
                   onChange={(e) => setPropertyData({ ...propertyData, guests: parseInt(e.target.value) })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-4 py-2 border border-[#c9f0e8] rounded-lg"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Chambres</label>
+                <label className="block text-sm font-medium text-[#1c3b56] mb-1">Chambres</label>
                 <input
                   type="number"
                   min={0}
                   value={propertyData.bedrooms}
                   onChange={(e) => setPropertyData({ ...propertyData, bedrooms: parseInt(e.target.value) })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-4 py-2 border border-[#c9f0e8] rounded-lg"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Lits</label>
+                <label className="block text-sm font-medium text-[#1c3b56] mb-1">Lits</label>
                 <input
                   type="number"
                   min={0}
                   value={propertyData.beds}
                   onChange={(e) => setPropertyData({ ...propertyData, beds: parseInt(e.target.value) })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-4 py-2 border border-[#c9f0e8] rounded-lg"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Salles de bain</label>
+                <label className="block text-sm font-medium text-[#1c3b56] mb-1">Salles de bain</label>
                 <input
                   type="number"
                   min={0}
                   value={propertyData.bathrooms}
                   onChange={(e) => setPropertyData({ ...propertyData, bathrooms: parseInt(e.target.value) })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-4 py-2 border border-[#c9f0e8] rounded-lg"
                 />
               </div>
             </div>
@@ -1361,7 +1098,7 @@ const PropertyForm = ({ onSaveAndQuit, userData, onGoToDashboard }: any) => {
         return (
           <div className="space-y-4">
             <h2 className="text-xl font-semibold text-[#0F2940]">Photos</h2>
-            <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center">
+            <div className="border-2 border-dashed border-[#c9f0e8] rounded-xl p-6 text-center">
               <input
                 type="file"
                 accept="image/*"
@@ -1371,9 +1108,9 @@ const PropertyForm = ({ onSaveAndQuit, userData, onGoToDashboard }: any) => {
                 id="photos-upload"
               />
               <label htmlFor="photos-upload" className="cursor-pointer block">
-                <Camera className="w-12 h-12 mx-auto text-gray-400 mb-3" />
-                <p className="text-gray-600">Cliquez pour ajouter des photos</p>
-                <p className="text-xs text-gray-400">Minimum 5 photos recommandées</p>
+                <Camera className="w-12 h-12 mx-auto text-[#5b6b7a] mb-3" />
+                <p className="text-[#5b6b7a]">Cliquez pour ajouter des photos</p>
+                <p className="text-xs text-[#5b6b7a]">Minimum 5 photos recommandées</p>
               </label>
             </div>
             {photoPreview.length > 0 && (
@@ -1390,30 +1127,30 @@ const PropertyForm = ({ onSaveAndQuit, userData, onGoToDashboard }: any) => {
           <div className="space-y-4">
             <h2 className="text-xl font-semibold text-[#0F2940]">Tarifs et disponibilités</h2>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Prix par nuit (FCFA)</label>
+              <label className="block text-sm font-medium text-[#1c3b56] mb-1">Prix par nuit (FCFA)</label>
               <input
                 type="number"
                 value={propertyData.price}
                 onChange={(e) => setPropertyData({ ...propertyData, price: parseInt(e.target.value) })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                className="w-full px-4 py-2 border border-[#c9f0e8] rounded-lg"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Adresse exacte</label>
+              <label className="block text-sm font-medium text-[#1c3b56] mb-1">Adresse exacte</label>
               <input
                 type="text"
                 value={propertyData.address}
                 onChange={(e) => setPropertyData({ ...propertyData, address: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                className="w-full px-4 py-2 border border-[#c9f0e8] rounded-lg"
                 placeholder="Numéro, rue, quartier"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Ville</label>
+              <label className="block text-sm font-medium text-[#1c3b56] mb-1">Ville</label>
               <select
                 value={propertyData.city}
                 onChange={(e) => setPropertyData({ ...propertyData, city: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                className="w-full px-4 py-2 border border-[#c9f0e8] rounded-lg"
               >
                 <option>Cotonou</option>
                 <option>Porto-Novo</option>
@@ -1433,7 +1170,7 @@ const PropertyForm = ({ onSaveAndQuit, userData, onGoToDashboard }: any) => {
       <div className="max-w-2xl mx-auto p-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-semibold text-[#0F2940]">Créer mon annonce</h1>
-          <button onClick={onSaveAndQuit} className="text-gray-500 hover:text-gray-700">
+          <button onClick={onSaveAndQuit} className="text-[#5b6b7a] hover:text-[#1c3b56]">
             Sauvegarder et quitter
           </button>
         </div>
@@ -1444,7 +1181,7 @@ const PropertyForm = ({ onSaveAndQuit, userData, onGoToDashboard }: any) => {
             <div
               key={step}
               className={`flex-1 h-2 rounded-full transition ${
-                step <= currentStep ? "bg-[#00c9a7]" : "bg-gray-200"
+                step <= currentStep ? "bg-[#00c9a7]" : "bg-[#e2f5f2]"
               }`}
             />
           ))}
@@ -1456,14 +1193,14 @@ const PropertyForm = ({ onSaveAndQuit, userData, onGoToDashboard }: any) => {
           {currentStep > 1 && (
             <button
               onClick={handlePrevious}
-              className="flex-1 border border-gray-300 py-3 rounded-xl font-semibold hover:bg-gray-50 transition"
+              className="flex-1 border border-[#c9f0e8] py-3 rounded-xl font-semibold hover:bg-[#f4fffe] transition"
             >
               Précédent
             </button>
           )}
           <button
             onClick={handleNext}
-            className="flex-1 bg-[#00c9a7] text-[#0F2940] py-3 rounded-xl font-semibold hover:bg-[#00b892] transition"
+            className="flex-1 bg-[#00c9a7] text-[#0F2940] py-3 rounded-xl font-semibold hover:bg-[#00b396] transition"
           >
             {currentStep === 4 ? "Publier mon annonce" : "Continuer"}
           </button>
@@ -1491,16 +1228,16 @@ const HostDashboard = ({ onLogout, userData }: any) => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#f4fffe]">
       <div className="sticky top-0 z-40 bg-white border-b px-5 py-4">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <button onClick={onLogout} className="text-gray-500">
+            <button onClick={onLogout} className="text-[#5b6b7a]">
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div>
               <h1 className="text-xl font-semibold text-[#0F2940]">Tableau de bord hôte</h1>
-              <p className="text-sm text-gray-500">Bienvenue {userData?.name || "Hôte"}</p>
+              <p className="text-sm text-[#5b6b7a]">Bienvenue {userData?.name || "Hôte"}</p>
             </div>
           </div>
           <button className="bg-[#00c9a7] text-[#0F2940] px-4 py-2 rounded-full text-sm font-medium">
@@ -1521,7 +1258,7 @@ const HostDashboard = ({ onLogout, userData }: any) => {
                   <span className="text-xs text-green-600">{stat.change}</span>
                 </div>
                 <p className="text-2xl font-bold text-[#0F2940]">{stat.value}</p>
-                <p className="text-sm text-gray-500">{stat.label}</p>
+                <p className="text-sm text-[#5b6b7a]">{stat.label}</p>
               </div>
             );
           })}
@@ -1541,7 +1278,7 @@ const HostDashboard = ({ onLogout, userData }: any) => {
               className={`pb-3 px-2 font-medium transition ${
                 activeTab === tab.id 
                   ? "text-[#00c9a7] border-b-2 border-[#00c9a7]" 
-                  : "text-gray-500 hover:text-gray-700"
+                  : "text-[#5b6b7a] hover:text-[#1c3b56]"
               }`}
             >
               {tab.label}
@@ -1553,18 +1290,18 @@ const HostDashboard = ({ onLogout, userData }: any) => {
         {activeTab === "reservations" && (
           <div className="bg-white rounded-xl overflow-hidden shadow-sm">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b">
+              <thead className="bg-[#f4fffe] border-b">
                 <tr>
-                  <th className="text-left p-4 text-sm font-medium text-gray-500">Voyageur</th>
-                  <th className="text-left p-4 text-sm font-medium text-gray-500">Dates</th>
-                  <th className="text-left p-4 text-sm font-medium text-gray-500">Montant</th>
-                  <th className="text-left p-4 text-sm font-medium text-gray-500">Statut</th>
-                  <th className="text-left p-4 text-sm font-medium text-gray-500">Actions</th>
+                  <th className="text-left p-4 text-sm font-medium text-[#5b6b7a]">Voyageur</th>
+                  <th className="text-left p-4 text-sm font-medium text-[#5b6b7a]">Dates</th>
+                  <th className="text-left p-4 text-sm font-medium text-[#5b6b7a]">Montant</th>
+                  <th className="text-left p-4 text-sm font-medium text-[#5b6b7a]">Statut</th>
+                  <th className="text-left p-4 text-sm font-medium text-[#5b6b7a]">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {recentBookings.map(booking => (
-                  <tr key={booking.id} className="border-b hover:bg-gray-50">
+                  <tr key={booking.id} className="border-b hover:bg-[#f4fffe]">
                     <td className="p-4">{booking.guest}</td>
                     <td className="p-4 text-sm">{booking.dates}</td>
                     <td className="p-4 font-medium">{booking.amount}</td>
@@ -1572,7 +1309,7 @@ const HostDashboard = ({ onLogout, userData }: any) => {
                       <span className={`px-2 py-1 rounded-full text-xs ${
                         booking.status === "confirmée" 
                           ? "bg-green-100 text-green-700" 
-                          : "bg-yellow-100 text-yellow-700"
+                          : "bg-[#fff3cd] text-[#6b4e06]"
                       }`}>
                         {booking.status}
                       </span>
@@ -1588,19 +1325,19 @@ const HostDashboard = ({ onLogout, userData }: any) => {
         )}
 
         {activeTab === "calendar" && (
-          <div className="bg-white rounded-xl p-6 shadow-sm text-center text-gray-500">
+          <div className="bg-white rounded-xl p-6 shadow-sm text-center text-[#5b6b7a]">
             Calendrier des réservations (à implémenter)
           </div>
         )}
 
         {activeTab === "annonces" && (
-          <div className="bg-white rounded-xl p-6 shadow-sm text-center text-gray-500">
+          <div className="bg-white rounded-xl p-6 shadow-sm text-center text-[#5b6b7a]">
             Liste de vos annonces (à implémenter)
           </div>
         )}
 
         {activeTab === "payouts" && (
-          <div className="bg-white rounded-xl p-6 shadow-sm text-center text-gray-500">
+          <div className="bg-white rounded-xl p-6 shadow-sm text-center text-[#5b6b7a]">
             Historique des paiements (à implémenter)
           </div>
         )}
@@ -1674,17 +1411,17 @@ const ArticleModal = ({ article, onClose }: { article: { id: string; title: stri
     <div className="fixed inset-0 z-50 bg-black/80 overflow-y-auto p-4">
       <div className="min-h-screen flex items-center justify-center">
         <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-          <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex justify-between items-center">
+          <div className="sticky top-0 bg-white border-b border-[#e2f5f2] p-4 flex justify-between items-center">
             <div>
               <span className="text-sm text-[#00c9a7] font-medium">Guide pratique • {article.category}</span>
               <h2 className="text-2xl font-semibold text-[#0F2940]">{article.title}</h2>
             </div>
-            <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100"><X className="w-5 h-5" /></button>
+            <button onClick={onClose} className="p-2 rounded-full hover:bg-[#e8faf6]"><X className="w-5 h-5" /></button>
           </div>
           
           <div className="p-6">
             <div className="space-y-6">
-              <p className="text-gray-700">Vos projets ont changé et vous devez maintenant annuler votre réservation d'un logement ? Aucun problème.</p>
+              <p className="text-[#1c3b56]">Vos projets ont changé et vous devez maintenant annuler votre réservation d'un logement ? Aucun problème.</p>
               
               <div className="bg-[#0F2940]/5 rounded-xl p-4 mb-4">
                 <h3 className="text-xl font-semibold text-[#0F2940] mt-2 mb-4">Dans cet article</h3>
@@ -1702,23 +1439,23 @@ const ArticleModal = ({ article, onClose }: { article: { id: string; title: stri
               <h3 id="annuler" className="text-xl font-semibold text-[#0F2940] mt-6 mb-4 border-l-4 border-[#00c9a7] pl-3">Annuler une réservation</h3>
               
               {/* Onglets filtrants */}
-              <div className="flex flex-wrap gap-2 border-b border-gray-200 pb-2">
-                <button onClick={() => setActiveDevice("ordi")} className={`px-5 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${activeDevice === "ordi" ? "bg-[#00c9a7] text-[#0F2940] shadow-md" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}>
+              <div className="flex flex-wrap gap-2 border-b border-[#e2f5f2] pb-2">
+                <button onClick={() => setActiveDevice("ordi")} className={`px-5 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${activeDevice === "ordi" ? "bg-[#00c9a7] text-[#0F2940] shadow-md" : "bg-[#e8faf6] text-[#1c3b56] hover:bg-[#e2f5f2]"}`}>
                   <Monitor className="w-4 h-4" /> Ordinateur
                 </button>
-                <button onClick={() => setActiveDevice("ios")} className={`px-5 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${activeDevice === "ios" ? "bg-[#00c9a7] text-[#0F2940] shadow-md" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}>
+                <button onClick={() => setActiveDevice("ios")} className={`px-5 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${activeDevice === "ios" ? "bg-[#00c9a7] text-[#0F2940] shadow-md" : "bg-[#e8faf6] text-[#1c3b56] hover:bg-[#e2f5f2]"}`}>
                   <Smartphone className="w-4 h-4" /> iOS
                 </button>
-                <button onClick={() => setActiveDevice("android")} className={`px-5 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${activeDevice === "android" ? "bg-[#00c9a7] text-[#0F2940] shadow-md" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}>
+                <button onClick={() => setActiveDevice("android")} className={`px-5 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${activeDevice === "android" ? "bg-[#00c9a7] text-[#0F2940] shadow-md" : "bg-[#e8faf6] text-[#1c3b56] hover:bg-[#e2f5f2]"}`}>
                   <Smartphone className="w-4 h-4" /> Android
                 </button>
-                <button onClick={() => setActiveDevice("mobile")} className={`px-5 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${activeDevice === "mobile" ? "bg-[#00c9a7] text-[#0F2940] shadow-md" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}>
+                <button onClick={() => setActiveDevice("mobile")} className={`px-5 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${activeDevice === "mobile" ? "bg-[#00c9a7] text-[#0F2940] shadow-md" : "bg-[#e8faf6] text-[#1c3b56] hover:bg-[#e2f5f2]"}`}>
                   <Tablet className="w-4 h-4" /> Mobile
                 </button>
               </div>
               
               {/* Contenu de l'onglet actif */}
-              <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm mt-4">
+              <div className="bg-white rounded-xl p-5 border border-[#e2f5f2] shadow-sm mt-4">
                 <div className="flex items-center gap-3 mb-4">
                   {activeDevice === "ordi" && <Monitor className="w-6 h-6 text-[#00c9a7]" />}
                   {activeDevice === "ios" && <Smartphone className="w-6 h-6 text-[#00c9a7]" />}
@@ -1726,7 +1463,7 @@ const ArticleModal = ({ article, onClose }: { article: { id: string; title: stri
                   {activeDevice === "mobile" && <Tablet className="w-6 h-6 text-[#00c9a7]" />}
                   <span className="font-semibold text-[#0F2940] text-lg">{deviceContent.title}</span>
                 </div>
-                <ol className="list-decimal pl-5 space-y-3 text-gray-700">
+                <ol className="list-decimal pl-5 space-y-3 text-[#1c3b56]">
                   {deviceContent.steps.map((step, idx) => (
                     <li key={idx}>{step}</li>
                   ))}
@@ -1734,49 +1471,49 @@ const ArticleModal = ({ article, onClose }: { article: { id: string; title: stri
               </div>
 
               <div className="bg-[#0F2940]/5 rounded-xl p-5 mt-4">
-                <p className="text-gray-700 leading-relaxed">Les délais d'annulation pour recevoir un remboursement sont calculés à partir de l'heure d'arrivée précisée pour le logement en question, dans le fuseau horaire local, ou 15h si aucune heure d'arrivée n'est spécifiée.</p>
+                <p className="text-[#1c3b56] leading-relaxed">Les délais d'annulation pour recevoir un remboursement sont calculés à partir de l'heure d'arrivée précisée pour le logement en question, dans le fuseau horaire local, ou 15h si aucune heure d'arrivée n'est spécifiée.</p>
               </div>
 
               <h3 id="conditions" className="text-xl font-semibold text-[#0F2940] mt-8 mb-4 border-l-4 border-[#00c9a7] pl-3">Conditions d'annulation pour les séjours dans des logements</h3>
               <div className="bg-[#0F2940]/5 rounded-xl p-5">
-                <p className="text-gray-700 leading-relaxed">Pour les réservations de logements, les conditions d'annulation sont fixées par l'hôte et varient selon les annonces. Si un hôte a opté pour une politique avec une option de remboursement intégral, vous pouvez annuler la réservation gratuitement. Assurez-vous simplement d'annuler avant l'heure et la date indiquées.</p>
-                <p className="text-gray-700 mt-3 leading-relaxed">N'oubliez pas : pour certaines annonces, il est possible que la réservation ne soit pas remboursable, ou qu'elle ne le soit que partiellement, après certaines dates et heures. Dans ce cas, vous ne pourrez pas annuler votre réservation gratuitement. Dans les rares cas où un événement majeur sur votre lieu de destination vous empêcherait de bénéficier de votre réservation, vous pouvez être éligible à un remboursement en vertu de la Politique relative aux circonstances extraordinaires de Bf-Immo.</p>
+                <p className="text-[#1c3b56] leading-relaxed">Pour les réservations de logements, les conditions d'annulation sont fixées par l'hôte et varient selon les annonces. Si un hôte a opté pour une politique avec une option de remboursement intégral, vous pouvez annuler la réservation gratuitement. Assurez-vous simplement d'annuler avant l'heure et la date indiquées.</p>
+                <p className="text-[#1c3b56] mt-3 leading-relaxed">N'oubliez pas : pour certaines annonces, il est possible que la réservation ne soit pas remboursable, ou qu'elle ne le soit que partiellement, après certaines dates et heures. Dans ce cas, vous ne pourrez pas annuler votre réservation gratuitement. Dans les rares cas où un événement majeur sur votre lieu de destination vous empêcherait de bénéficier de votre réservation, vous pouvez être éligible à un remboursement en vertu de la Politique relative aux circonstances extraordinaires de Bf-Immo.</p>
               </div>
 
               <h3 id="consequences" className="text-xl font-semibold text-[#0F2940] mt-8 mb-4 border-l-4 border-[#00c9a7] pl-3">Conséquences d'une annulation de réservation de logement sur les réservations de service</h3>
               <div className="bg-[#0F2940]/5 rounded-xl p-5">
-                <p className="text-gray-700">Si vous avez réservé des services dans le logement que vous annulez, n'oubliez pas que vous devez les annuler séparément ou contacter l'hôte concerné afin de trouver une autre solution.</p>
+                <p className="text-[#1c3b56]">Si vous avez réservé des services dans le logement que vous annulez, n'oubliez pas que vous devez les annuler séparément ou contacter l'hôte concerné afin de trouver une autre solution.</p>
               </div>
 
               <h3 id="remboursement" className="text-xl font-semibold text-[#0F2940] mt-8 mb-4 border-l-4 border-[#00c9a7] pl-3">Vérifiez si vous recevrez un remboursement avant d'annuler</h3>
               <div className="bg-[#0F2940]/5 rounded-xl p-5">
-                <p className="text-gray-700">Découvrez les remboursements auxquels vous avez droit en cas d'annulation d'une réservation d'un logement. N'oubliez pas : le montant remboursé ne sera jamais supérieur au montant payé au moment de l'annulation. Vous pouvez connaître le montant du remboursement avant ou après l'annulation de la réservation.</p>
+                <p className="text-[#1c3b56]">Découvrez les remboursements auxquels vous avez droit en cas d'annulation d'une réservation d'un logement. N'oubliez pas : le montant remboursé ne sera jamais supérieur au montant payé au moment de l'annulation. Vous pouvez connaître le montant du remboursement avant ou après l'annulation de la réservation.</p>
               </div>
 
               <h3 id="apres-arrivee" className="text-xl font-semibold text-[#0F2940] mt-8 mb-4 border-l-4 border-[#00c9a7] pl-3">Si vous annulez après l'arrivée</h3>
               <div className="bg-[#0F2940]/5 rounded-xl p-5">
-                <p className="text-gray-700">Si vous annulez votre réservation après votre arrivée, vous devez quitter le logement immédiatement.</p>
+                <p className="text-[#1c3b56]">Si vous annulez votre réservation après votre arrivée, vous devez quitter le logement immédiatement.</p>
               </div>
 
               <h3 id="probleme" className="text-xl font-semibold text-[#0F2940] mt-8 mb-4 border-l-4 border-[#00c9a7] pl-3">Si vous annulez en raison d'un problème pendant votre séjour</h3>
               <div className="bg-[#0F2940]/5 rounded-xl p-5">
-                <p className="text-gray-700">Si vous rencontrez un problème pendant votre séjour, vous pouvez demander à l'hôte d'y remédier, demander un remboursement partiel ou l'annulation de la réservation pour bénéficier d'un remboursement intégral. Avant d'annuler votre séjour, consultez les options qui s'offrent à vous en cas de problème pendant votre séjour.</p>
+                <p className="text-[#1c3b56]">Si vous rencontrez un problème pendant votre séjour, vous pouvez demander à l'hôte d'y remédier, demander un remboursement partiel ou l'annulation de la réservation pour bénéficier d'un remboursement intégral. Avant d'annuler votre séjour, consultez les options qui s'offrent à vous en cas de problème pendant votre séjour.</p>
               </div>
 
               <h3 id="service" className="text-xl font-semibold text-[#0F2940] mt-8 mb-4 border-l-4 border-[#00c9a7] pl-3">Comment puis-je annuler un service ou une expérience ?</h3>
               <div className="bg-[#0F2940]/5 rounded-xl p-5">
-                <p className="text-gray-700">Vous souhaitez annuler un service ou une expérience ? En général, vous pouvez annuler gratuitement jusqu'à 1 jour (24 heures) avant le début du service ou de l'expérience. Toutefois, certains services et expériences vous permettent d'annuler et d'obtenir un remboursement intégral jusqu'à 3 jours (72 heures) avant l'heure de début. Découvrez comment annuler votre réservation de service ou d'expérience en tant que voyageur.</p>
+                <p className="text-[#1c3b56]">Vous souhaitez annuler un service ou une expérience ? En général, vous pouvez annuler gratuitement jusqu'à 1 jour (24 heures) avant le début du service ou de l'expérience. Toutefois, certains services et expériences vous permettent d'annuler et d'obtenir un remboursement intégral jusqu'à 3 jours (72 heures) avant l'heure de début. Découvrez comment annuler votre réservation de service ou d'expérience en tant que voyageur.</p>
               </div>
 
-              <div className="bg-gradient-to-r from-[#00c9a7]/10 to-[#0F2940]/10 rounded-xl p-4 mt-8">
+              <div className="bg-[#f4fffe] rounded-xl p-4 mt-8">
                 <p className="font-medium text-[#0F2940]">Cet article vous a-t-il été utile ?</p>
                 <div className="flex gap-4 mt-3">
-                  <button className="px-5 py-2 bg-[#00c9a7] text-[#0F2940] rounded-full text-sm font-medium hover:bg-[#00b892] transition">Oui</button>
-                  <button className="px-5 py-2 border border-gray-300 rounded-full text-sm font-medium hover:bg-gray-50 transition">Non</button>
+                  <button className="px-5 py-2 bg-[#00c9a7] text-[#0F2940] rounded-full text-sm font-medium hover:bg-[#00b396] transition">Oui</button>
+                  <button className="px-5 py-2 border border-[#c9f0e8] rounded-full text-sm font-medium hover:bg-[#f4fffe] transition">Non</button>
                 </div>
               </div>
 
-              <div className="border-t border-gray-200 pt-6 mt-8">
+              <div className="border-t border-[#e2f5f2] pt-6 mt-8">
                 <h4 className="font-semibold text-[#0F2940] mb-3">Sur le même sujet</h4>
                 <ul className="space-y-2">
                   <li><a href="#" className="text-[#00c9a7] text-sm hover:underline flex items-center gap-2"><ArrowRight className="w-3 h-3" /> Trouvez les conditions d'annulation qui s'appliquent à tout logement, service ou expérience</a></li>
@@ -1804,7 +1541,7 @@ const articlesData: Record<string, { title: string; category: string; content: s
     category: "Voyageur",
     content: `
       <div class="space-y-6">
-        <p class="text-gray-700">Nous acceptons plusieurs modes de paiement. Dans la plupart des pays, vous pouvez payer avec les principales cartes de crédit, ainsi que les cartes de débit qui peuvent être traitées comme des cartes de crédit. Nous acceptons également les portefeuilles numériques comme mobile money, ainsi que les services en ligne tels que Mastercard, Visa. Quel que soit votre mode de paiement, assurez la sécurité de vos transactions en les effectuant toujours sur Bf-Immo.</p>
+        <p class="text-[#1c3b56]">Nous acceptons plusieurs modes de paiement. Dans la plupart des pays, vous pouvez payer avec les principales cartes de crédit, ainsi que les cartes de débit qui peuvent être traitées comme des cartes de crédit. Nous acceptons également les portefeuilles numériques comme mobile money, ainsi que les services en ligne tels que Mastercard, Visa. Quel que soit votre mode de paiement, assurez la sécurité de vos transactions en les effectuant toujours sur Bf-Immo.</p>
         
         <div class="bg-[#0F2940]/5 rounded-xl p-4 mb-4">
           <h3 class="text-lg font-semibold text-[#0F2940] mb-3">Dans cet article</h3>
@@ -1818,12 +1555,12 @@ const articlesData: Record<string, { title: string; category: string; content: s
 
         <h3 id="fedapay" class="text-xl font-semibold text-[#0F2940] mt-8 mb-4 border-l-4 border-[#00c9a7] pl-3">Paiement différé avec FedaPay</h3>
         <div class="bg-[#0F2940]/5 rounded-xl p-5">
-          <p class="text-gray-700">Les résidents des États-Unis et du Canada ont la possibilité de payer avec Fedapay, ce qui leur permet de régler en plusieurs fois plutôt qu'en une seule fois. Fedapay accepte toutes les principales cartes de débit et de crédit (comme Visa et Mastercard). Les cartes prépayées ne sont pas acceptées. En savoir plus sur le paiement avec Fedapay.</p>
+          <p class="text-[#1c3b56]">Les résidents des États-Unis et du Canada ont la possibilité de payer avec Fedapay, ce qui leur permet de régler en plusieurs fois plutôt qu'en une seule fois. Fedapay accepte toutes les principales cartes de débit et de crédit (comme Visa et Mastercard). Les cartes prépayées ne sont pas acceptées. En savoir plus sur le paiement avec Fedapay.</p>
         </div>
 
         <h3 id="options" class="text-xl font-semibold text-[#0F2940] mt-8 mb-4 border-l-4 border-[#00c9a7] pl-3">Options de paiement disponibles dans la plupart des pays</h3>
         <div class="bg-[#0F2940]/5 rounded-xl p-5">
-          <ul class="list-disc pl-5 space-y-2 text-gray-700">
+          <ul class="list-disc pl-5 space-y-2 text-[#1c3b56]">
             <li>Visa, MasterCard, et les cartes de débit qui peuvent être traitées comme des cartes de crédit</li>
             <li>Apple Pay</li>
             <li>Mobile money</li>
@@ -1832,19 +1569,19 @@ const articlesData: Record<string, { title: string; category: string; content: s
 
         <h3 id="options-pays" class="text-xl font-semibold text-[#0F2940] mt-8 mb-4 border-l-4 border-[#00c9a7] pl-3">Options de paiement disponibles dans certains pays</h3>
         <div class="grid md:grid-cols-2 gap-4">
-          <div class="bg-[#0F2940]/5 rounded-xl p-4"><p class="font-semibold text-[#0F2940]">FedaPay :</p><p class="text-gray-700 text-sm">Bénin, Togo, Côte d'Ivoire, Sénégal, Mali, Niger, Burkina Faso, Guinée</p></div>
-          <div class="bg-[#0F2940]/5 rounded-xl p-4"><p class="font-semibold text-[#0F2940]">Mobile money :</p><p class="text-gray-700 text-sm">Bénin, Ouganda, Rwanda, Cameroun, Zambie (déploiement progressif selon les pays)</p></div>
-          <div class="bg-[#0F2940]/5 rounded-xl p-4 col-span-2"><p class="font-semibold text-[#0F2940]">Visa & MasterCard :</p><p class="text-gray-700 text-sm">Acceptée dans plus de 200 pays et territoires dans le monde</p></div>
+          <div class="bg-[#0F2940]/5 rounded-xl p-4"><p class="font-semibold text-[#0F2940]">FedaPay :</p><p class="text-[#1c3b56] text-sm">Bénin, Togo, Côte d'Ivoire, Sénégal, Mali, Niger, Burkina Faso, Guinée</p></div>
+          <div class="bg-[#0F2940]/5 rounded-xl p-4"><p class="font-semibold text-[#0F2940]">Mobile money :</p><p class="text-[#1c3b56] text-sm">Bénin, Ouganda, Rwanda, Cameroun, Zambie (déploiement progressif selon les pays)</p></div>
+          <div class="bg-[#0F2940]/5 rounded-xl p-4 col-span-2"><p class="font-semibold text-[#0F2940]">Visa & MasterCard :</p><p class="text-[#1c3b56] text-sm">Acceptée dans plus de 200 pays et territoires dans le monde</p></div>
         </div>
 
         <h3 id="securite" class="text-xl font-semibold text-[#0F2940] mt-8 mb-4 border-l-4 border-[#00c9a7] pl-3">Assurez la sécurité de vos paiements en les effectuant toujours sur Bf-Immo</h3>
         <div class="bg-[#0F2940]/5 rounded-xl p-5">
-          <p class="text-gray-700">Les paiements en espèces ou effectués en dehors du site vont à l'encontre de nos Conditions de service et peuvent conduire à une exclusion de la communauté Bf-Immo. Lorsque vous payez en dehors de la plateforme, il nous est plus difficile de protéger vos données et vous vous exposez à un risque accru de fraudes et de failles de sécurité.</p>
+          <p class="text-[#1c3b56]">Les paiements en espèces ou effectués en dehors du site vont à l'encontre de nos Conditions de service et peuvent conduire à une exclusion de la communauté Bf-Immo. Lorsque vous payez en dehors de la plateforme, il nous est plus difficile de protéger vos données et vous vous exposez à un risque accru de fraudes et de failles de sécurité.</p>
         </div>
 
-        <div class="bg-gradient-to-r from-[#00c9a7]/10 to-[#0F2940]/10 rounded-xl p-4 mt-8">
+        <div class="bg-[#f4fffe] rounded-xl p-4 mt-8">
           <p class="font-medium text-[#0F2940]">Cet article vous a-t-il été utile ?</p>
-          <div class="flex gap-4 mt-3"><button class="px-5 py-2 bg-[#00c9a7] text-[#0F2940] rounded-full text-sm font-medium">Oui</button><button class="px-5 py-2 border border-gray-300 rounded-full text-sm font-medium">Non</button></div>
+          <div class="flex gap-4 mt-3"><button class="px-5 py-2 bg-[#00c9a7] text-[#0F2940] rounded-full text-sm font-medium">Oui</button><button class="px-5 py-2 border border-[#c9f0e8] rounded-full text-sm font-medium">Non</button></div>
         </div>
       </div>
     `
@@ -1854,7 +1591,7 @@ const articlesData: Record<string, { title: string; category: string; content: s
     category: "Voyageur",
     content: `
       <div class="space-y-6">
-        <p class="text-gray-700">Si vous avez réservé un service ou une expérience, mais que la date ou l'heure ne vous convient plus, ne vous inquiétez pas, il y a une solution ! Vous avez peut-être la possibilité de modifier votre réservation en fonction des disponibilités de l'hôte et de ses conditions d'annulation.</p>
+        <p class="text-[#1c3b56]">Si vous avez réservé un service ou une expérience, mais que la date ou l'heure ne vous convient plus, ne vous inquiétez pas, il y a une solution ! Vous avez peut-être la possibilité de modifier votre réservation en fonction des disponibilités de l'hôte et de ses conditions d'annulation.</p>
         
         <div class="bg-[#0F2940]/5 rounded-xl p-4 mb-4">
           <h3 class="text-lg font-semibold text-[#0F2940] mb-3">Dans cet article</h3>
@@ -1867,12 +1604,12 @@ const articlesData: Record<string, { title: string; category: string; content: s
 
         <h3 id="reprogrammer" class="text-xl font-semibold text-[#0F2940] mt-8 mb-4 border-l-4 border-[#00c9a7] pl-3">Reprogrammer si la période d'annulation de l'hôte n'est pas terminée</h3>
         <div class="bg-[#0F2940]/5 rounded-xl p-5">
-          <p class="text-gray-700">Si la période d'annulation gratuite de votre réservation de service ou d'expérience n'est pas encore terminée, vous pouvez reprogrammer et réserver n'importe quelle autre heure ou date disponibles sur le calendrier de l'hôte.</p>
+          <p class="text-[#1c3b56]">Si la période d'annulation gratuite de votre réservation de service ou d'expérience n'est pas encore terminée, vous pouvez reprogrammer et réserver n'importe quelle autre heure ou date disponibles sur le calendrier de l'hôte.</p>
         </div>
 
-        <div class="bg-gradient-to-r from-[#00c9a7]/10 to-[#0F2940]/10 rounded-xl p-4 mt-8">
+        <div class="bg-[#f4fffe] rounded-xl p-4 mt-8">
           <p class="font-medium text-[#0F2940]">Cet article vous a-t-il été utile ?</p>
-          <div class="flex gap-4 mt-3"><button class="px-5 py-2 bg-[#00c9a7] text-[#0F2940] rounded-full text-sm font-medium">Oui</button><button class="px-5 py-2 border border-gray-300 rounded-full text-sm font-medium">Non</button></div>
+          <div class="flex gap-4 mt-3"><button class="px-5 py-2 bg-[#00c9a7] text-[#0F2940] rounded-full text-sm font-medium">Oui</button><button class="px-5 py-2 border border-[#c9f0e8] rounded-full text-sm font-medium">Non</button></div>
         </div>
       </div>
     `
@@ -1882,7 +1619,7 @@ const articlesData: Record<string, { title: string; category: string; content: s
     category: "Voyageur",
     content: `
       <div class="space-y-6">
-        <p class="text-gray-700">Bien que cette situation soit rare, un hôte peut parfois devoir annuler une réservation. Rassurez-vous : si l'hôte annule votre réservation avant l'arrivée, vous recevez un remboursement intégral.</p>
+        <p class="text-[#1c3b56]">Bien que cette situation soit rare, un hôte peut parfois devoir annuler une réservation. Rassurez-vous : si l'hôte annule votre réservation avant l'arrivée, vous recevez un remboursement intégral.</p>
         
         <div class="bg-[#0F2940]/5 rounded-xl p-4 mb-4">
           <h3 class="text-lg font-semibold text-[#0F2940] mb-3">Dans cet article</h3>
@@ -1894,9 +1631,9 @@ const articlesData: Record<string, { title: string; category: string; content: s
           </ul>
         </div>
 
-        <div class="bg-gradient-to-r from-[#00c9a7]/10 to-[#0F2940]/10 rounded-xl p-4 mt-8">
+        <div class="bg-[#f4fffe] rounded-xl p-4 mt-8">
           <p class="font-medium text-[#0F2940]">Cet article vous a-t-il été utile ?</p>
-          <div class="flex gap-4 mt-3"><button class="px-5 py-2 bg-[#00c9a7] text-[#0F2940] rounded-full text-sm font-medium">Oui</button><button class="px-5 py-2 border border-gray-300 rounded-full text-sm font-medium">Non</button></div>
+          <div class="flex gap-4 mt-3"><button class="px-5 py-2 bg-[#00c9a7] text-[#0F2940] rounded-full text-sm font-medium">Oui</button><button class="px-5 py-2 border border-[#c9f0e8] rounded-full text-sm font-medium">Non</button></div>
         </div>
       </div>
     `
@@ -1906,7 +1643,7 @@ const articlesData: Record<string, { title: string; category: string; content: s
     category: "Voyageur",
     content: `
       <div class="space-y-6">
-        <p class="text-gray-700">Vous souhaitez savoir quand le montant de votre réservation sera débité ? Tout dépend du type de réservation et du mode de paiement. Dans la plupart des cas, votre mode de paiement est débité dès la confirmation de votre réservation.</p>
+        <p class="text-[#1c3b56]">Vous souhaitez savoir quand le montant de votre réservation sera débité ? Tout dépend du type de réservation et du mode de paiement. Dans la plupart des cas, votre mode de paiement est débité dès la confirmation de votre réservation.</p>
         
         <div class="bg-[#0F2940]/5 rounded-xl p-4 mb-4">
           <h3 class="text-lg font-semibold text-[#0F2940] mb-3">Dans cet article</h3>
@@ -1917,9 +1654,9 @@ const articlesData: Record<string, { title: string; category: string; content: s
           </ul>
         </div>
 
-        <div class="bg-gradient-to-r from-[#00c9a7]/10 to-[#0F2940]/10 rounded-xl p-4 mt-8">
+        <div class="bg-[#f4fffe] rounded-xl p-4 mt-8">
           <p class="font-medium text-[#0F2940]">Cet article vous a-t-il été utile ?</p>
-          <div class="flex gap-4 mt-3"><button class="px-5 py-2 bg-[#00c9a7] text-[#0F2940] rounded-full text-sm font-medium">Oui</button><button class="px-5 py-2 border border-gray-300 rounded-full text-sm font-medium">Non</button></div>
+          <div class="flex gap-4 mt-3"><button class="px-5 py-2 bg-[#00c9a7] text-[#0F2940] rounded-full text-sm font-medium">Oui</button><button class="px-5 py-2 border border-[#c9f0e8] rounded-full text-sm font-medium">Non</button></div>
         </div>
       </div>
     `
@@ -1929,34 +1666,34 @@ const articlesData: Record<string, { title: string; category: string; content: s
     category: "Voyageur",
     content: `
       <div class="space-y-6">
-        <p class="text-gray-700">Réserver un logement sur Bf-Immo est simple et rapide. Suivez ces étapes :</p>
+        <p class="text-[#1c3b56]">Réserver un logement sur Bf-Immo est simple et rapide. Suivez ces étapes :</p>
         
         <div class="space-y-4">
           <div class="flex gap-4 items-start p-4 bg-[#0F2940]/5 rounded-xl">
             <div class="w-8 h-8 rounded-full bg-[#00c9a7] flex items-center justify-center text-white font-bold">1</div>
-            <div><h3 class="font-semibold text-[#0F2940]">Recherchez votre destination</h3><p class="text-gray-600">Utilisez la barre de recherche.</p></div>
+            <div><h3 class="font-semibold text-[#0F2940]">Recherchez votre destination</h3><p class="text-[#5b6b7a]">Utilisez la barre de recherche.</p></div>
           </div>
           <div class="flex gap-4 items-start p-4 bg-[#0F2940]/5 rounded-xl">
             <div class="w-8 h-8 rounded-full bg-[#00c9a7] flex items-center justify-center text-white font-bold">2</div>
-            <div><h3 class="font-semibold text-[#0F2940]">Choisissez vos dates</h3><p class="text-gray-600">Sélectionnez l'arrivée et le départ.</p></div>
+            <div><h3 class="font-semibold text-[#0F2940]">Choisissez vos dates</h3><p class="text-[#5b6b7a]">Sélectionnez l'arrivée et le départ.</p></div>
           </div>
           <div class="flex gap-4 items-start p-4 bg-[#0F2940]/5 rounded-xl">
             <div class="w-8 h-8 rounded-full bg-[#00c9a7] flex items-center justify-center text-white font-bold">3</div>
-            <div><h3 class="font-semibold text-[#0F2940]">Indiquez le nombre de voyageurs</h3><p class="text-gray-600">Précisez adultes, enfants, bébés.</p></div>
+            <div><h3 class="font-semibold text-[#0F2940]">Indiquez le nombre de voyageurs</h3><p class="text-[#5b6b7a]">Précisez adultes, enfants, bébés.</p></div>
           </div>
           <div class="flex gap-4 items-start p-4 bg-[#0F2940]/5 rounded-xl">
             <div class="w-8 h-8 rounded-full bg-[#00c9a7] flex items-center justify-center text-white font-bold">4</div>
-            <div><h3 class="font-semibold text-[#0F2940]">Parcourez les annonces</h3><p class="text-gray-600">Filtrez et trouvez le logement idéal.</p></div>
+            <div><h3 class="font-semibold text-[#0F2940]">Parcourez les annonces</h3><p class="text-[#5b6b7a]">Filtrez et trouvez le logement idéal.</p></div>
           </div>
           <div class="flex gap-4 items-start p-4 bg-[#0F2940]/5 rounded-xl">
             <div class="w-8 h-8 rounded-full bg-[#00c9a7] flex items-center justify-center text-white font-bold">5</div>
-            <div><h3 class="font-semibold text-[#0F2940]">Réservez</h3><p class="text-gray-600">Confirmez et payez en toute sécurité.</p></div>
+            <div><h3 class="font-semibold text-[#0F2940]">Réservez</h3><p class="text-[#5b6b7a]">Confirmez et payez en toute sécurité.</p></div>
           </div>
         </div>
 
-        <div class="bg-gradient-to-r from-[#00c9a7]/10 to-[#0F2940]/10 rounded-xl p-4 mt-8">
+        <div class="bg-[#f4fffe] rounded-xl p-4 mt-8">
           <p class="font-medium text-[#0F2940]">Cet article vous a-t-il été utile ?</p>
-          <div class="flex gap-4 mt-3"><button class="px-5 py-2 bg-[#00c9a7] text-[#0F2940] rounded-full text-sm font-medium">Oui</button><button class="px-5 py-2 border border-gray-300 rounded-full text-sm font-medium">Non</button></div>
+          <div class="flex gap-4 mt-3"><button class="px-5 py-2 bg-[#00c9a7] text-[#0F2940] rounded-full text-sm font-medium">Oui</button><button class="px-5 py-2 border border-[#c9f0e8] rounded-full text-sm font-medium">Non</button></div>
         </div>
       </div>
     `
@@ -2123,17 +1860,17 @@ const allExperiences = [
 //     <div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 p-4 text-[#0F2940]">
 //       <div className="mx-auto max-w-6xl bg-white rounded-[32px] shadow-2xl overflow-hidden">
 //         {/* En-tête */}
-//         <div className="flex flex-col gap-4 border-b border-gray-200 p-6 lg:flex-row lg:items-start lg:justify-between">
+//         <div className="flex flex-col gap-4 border-b border-[#e2f5f2] p-6 lg:flex-row lg:items-start lg:justify-between">
 //           <div className="max-w-3xl">
-//             <p className="text-sm text-gray-500">{service.location}</p>
+//             <p className="text-sm text-[#5b6b7a]">{service.location}</p>
 //             <h2 className="text-3xl font-semibold text-[#0F2940] mt-2">{service.title}</h2>
-//             <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-gray-600">
+//             <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-[#5b6b7a]">
 //               <span>{service.rating} · {service.reviews} évaluations</span>
 //               <span>Hôte : {service.hostType}</span>
 //               <span>À partir de {service.price} € / {service.priceType}</span>
 //             </div>
 //           </div>
-//           <button onClick={onClose} className="rounded-full border border-gray-200 bg-white p-3 text-gray-700 hover:bg-gray-100">
+//           <button onClick={onClose} className="rounded-full border border-[#e2f5f2] bg-white p-3 text-[#1c3b56] hover:bg-[#e8faf6]">
 //             <X className="w-5 h-5" />
 //           </button>
 //         </div>
@@ -2191,7 +1928,7 @@ const allExperiences = [
 //             {/* Description */}
 //             <div>
 //               <h3 className="text-xl font-semibold text-[#0F2940] mb-4">Description</h3>
-//               <p className="text-gray-700 leading-relaxed">{service.longDescription || service.description}</p>
+//               <p className="text-[#1c3b56] leading-relaxed">{service.longDescription || service.description}</p>
 //             </div>
 
 //             {/* Déroulement du service */}
@@ -2199,9 +1936,9 @@ const allExperiences = [
 //               <h3 className="text-xl font-semibold text-[#0F2940] mb-4">Déroulement</h3>
 //               <div className="space-y-3">
 //                 {serviceSteps.map((step: string, idx: number) => (
-//                   <div key={idx} className="rounded-3xl border border-gray-200 bg-gray-50 p-4">
+//                   <div key={idx} className="rounded-3xl border border-[#e2f5f2] bg-[#f4fffe] p-4">
 //                     <p className="font-semibold">{`Étape ${idx + 1}`}</p>
-//                     <p className="mt-2 text-sm text-gray-600">{step}</p>
+//                     <p className="mt-2 text-sm text-[#5b6b7a]">{step}</p>
 //                   </div>
 //                 ))}
 //               </div>
@@ -2211,10 +1948,10 @@ const allExperiences = [
 //             <div>
 //               <h3 className="text-xl font-semibold text-[#0F2940] mb-4">Ce qui est inclus</h3>
 //               <div className="grid grid-cols-2 gap-3">
-//                 <div className="flex items-center gap-2 text-gray-700"><Check className="w-5 h-5 text-[#00c9a7]" />Service professionnel</div>
-//                 <div className="flex items-center gap-2 text-gray-700"><Check className="w-5 h-5 text-[#00c9a7]" />Personnel qualifié</div>
-//                 <div className="flex items-center gap-2 text-gray-700"><Check className="w-5 h-5 text-[#00c9a7]" />Matériel fourni</div>
-//                 <div className="flex items-center gap-2 text-gray-700"><Check className="w-5 h-5 text-[#00c9a7]" />Assistance prioritaire</div>
+//                 <div className="flex items-center gap-2 text-[#1c3b56]"><Check className="w-5 h-5 text-[#00c9a7]" />Service professionnel</div>
+//                 <div className="flex items-center gap-2 text-[#1c3b56]"><Check className="w-5 h-5 text-[#00c9a7]" />Personnel qualifié</div>
+//                 <div className="flex items-center gap-2 text-[#1c3b56]"><Check className="w-5 h-5 text-[#00c9a7]" />Matériel fourni</div>
+//                 <div className="flex items-center gap-2 text-[#1c3b56]"><Check className="w-5 h-5 text-[#00c9a7]" />Assistance prioritaire</div>
 //               </div>
 //             </div>
 
@@ -2223,15 +1960,15 @@ const allExperiences = [
 //               <h3 className="text-xl font-semibold text-[#0F2940] mb-4">Avis des clients</h3>
 //               <div className="space-y-4">
 //                 {service.reviews?.map((review: any, idx: number) => (
-//                   <div key={idx} className="rounded-3xl border border-gray-200 p-4">
+//                   <div key={idx} className="rounded-3xl border border-[#e2f5f2] p-4">
 //                     <div className="flex items-center justify-between gap-3">
 //                       <div>
 //                         <p className="font-semibold text-[#0F2940]">{review.name}</p>
-//                         <p className="text-sm text-gray-500">{review.location} · {review.daysAgo}</p>
+//                         <p className="text-sm text-[#5b6b7a]">{review.location} · {review.daysAgo}</p>
 //                       </div>
 //                       <span className="rounded-full bg-[#00c9a7]/10 px-3 py-1 text-sm text-[#0F2940]">{review.rating.toFixed(1)}</span>
 //                     </div>
-//                     <p className="mt-3 text-sm text-gray-700">{review.text}</p>
+//                     <p className="mt-3 text-sm text-[#1c3b56]">{review.text}</p>
 //                   </div>
 //                 ))}
 //               </div>
@@ -2239,17 +1976,17 @@ const allExperiences = [
 //           </div>
 
 //           {/* Colonne droite - Réservation */}
-//           <aside className="space-y-6 rounded-3xl border border-gray-200 bg-[#f8fafb] p-6">
+//           <aside className="space-y-6 rounded-3xl border border-[#e2f5f2] bg-[#f4fffe] p-6">
 //             {/* Prix */}
 //             <div className="text-center">
 //               <span className="text-4xl font-bold text-[#0F2940]">{service.price} €</span>
-//               <span className="text-gray-500"> / {service.priceType}</span>
+//               <span className="text-[#5b6b7a]"> / {service.priceType}</span>
 //             </div>
 
 //             {/* À savoir */}
 //             <div>
-//               <p className="text-sm font-semibold text-gray-700">À savoir</p>
-//               <ul className="mt-4 space-y-3 text-sm text-gray-600">
+//               <p className="text-sm font-semibold text-[#1c3b56]">À savoir</p>
+//               <ul className="mt-4 space-y-3 text-sm text-[#5b6b7a]">
 //                 <li className="flex items-center gap-2"><Calendar className="w-4 h-4 text-[#00c9a7]" />Durée : {service.duration}</li>
 //                 <li className="flex items-center gap-2"><Users className="w-4 h-4 text-[#00c9a7]" />Service personnalisé</li>
 //                 <li className="flex items-center gap-2"><Star className="w-4 h-4 text-[#00c9a7]" />Service professionnel certifié</li>
@@ -2259,15 +1996,15 @@ const allExperiences = [
 
 //             {/* Lieu */}
 //             <div className="rounded-3xl bg-white p-4 shadow-sm">
-//               <p className="text-sm text-gray-500">Lieu du service</p>
+//               <p className="text-sm text-[#5b6b7a]">Lieu du service</p>
 //               <p className="mt-2 font-medium text-[#0F2940]">{service.location}</p>
 //             </div>
 
 //             {/* Bouton de réservation */}
-//             <button className="w-full rounded-full bg-[#00c9a7] px-5 py-3 text-sm font-semibold text-[#0F2940] hover:bg-[#00b892] transition-colors shadow-md hover:shadow-lg">
+//             <button className="w-full rounded-full bg-[#00c9a7] px-5 py-3 text-sm font-semibold text-[#0F2940] hover:bg-[#00b396] transition-colors shadow-md hover:shadow-lg">
 //               Réserver ce service
 //             </button>
-//             <p className="text-center text-xs text-gray-500">Aucun débit pour le moment</p>
+//             <p className="text-center text-xs text-[#5b6b7a]">Aucun débit pour le moment</p>
 //           </aside>
 //         </div>
 //       </div>
@@ -2299,25 +2036,25 @@ const LocationSearchModal = ({ onClose, onCoHostAvailable }: { onClose: () => vo
       <div className="bg-white rounded-3xl max-w-md w-full p-6">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-[#0F2940]">Vérifier la disponibilité d'un co-hôte</h3>
-          <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100"><X className="w-5 h-5" /></button>
+          <button onClick={onClose} className="p-2 rounded-full hover:bg-[#e8faf6]"><X className="w-5 h-5" /></button>
         </div>
         <div className="flex items-start gap-4 mb-6">
           <div className="flex-1">
-            <p className="text-sm text-gray-600 mb-3">Entrez la localisation de votre logement pour vérifier si un co-hôte est disponible à proximité.</p>
+            <p className="text-sm text-[#5b6b7a] mb-3">Entrez la localisation de votre logement pour vérifier si un co-hôte est disponible à proximité.</p>
             <div className="relative">
-              <MapPin className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-              <input type="text" placeholder="Ex: Cotonou, Haie Vive, Fidjrossè..." value={location} onChange={(e) => setLocation(e.target.value)} className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c9a7]" />
+              <MapPin className="absolute left-3 top-3 w-5 h-5 text-[#5b6b7a]" />
+              <input type="text" placeholder="Ex: Cotonou, Haie Vive, Fidjrossè..." value={location} onChange={(e) => setLocation(e.target.value)} className="w-full pl-10 pr-4 py-3 border border-[#e2f5f2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c9a7]" />
             </div>
-            <button onClick={handleSearch} disabled={searching} className="w-full mt-3 bg-[#00c9a7] text-[#0F2940] py-2 rounded-full font-semibold hover:bg-[#00b892] transition-colors">
+            <button onClick={handleSearch} disabled={searching} className="w-full mt-3 bg-[#00c9a7] text-[#0F2940] py-2 rounded-full font-semibold hover:bg-[#00b396] transition-colors">
               {searching ? "Recherche en cours..." : "Vérifier la disponibilité"}
             </button>
           </div>
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#00c9a7] to-[#0F2940] flex items-center justify-center shrink-0">
+          <div className="w-20 h-20 rounded-full bg-[#0f2940] flex items-center justify-center shrink-0">
             <User className="w-10 h-10 text-white" />
           </div>
         </div>
         {result && (<div className={`p-4 rounded-xl ${result.available ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}><p className="text-sm">{result.message}</p></div>)}
-        <button onClick={onClose} className="w-full mt-4 border border-gray-300 py-2 rounded-full">Fermer</button>
+        <button onClick={onClose} className="w-full mt-4 border border-[#c9f0e8] py-2 rounded-full">Fermer</button>
       </div>
     </div>
   );
@@ -2520,7 +2257,7 @@ export function PropertyCard({
       onClick={handleCardClick}
     >
       {/* Image container */}
-      <div className="relative overflow-hidden bg-gray-100 aspect-[4/3]">
+      <div className="relative overflow-hidden bg-[#e8faf6] aspect-[4/3]">
         <img
           src={imageUrl}
           alt={property.title || 'Logement'}
@@ -2529,12 +2266,7 @@ export function PropertyCard({
           onError={() => setImgError(true)}
         />
         
-        {/* Badge Bluefin Immo Certifié */}
-        {property.bluefin_certified && (
-          <div className="absolute top-3 left-3 bg-blue-600 text-white text-xs px-2 py-1 rounded-full font-medium z-10">
-            ✓ Bluefin Immo Certifié
-          </div>
-        )}
+        {property.bluefin_certified && <CertifiedBadge size="md" className="absolute top-3 left-3 z-10" />}
         
         {/* Bouton favori */}
         <button
@@ -2546,7 +2278,7 @@ export function PropertyCard({
             className={`w-5 h-5 transition-all duration-200 ${
               isFavoriteFn(property.id) 
                 ? 'fill-red-500 text-red-500' 
-                : 'text-gray-600 hover:text-red-500'
+                : 'text-[#5b6b7a] hover:text-red-500'
             }`} 
           />
         </button>
@@ -2557,10 +2289,10 @@ export function PropertyCard({
         {/* Titre et localisation */}
         <div className="flex justify-between items-start gap-4">
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-[#0F2940] text-base line-clamp-1 hover:text-blue-600 transition-colors">
+            <h3 className="font-semibold text-[#0F2940] text-base line-clamp-1 hover:text-[#00806b] transition-colors">
               {property.title || 'Logement sans titre'}
             </h3>
-            <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
+            <p className="text-sm text-[#5b6b7a] mt-1 flex items-center gap-1">
               <MapPin className="w-3 h-3 flex-shrink-0" />
               <span className="truncate">{location}</span>
             </p>
@@ -2568,11 +2300,11 @@ export function PropertyCard({
           
           {/* Note */}
           {rating > 0 && (
-            <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-lg flex-shrink-0">
-              <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+            <div className="flex items-center gap-1 bg-[#f4fffe] px-2 py-1 rounded-lg flex-shrink-0">
+              <Star className="w-4 h-4 text-[#e0ac1f] fill-[#ffc93c]" />
               <span className="font-semibold text-sm">{rating.toFixed(1)}</span>
               {reviewCount > 0 && (
-                <span className="text-xs text-gray-400">({reviewCount})</span>
+                <span className="text-xs text-[#5b6b7a]">({reviewCount})</span>
               )}
             </div>
           )}
@@ -2580,13 +2312,13 @@ export function PropertyCard({
 
         {/* Description (optionnel) */}
         {showDescription && property.description && (
-          <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+          <p className="text-sm text-[#5b6b7a] mt-2 line-clamp-2">
             {property.description}
           </p>
         )}
 
         {/* Équipements clés */}
-        <div className="flex flex-wrap items-center gap-3 mt-3 text-sm text-gray-500">
+        <div className="flex flex-wrap items-center gap-3 mt-3 text-sm text-[#5b6b7a]">
           {bedCount > 0 && (
             <div className="flex items-center gap-1">
               <Bed className="w-4 h-4" />
@@ -2610,17 +2342,17 @@ export function PropertyCard({
         {/* Équipements spécifiques */}
         <div className="flex flex-wrap gap-2 mt-2">
           {property.has_wifi && (
-            <span className="inline-flex items-center gap-1 text-xs bg-gray-100 px-2 py-1 rounded-full">
+            <span className="inline-flex items-center gap-1 text-xs bg-[#e8faf6] px-2 py-1 rounded-full">
               <Wifi className="w-3 h-3" /> Wi-Fi
             </span>
           )}
           {property.has_air_conditioning && (
-            <span className="inline-flex items-center gap-1 text-xs bg-gray-100 px-2 py-1 rounded-full">
+            <span className="inline-flex items-center gap-1 text-xs bg-[#e8faf6] px-2 py-1 rounded-full">
               <Wind className="w-3 h-3" /> Clim
             </span>
           )}
           {property.has_generator && (
-            <span className="inline-flex items-center gap-1 text-xs bg-gray-100 px-2 py-1 rounded-full">
+            <span className="inline-flex items-center gap-1 text-xs bg-[#e8faf6] px-2 py-1 rounded-full">
               <Zap className="w-3 h-3" /> Groupe
             </span>
           )}
@@ -2629,13 +2361,13 @@ export function PropertyCard({
       
 
 {/* Prix avec conversion Euro - Couleurs du site */}
-<div className="mt-3 pt-2 border-t border-gray-100">
+<div className="mt-3 pt-2 border-t border-[#e2f5f2]">
   <div className="flex items-baseline justify-between">
     <div>
       <span className="text-xl font-bold text-[#00c9a7]">{property.priceDisplay}</span>
-      <span className="text-sm text-gray-400"> / nuit</span>
+      <span className="text-sm text-[#5b6b7a]"> / nuit</span>
       {property.priceEuroDisplay && (
-        <div className="text-xs text-gray-400 mt-0.5">
+        <div className="text-xs text-[#5b6b7a] mt-0.5">
           {property.priceEuroDisplay}
         </div>
       )}
@@ -2705,9 +2437,9 @@ interface AvailabilityCalendarProps {
 const AmenitiesDisplay = ({ amenities, showAll, onToggle }: { amenities: string[]; showAll: boolean; onToggle: () => void }) => {
   if (amenities.length === 0) {
     return (
-      <div className="text-center py-8 bg-gray-50 rounded-xl">
-        <p className="text-gray-400 text-sm font-medium">Aucun équipement renseigné</p>
-        <p className="text-gray-300 text-xs mt-1">L'hôte n'a pas encore ajouté d'équipements</p>
+      <div className="text-center py-8 bg-[#f4fffe] rounded-xl">
+        <p className="text-[#5b6b7a] text-sm font-medium">Aucun équipement renseigné</p>
+        <p className="text-[#9fb3c4] text-xs mt-1">L'hôte n'a pas encore ajouté d'équipements</p>
       </div>
     );
   }
@@ -2721,9 +2453,9 @@ const AmenitiesDisplay = ({ amenities, showAll, onToggle }: { amenities: string[
         {displayedAmenities.map((amenity, index) => (
           <div
             key={index}
-            className="flex items-center px-4 py-3 bg-white border border-gray-100 rounded-xl hover:border-[#00c9a7]/30 hover:shadow-md transition-all duration-200 group"
+            className="flex items-center px-4 py-3 bg-white border border-[#e2f5f2] rounded-xl hover:border-[#00c9a7]/30 hover:shadow-md transition-all duration-200 group"
           >
-            <span className="text-sm text-gray-700 group-hover:text-[#0F2940] transition-colors font-medium">
+            <span className="text-sm text-[#1c3b56] group-hover:text-[#0F2940] transition-colors font-medium">
               {amenity}
             </span>
           </div>
@@ -2733,7 +2465,7 @@ const AmenitiesDisplay = ({ amenities, showAll, onToggle }: { amenities: string[
       {hasMore && (
         <button
           onClick={onToggle}
-          className="w-full py-3 text-sm text-[#00c9a7] font-semibold bg-gray-50 rounded-xl hover:bg-[#f0fdf4] transition-colors flex items-center justify-center gap-2"
+          className="w-full py-3 text-sm text-[#00c9a7] font-semibold bg-[#f4fffe] rounded-xl hover:bg-[#f0fdf4] transition-colors flex items-center justify-center gap-2"
         >
           {showAll ? (
             <>Voir moins</>
@@ -3339,35 +3071,35 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
           <button onClick={() => setShowCancellationModal(false)} className="p-1.5 sm:p-2 rounded-full hover:bg-white/10 transition-colors"><X className="w-4 h-4 sm:w-5 sm:h-5 text-white" /></button>
         </div>
         <div className="p-4 sm:p-6 overflow-y-auto max-h-[calc(85vh-70px)] space-y-3 sm:space-y-4">
-          <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-3 sm:p-4 mb-3 sm:mb-4">
-            <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3"><CalendarIcon className="w-3 h-3 sm:w-4 sm:h-4 text-[#00c9a7]" /><span className="font-medium">Vos dates</span></div>
+          <div className="bg-gradient-to-r from-[#f4fffe] to-[#e8faf6] rounded-xl p-3 sm:p-4 mb-3 sm:mb-4">
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-[#5b6b7a] mb-2 sm:mb-3"><CalendarIcon className="w-3 h-3 sm:w-4 sm:h-4 text-[#00c9a7]" /><span className="font-medium">Vos dates</span></div>
             <div className="grid grid-cols-3 gap-2 sm:gap-3 text-center">
-              <div className="bg-white rounded-lg p-2 shadow-sm"><p className="text-[10px] sm:text-xs text-gray-500">Arrivée</p><p className="font-semibold text-gray-900 text-xs sm:text-sm">{formatDisplayFromIso(checkIn) || '—'}</p></div>
-              <div className="bg-white rounded-lg p-2 shadow-sm"><p className="text-[10px] sm:text-xs text-gray-500">Départ</p><p className="font-semibold text-gray-900 text-xs sm:text-sm">{formatDisplayFromIso(checkOut) || '—'}</p></div>
-              <div className="bg-white rounded-lg p-2 shadow-sm"><p className="text-[10px] sm:text-xs text-gray-500">Nuits</p><p className="font-semibold text-gray-900 text-xs sm:text-sm">{nights}</p></div>
+              <div className="bg-white rounded-lg p-2 shadow-sm"><p className="text-[10px] sm:text-xs text-[#5b6b7a]">Arrivée</p><p className="font-semibold text-[#0f2940] text-xs sm:text-sm">{formatDisplayFromIso(checkIn) || '—'}</p></div>
+              <div className="bg-white rounded-lg p-2 shadow-sm"><p className="text-[10px] sm:text-xs text-[#5b6b7a]">Départ</p><p className="font-semibold text-[#0f2940] text-xs sm:text-sm">{formatDisplayFromIso(checkOut) || '—'}</p></div>
+              <div className="bg-white rounded-lg p-2 shadow-sm"><p className="text-[10px] sm:text-xs text-[#5b6b7a]">Nuits</p><p className="font-semibold text-[#0f2940] text-xs sm:text-sm">{nights}</p></div>
             </div>
           </div>
           <div className="space-y-2 sm:space-y-3">
-            <p className="text-xs sm:text-sm font-medium text-gray-700 px-1">📋 Conditions d'annulation</p>
+            <p className="text-xs sm:text-sm font-medium text-[#1c3b56] px-1">📋 Conditions d'annulation</p>
             {cancellationRules.map((rule, index) => (
-              <div key={index} className={`rounded-xl p-3 sm:p-4 border-l-4 transition-all hover:shadow-md ${rule.color === 'green' ? 'bg-green-50 border-green-500' : rule.color === 'orange' ? 'bg-orange-50 border-orange-500' : 'bg-red-50 border-red-500'}`}>
+              <div key={index} className={`rounded-xl p-3 sm:p-4 border-l-4 transition-all hover:shadow-md ${rule.color === 'green' ? 'bg-green-50 border-green-500' : rule.color === 'orange' ? 'bg-[#fffaeb] border-[#ffc93c]' : 'bg-red-50 border-red-500'}`}>
                 <div className="flex items-start gap-2 sm:gap-3">
                   <span className="text-lg sm:text-xl">{rule.icon}</span>
                   <div className="flex-1">
-                    <h3 className={`font-semibold text-sm sm:text-base ${rule.color === 'green' ? 'text-green-700' : rule.color === 'orange' ? 'text-orange-700' : 'text-red-700'}`}>{rule.label}</h3>
-                    <p className="text-xs sm:text-sm text-gray-600 mt-1">{rule.description}</p>
-                    <p className="text-[10px] sm:text-xs text-gray-500 mt-1 sm:mt-2">{rule.percentage === 100 ? `✓ Annulation ${rule.deadlineText}` : rule.percentage === 50 ? `⚠️ Annulation ${rule.deadlineText}` : `❌ ${rule.deadlineText}`}</p>
+                    <h3 className={`font-semibold text-sm sm:text-base ${rule.color === 'green' ? 'text-green-700' : rule.color === 'orange' ? 'text-[#6b4e06]' : 'text-red-700'}`}>{rule.label}</h3>
+                    <p className="text-xs sm:text-sm text-[#5b6b7a] mt-1">{rule.description}</p>
+                    <p className="text-[10px] sm:text-xs text-[#5b6b7a] mt-1 sm:mt-2">{rule.percentage === 100 ? `✓ Annulation ${rule.deadlineText}` : rule.percentage === 50 ? `⚠️ Annulation ${rule.deadlineText}` : `❌ ${rule.deadlineText}`}</p>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-          <div className="bg-blue-50 rounded-xl p-3 sm:p-4 mt-2">
-            <div className="flex items-start gap-2"><Info className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500 mt-0.5 flex-shrink-0" /><p className="text-[10px] sm:text-xs text-blue-700">Les frais de service ne sont jamais remboursés en cas d'annulation partielle. L'heure indiquée est basée sur l'emplacement du logement (GMT+1).</p></div>
+          <div className="bg-[#f4fffe] rounded-xl p-3 sm:p-4 mt-2">
+            <div className="flex items-start gap-2"><Info className="w-3 h-3 sm:w-4 sm:h-4 text-[#00806b] mt-0.5 flex-shrink-0" /><p className="text-[10px] sm:text-xs text-[#0f2940]">Les frais de service ne sont jamais remboursés en cas d'annulation partielle. L'heure indiquée est basée sur l'emplacement du logement (GMT+1).</p></div>
           </div>
         </div>
         <div className="sticky bottom-0 bg-white border-t px-4 sm:px-6 py-3 sm:py-4">
-          <button onClick={() => setShowCancellationModal(false)} className="w-full py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-[#00c9a7] to-[#00a887] text-white font-semibold text-sm sm:text-base hover:shadow-lg transition-all transform hover:scale-[1.02]">Fermer</button>
+          <button onClick={() => setShowCancellationModal(false)} className="w-full py-2.5 sm:py-3 rounded-xl bg-[#00c9a7] text-white font-semibold text-sm sm:text-base hover:shadow-lg transition-all transform hover:scale-[1.02]">Fermer</button>
         </div>
       </div>
     </div>
@@ -3382,14 +3114,14 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
         <div className="min-h-screen pb-20">
           {/* Header sticky */}
           <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b px-3 sm:px-4 py-3 flex justify-between items-center">
-            <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100 transition-all">
+            <button onClick={onClose} className="p-2 rounded-full hover:bg-[#e8faf6] transition-all">
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div className="flex gap-2">
-              <button className="p-2 rounded-full hover:bg-gray-100 transition-all">
+              <button className="p-2 rounded-full hover:bg-[#e8faf6] transition-all">
                 <Share2 className="w-5 h-5" />
               </button>
-              <button className="p-2 rounded-full hover:bg-gray-100 transition-all">
+              <button className="p-2 rounded-full hover:bg-[#e8faf6] transition-all">
                 <Heart className="w-5 h-5" />
               </button>
             </div>
@@ -3401,7 +3133,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
               <div className="relative">
                 {/* Image principale */}
                 <div 
-                  className="relative rounded-2xl overflow-hidden cursor-pointer group aspect-[16/9] bg-gray-100"
+                  className="relative rounded-2xl overflow-hidden cursor-pointer group aspect-[16/9] bg-[#e8faf6]"
                   onClick={() => setIsGalleryOpen(true)}
                 >
                   <img 
@@ -3427,7 +3159,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                     {images.slice(1, 5).map((img, index) => (
                       <div 
                         key={index} 
-                        className="aspect-[4/3] rounded-xl overflow-hidden cursor-pointer hover:ring-2 hover:ring-[#00c9a7] transition-all bg-gray-100"
+                        className="aspect-[4/3] rounded-xl overflow-hidden cursor-pointer hover:ring-2 hover:ring-[#00c9a7] transition-all bg-[#e8faf6]"
                         onClick={() => {
                           setGalleryIndex(index + 1);
                           setIsGalleryOpen(true);
@@ -3461,7 +3193,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
               {/* Colonne gauche - Détails */}
               <div className="flex-1 space-y-6 sm:space-y-8">
                 <div className="border-b pb-4">
-                  <div className="text-xs sm:text-sm text-gray-500">
+                  <div className="text-xs sm:text-sm text-[#5b6b7a]">
                     {property.property_type || 'Logement'} · {property.beds} chambres
                   </div>
                   <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold text-[#0F2940] mt-2">
@@ -3470,7 +3202,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                   <div className="flex flex-wrap items-center gap-2 mt-2">
                     <Star className="w-4 h-4 fill-current text-[#00c9a7]" />
                     <span className="font-medium text-sm">{property.rating}</span>
-                    <span className="text-gray-500 text-sm">· {property.reviews} commentaires</span>
+                    <span className="text-[#5b6b7a] text-sm">· {property.reviews} commentaires</span>
                     {superhost && <span className="text-[#00c9a7] text-sm font-medium">· Superhôte</span>}
                   </div>
                 </div>
@@ -3480,7 +3212,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                     <Crown className="w-8 h-8 text-[#00c9a7]" />
                     <div>
                       <div className="font-semibold">Coup de cœur</div>
-                      <div className="text-sm text-gray-600">Logement préféré des voyageurs</div>
+                      <div className="text-sm text-[#5b6b7a]">Logement préféré des voyageurs</div>
                     </div>
                   </div>
                 )}
@@ -3490,11 +3222,11 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                   <div>
                     <div className="font-semibold text-base sm:text-xl">Hôte : {host}</div>
                     {superhost && <div className="text-sm text-[#00c9a7]">⭐ Superhôte · {hostSince}</div>}
-                    <div className="text-xs text-gray-600">Taux de réponse {responseRate}%</div>
+                    <div className="text-xs text-[#5b6b7a]">Taux de réponse {responseRate}%</div>
                   </div>
                 </div>
                 
-                <div className="text-sm sm:text-base text-gray-700 leading-relaxed">
+                <div className="text-sm sm:text-base text-[#1c3b56] leading-relaxed">
                   {property.description}
                 </div>
                 
@@ -3517,7 +3249,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                   />
                 </div>
                 
-                <div className="bg-gradient-to-r from-[#0F2940]/5 to-[#00c9a7]/5 rounded-xl p-5">
+                <div className="bg-[#f4fffe] rounded-xl p-5">
                   <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
                     <span className="text-[#00c9a7]">✨</span>
                     Ce que nos clients disent
@@ -3530,7 +3262,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                     />
                     <div>
                       <div className="font-semibold">{testimonials[currentTestimonial]?.name}</div>
-                      <p className="text-gray-600 text-sm mt-1">"{testimonials[currentTestimonial]?.text}"</p>
+                      <p className="text-[#5b6b7a] text-sm mt-1">"{testimonials[currentTestimonial]?.text}"</p>
                     </div>
                   </div>
                 </div>
@@ -3545,13 +3277,13 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                         <span className="text-2xl sm:text-3xl font-bold text-[#0F2940]">
                           {nightlyPrice.toLocaleString()} FCFA
                         </span>
-                        <span className="text-gray-500 text-sm">/ nuit</span>
+                        <span className="text-[#5b6b7a] text-sm">/ nuit</span>
                       </div>
                       <div className="text-xs text-[#00c9a7] mt-0.5">
                         {nightlyPriceFormatted.euro}
                       </div>
                     </div>
-                    <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-full">
+                    <div className="flex items-center gap-1 bg-[#e8faf6] px-2 py-1 rounded-full">
                       <Star className="w-4 h-4 fill-current text-[#00c9a7]" />
                       {property.rating}
                     </div>
@@ -3569,7 +3301,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
 
                     <div className="grid grid-cols-2 border-t">
                       <div className="p-3">
-                        <div className="text-xs font-bold text-gray-500 uppercase">Arrivée</div>
+                        <div className="text-xs font-bold text-[#5b6b7a] uppercase">Arrivée</div>
                         <input 
                           type="date" 
                           value={checkIn} 
@@ -3582,7 +3314,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                         />
                       </div>
                       <div className="p-3 border-l">
-                        <div className="text-xs font-bold text-gray-500 uppercase">Départ</div>
+                        <div className="text-xs font-bold text-[#5b6b7a] uppercase">Départ</div>
                         <input 
                           type="date" 
                           value={checkOut} 
@@ -3608,24 +3340,24 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                     )}
 
                     <div className="p-3 border-t">
-                      <div className="text-xs font-bold text-gray-500 uppercase mb-2">Voyageurs</div>
+                      <div className="text-xs font-bold text-[#5b6b7a] uppercase mb-2">Voyageurs</div>
                       
                       <div className="flex justify-between items-center py-1">
                         <div>
                           <span className="text-sm">Adultes</span>
-                          <p className="text-[10px] text-gray-400">À partir de 13 ans</p>
+                          <p className="text-[10px] text-[#5b6b7a]">À partir de 13 ans</p>
                         </div>
                         <div className="flex gap-3">
                           <button 
                             onClick={() => setAdults(Math.max(1, adults-1))} 
-                            className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors"
+                            className="w-7 h-7 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors"
                           >
                             -
                           </button>
                           <span className="min-w-[20px] text-center">{adults}</span>
                           <button 
                             onClick={() => setAdults(adults+1)} 
-                            className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors"
+                            className="w-7 h-7 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors"
                           >
                             +
                           </button>
@@ -3635,19 +3367,19 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                       <div className="flex justify-between items-center py-1 border-t">
                         <div>
                           <span className="text-sm">Enfants</span>
-                          <p className="text-[10px] text-gray-400">De 2 à 12 ans</p>
+                          <p className="text-[10px] text-[#5b6b7a]">De 2 à 12 ans</p>
                         </div>
                         <div className="flex gap-3">
                           <button 
                             onClick={() => setChildren(Math.max(0, children-1))} 
-                            className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors"
+                            className="w-7 h-7 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors"
                           >
                             -
                           </button>
                           <span className="min-w-[20px] text-center">{children}</span>
                           <button 
                             onClick={() => setChildren(children+1)} 
-                            className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors"
+                            className="w-7 h-7 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors"
                           >
                             +
                           </button>
@@ -3657,19 +3389,19 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                       <div className="flex justify-between items-center py-1 border-t">
                         <div>
                           <span className="text-sm">Bébés</span>
-                          <p className="text-[10px] text-gray-400">Moins de 2 ans</p>
+                          <p className="text-[10px] text-[#5b6b7a]">Moins de 2 ans</p>
                         </div>
                         <div className="flex gap-3">
                           <button 
                             onClick={() => setBabies(Math.max(0, babies-1))} 
-                            className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors"
+                            className="w-7 h-7 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors"
                           >
                             -
                           </button>
                           <span className="min-w-[20px] text-center">{babies}</span>
                           <button 
                             onClick={() => setBabies(babies+1)} 
-                            className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors"
+                            className="w-7 h-7 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors"
                           >
                             +
                           </button>
@@ -3679,56 +3411,56 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                       <div className="flex justify-between items-center py-1 border-t">
                         <div>
                           <span className="text-sm">Animaux domestiques</span>
-                          <p className="text-[10px] text-gray-400">Chiens, chats, etc.</p>
+                          <p className="text-[10px] text-[#5b6b7a]">Chiens, chats, etc.</p>
                         </div>
                         <div className="flex gap-3">
                           <button 
                             onClick={() => setPets(Math.max(0, pets-1))} 
-                            className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors"
+                            className="w-7 h-7 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors"
                           >
                             -
                           </button>
                           <span className="min-w-[20px] text-center">{pets}</span>
                           <button 
                             onClick={() => setPets(pets+1)} 
-                            className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors"
+                            className="w-7 h-7 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors"
                           >
                             +
                           </button>
                         </div>
                       </div>
                       
-                      <p className="text-xs text-gray-400 mt-2">Max {maxGuests} pers. + animaux</p>
+                      <p className="text-xs text-[#5b6b7a] mt-2">Max {maxGuests} pers. + animaux</p>
                     </div>
                   </div>
 
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">{nightlyPrice.toLocaleString()} FCFA × {nights} nuits</span>
+                      <span className="text-[#5b6b7a]">{nightlyPrice.toLocaleString()} FCFA × {nights} nuits</span>
                       <div className="text-right">
                         <div>{subtotalFormatted.fCFA}</div>
-                        <div className="text-xs text-gray-400">{subtotalFormatted.euro}</div>
+                        <div className="text-xs text-[#5b6b7a]">{subtotalFormatted.euro}</div>
                       </div>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Frais de service</span>
+                      <span className="text-[#5b6b7a]">Frais de service</span>
                       <div className="text-right">
                         <div>{serviceFeeFormatted.fCFA}</div>
-                        <div className="text-xs text-gray-400">{serviceFeeFormatted.euro}</div>
+                        <div className="text-xs text-[#5b6b7a]">{serviceFeeFormatted.euro}</div>
                       </div>
                     </div>
                     <div className="flex justify-between font-bold pt-2 border-t">
                       <span>Total</span>
                       <div className="text-right">
                         <div className="text-[#00c9a7]">{totalFormatted.fCFA}</div>
-                        <div className="text-xs text-gray-500">{totalFormatted.euro}</div>
+                        <div className="text-xs text-[#5b6b7a]">{totalFormatted.euro}</div>
                       </div>
                     </div>
                   </div>
 
                   <button 
                     onClick={() => setShowCancellationModal(true)} 
-                    className="w-full text-center text-xs sm:text-sm text-gray-500 hover:text-[#00c9a7] transition-colors mb-2 underline"
+                    className="w-full text-center text-xs sm:text-sm text-[#5b6b7a] hover:text-[#00c9a7] transition-colors mb-2 underline"
                   >
                     Voir la politique d'annulation
                   </button>
@@ -3738,8 +3470,8 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                     disabled={availabilityStatus !== 'available'} 
                     className={`w-full py-3 rounded-xl font-bold text-sm sm:text-base transition-all transform ${
                       availabilityStatus === 'available' 
-                        ? 'bg-gradient-to-r from-[#00c9a7] to-[#00a887] text-white hover:shadow-lg hover:scale-105' 
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        ? 'bg-[#00c9a7] text-white hover:shadow-lg hover:scale-105' 
+                        : 'bg-[#c9f0e8] text-[#5b6b7a] cursor-not-allowed'
                     }`}
                   >
                     {availabilityStatus === 'available' ? 'Réserver' : 
@@ -3977,13 +3709,13 @@ export function HomePage({
 
       {/* Barre de résultats de recherche */}
       {showSearchResults && (
-        <div className="bg-[#f4fffe] border-b border-gray-200 px-4 py-3">
+        <div className="bg-[#f4fffe] border-b border-[#e2f5f2] px-4 py-3">
           <div className="max-w-[1440px] mx-auto flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <div className="bg-[#00c9a7]/10 rounded-full p-1.5">
                 <Search className="w-4 h-4 text-[#00c9a7]" />
               </div>
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-[#5b6b7a]">
                 {isSearchingAPI || isSearching ? 'Recherche en cours...' :
                   `${searchResults.length} résultat${searchResults.length > 1 ? 's' : ''} trouvé${searchResults.length > 1 ? 's' : ''} pour "${searchDestination}"`}
               </span>
@@ -3996,7 +3728,7 @@ export function HomePage({
         </div>
       )}
 {/* Barre de navigation responsive : onglets mobiles / tri desktop */}
-<div className="border-b border-gray-200 sticky top-0 bg-white z-30 w-full">
+<div className="border-b border-[#e2f5f2] sticky top-0 bg-white z-30 w-full">
   <div className="w-full px-4 sm:px-6 lg:px-8 py-3">
     <div className="max-w-[1440px] mx-auto">
       <div className="flex items-center justify-between">
@@ -4007,7 +3739,7 @@ export function HomePage({
             className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
               activeTab === 'home' || activeTab === 'search-logements' || activeTab === 'popular'
                 ? 'bg-[#00c9a7] text-white' 
-                : 'border border-gray-300 text-[#0F2940] hover:border-gray-400'
+                : 'border border-[#c9f0e8] text-[#0F2940] hover:border-[#9fb3c4]'
             }`}
           >
             <img 
@@ -4025,7 +3757,7 @@ export function HomePage({
             className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
               activeTab === 'experience'
                 ? 'bg-[#00c9a7] text-white' 
-                : 'border border-gray-300 text-[#0F2940] hover:border-gray-400'
+                : 'border border-[#c9f0e8] text-[#0F2940] hover:border-[#9fb3c4]'
             }`}
           >
             <img 
@@ -4043,7 +3775,7 @@ export function HomePage({
             className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
               activeTab === 'services'
                 ? 'bg-[#00c9a7] text-white' 
-                : 'border border-gray-300 text-[#0F2940] hover:border-gray-400'
+                : 'border border-[#c9f0e8] text-[#0F2940] hover:border-[#9fb3c4]'
             }`}
           >
             <img 
@@ -4062,7 +3794,7 @@ export function HomePage({
         <div className="hidden lg:block relative">
           <button 
             onClick={() => setShowFilterDropdown(!showFilterDropdown)} 
-            className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-300 hover:border-gray-400 transition-colors whitespace-nowrap"
+            className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#c9f0e8] hover:border-[#9fb3c4] transition-colors whitespace-nowrap"
           >
             <Filter className="w-4 h-4 text-[#00c9a7]" />
             <span className="text-sm text-[#0F2940]">Trier par</span>
@@ -4071,7 +3803,7 @@ export function HomePage({
           {showFilterDropdown && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setShowFilterDropdown(false)} />
-              <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 z-50 py-2">
+              <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-[#e2f5f2] z-50 py-2">
                 {filtersList.map(filter => (
                   <button
                     key={filter}
@@ -4079,7 +3811,7 @@ export function HomePage({
                       setSelectedFilter(filter);
                       setShowFilterDropdown(false);
                     }}
-                    className={`w-full text-left px-4 py-2 text-sm hover:bg-[#f4fffe] ${selectedFilter === filter ? 'text-[#00c9a7] font-medium' : 'text-gray-700'}`}
+                    className={`w-full text-left px-4 py-2 text-sm hover:bg-[#f4fffe] ${selectedFilter === filter ? 'text-[#00c9a7] font-medium' : 'text-[#1c3b56]'}`}
                   >
                     {filter}
                   </button>
@@ -4124,9 +3856,9 @@ export function HomePage({
             <div className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
               {[...Array(8)].map((_, i) => (
                 <div key={i} className="animate-pulse">
-                  <div className="bg-gray-200 rounded-xl aspect-[4/3] mb-3"></div>
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                  <div className="bg-[#e2f5f2] rounded-xl aspect-[4/3] mb-3"></div>
+                  <div className="h-4 bg-[#e2f5f2] rounded w-3/4 mb-2"></div>
+                  <div className="h-3 bg-[#e2f5f2] rounded w-1/2"></div>
                 </div>
               ))}
             </div>
@@ -4136,7 +3868,7 @@ export function HomePage({
                 <h2 className="text-2xl font-semibold text-[#0F2940]">
                   {showSearchResults ? 'Résultats de recherche' : 'Tous les logements au Bénin'}
                 </h2>
-                <p className="text-gray-500 mt-1">
+                <p className="text-[#5b6b7a] mt-1">
                   {showSearchResults
                     ? `Voici les logements correspondant à "${searchDestination}"`
                     : 'Découvrez notre sélection de logements à travers le Bénin'}
@@ -4161,7 +3893,7 @@ export function HomePage({
                 <Search className="w-10 h-10 text-[#00c9a7]" />
               </div>
               <h3 className="text-xl font-semibold text-[#0F2940] mb-2">Aucun résultat</h3>
-              <p className="text-gray-500">
+              <p className="text-[#5b6b7a]">
                 Aucun logement ne correspond à votre recherche "{searchDestination}".
               </p>
               <button onClick={clearSearch} className="mt-4 px-6 py-2 bg-[#00c9a7] text-white rounded-full font-medium hover:bg-[#00b396] transition">
@@ -4179,7 +3911,7 @@ export function HomePage({
                     De superbes hôtels pour votre prochain voyage
                     <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform text-[#00c9a7]" />
                   </button>
-                  <p className="text-gray-500 mt-1">Hôtels de qualité supérieure, sélectionnés pour vous</p>
+                  <p className="text-[#5b6b7a] mt-1">Hôtels de qualité supérieure, sélectionnés pour vous</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
@@ -4393,20 +4125,20 @@ const AvailabilityCalendar = ({
   return (
     <div className="text-center">
       <div className="flex items-center justify-between mb-3">
-        <button onClick={handlePrevMonth} className="p-1 hover:bg-gray-100 rounded-full transition">
+        <button onClick={handlePrevMonth} className="p-1 hover:bg-[#e8faf6] rounded-full transition">
           <ChevronLeft className="w-4 h-4" />
         </button>
         <span className="font-medium text-sm">
           {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
         </span>
-        <button onClick={handleNextMonth} className="p-1 hover:bg-gray-100 rounded-full transition">
+        <button onClick={handleNextMonth} className="p-1 hover:bg-[#e8faf6] rounded-full transition">
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>
       
       <div className="grid grid-cols-7 gap-1 text-xs">
         {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((day, i) => (
-          <div key={i} className="font-medium text-gray-500 py-1">{day}</div>
+          <div key={i} className="font-medium text-[#5b6b7a] py-1">{day}</div>
         ))}
         {Array.from({ length: firstDay === 0 ? 6 : firstDay - 1 }).map((_, i) => (
           <div key={`empty-${i}`} className="py-1" />
@@ -4426,12 +4158,12 @@ const AvailabilityCalendar = ({
           let hoverEffect = '';
           
           if (!isCurrentMonthDay) {
-            textColor = 'text-gray-300';
+            textColor = 'text-[#9fb3c4]';
             cursor = 'cursor-default';
           } else if (isPast) {
-            textColor = 'text-gray-300';
+            textColor = 'text-[#9fb3c4]';
             cursor = 'cursor-not-allowed';
-            bgColor = 'bg-gray-50';
+            bgColor = 'bg-[#f4fffe]';
           } else if (isBooked) {
             bgColor = 'bg-red-50';
             textColor = 'text-red-500';
@@ -4447,7 +4179,7 @@ const AvailabilityCalendar = ({
             bgColor = 'hover:bg-green-50';
             textColor = 'text-green-600';
           } else {
-            textColor = 'text-gray-800';
+            textColor = 'text-[#0f2940]';
             cursor = 'cursor-pointer';
             hoverEffect = 'hover:bg-[#00c9a7]/20';
           }
@@ -4470,7 +4202,7 @@ const AvailabilityCalendar = ({
       
      
       
-      <div className="mt-2 text-xs text-gray-400">
+      <div className="mt-2 text-xs text-[#5b6b7a]">
         {!selectedStart && 'Cliquez sur une date pour commencer'}
         {selectedStart && !selectedEnd && 'Sélectionnez la date de fin'}
         {selectedStart && selectedEnd && (
@@ -4926,7 +4658,7 @@ export function BookingPage({ onNavigate, id, search }: any) {
     return (
       <div className="min-h-screen flex justify-center items-center bg-[#f4fffe] p-4">
         <div className="text-center bg-white rounded-2xl p-8 max-w-md">
-          <Home className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <Home className="w-16 h-16 text-[#9fb3c4] mx-auto mb-4" />
           <p className="text-red-500 mb-4">Propriété introuvable</p>
           <button onClick={() => onNavigate?.({ name: 'home' })} className="text-[#00c9a7] underline">Retour à l'accueil</button>
         </div>
@@ -4936,25 +4668,25 @@ export function BookingPage({ onNavigate, id, search }: any) {
 
   return (
     <div className="bg-[#f4fffe] min-h-screen pb-32 md:pb-12">
-      <div className="sticky top-0 z-40 bg-white border-b border-gray-100 px-4 py-3 shadow-sm">
+      <div className="sticky top-0 z-40 bg-white border-b border-[#e2f5f2] px-4 py-3 shadow-sm">
         <div className="flex items-center gap-3">
           <button 
             onClick={() => onNavigate?.({ name: 'listing', id: propertyId })} 
-            className="p-2 -ml-2 rounded-full hover:bg-gray-100 transition active:bg-gray-200"
+            className="p-2 -ml-2 rounded-full hover:bg-[#e8faf6] transition active:bg-[#e2f5f2]"
           >
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
+            <ArrowLeft className="w-5 h-5 text-[#5b6b7a]" />
           </button>
           <div>
             <h1 className="font-semibold text-[#0F2940] text-base sm:text-lg">Confirmation</h1>
-            <p className="text-xs text-gray-500">Vérifiez vos informations</p>
+            <p className="text-xs text-[#5b6b7a]">Vérifiez vos informations</p>
           </div>
         </div>
       </div>
 
       <div className="max-w-[1200px] mx-auto px-4 py-4 md:py-6">
-        <div className="lg:hidden bg-white rounded-xl p-4 mb-4 shadow-sm border border-gray-100">
+        <div className="lg:hidden bg-white rounded-xl p-4 mb-4 shadow-sm border border-[#e2f5f2]">
           <div className="flex items-start gap-3">
-            <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
+            <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-[#e8faf6]">
               <img 
                 src={property.images?.[0] || property.image} 
                 alt={property.title} 
@@ -4963,29 +4695,29 @@ export function BookingPage({ onNavigate, id, search }: any) {
               />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-gray-900 text-sm line-clamp-1">{property.title}</h3>
-              <p className="text-xs text-gray-500 mt-0.5">{property.district}, {property.city}</p>
+              <h3 className="font-semibold text-[#0f2940] text-sm line-clamp-1">{property.title}</h3>
+              <p className="text-xs text-[#5b6b7a] mt-0.5">{property.district}, {property.city}</p>
               <div className="flex items-center gap-2 mt-2 text-xs">
-                <span className="text-gray-500">{currentNights} nuit{currentNights > 1 ? 's' : ''}</span>
-                <span className="text-gray-300">•</span>
-                <span className="text-gray-500">
+                <span className="text-[#5b6b7a]">{currentNights} nuit{currentNights > 1 ? 's' : ''}</span>
+                <span className="text-[#9fb3c4]">•</span>
+                <span className="text-[#5b6b7a]">
                   {totalTravelers} voyageur{totalTravelers > 1 ? 's' : ''}
                 </span>
                 {currentChildren > 0 && (
-                  <span className="text-gray-400 text-xs">
+                  <span className="text-[#5b6b7a] text-xs">
                     ({currentChildren} enf.
                     {currentBabies > 0 ? `, ${currentBabies} bébé${currentBabies > 1 ? 's' : ''}` : ''}
                     {currentPets > 0 ? `, ${currentPets} animal${currentPets > 1 ? 'x' : ''}` : ''})
                   </span>
                 )}
                 {currentChildren === 0 && currentBabies > 0 && (
-                  <span className="text-gray-400 text-xs">
+                  <span className="text-[#5b6b7a] text-xs">
                     ({currentBabies} bébé{currentBabies > 1 ? 's' : ''}
                     {currentPets > 0 ? `, ${currentPets} animal${currentPets > 1 ? 'x' : ''}` : ''})
                   </span>
                 )}
                 {currentChildren === 0 && currentBabies === 0 && currentPets > 0 && (
-                  <span className="text-gray-400 text-xs">
+                  <span className="text-[#5b6b7a] text-xs">
                     ({currentPets} animal{currentPets > 1 ? 'x' : ''})
                   </span>
                 )}
@@ -4993,7 +4725,7 @@ export function BookingPage({ onNavigate, id, search }: any) {
             </div>
             <div className="text-right">
               <p className="font-bold text-[#00c9a7] text-sm">{total.toLocaleString()} FCFA</p>
-              <p className="text-xs text-gray-400">total</p>
+              <p className="text-xs text-[#5b6b7a]">total</p>
             </div>
           </div>
         </div>
@@ -5001,7 +4733,7 @@ export function BookingPage({ onNavigate, id, search }: any) {
         <div className="flex flex-col lg:flex-row gap-4 md:gap-6">
           <div className="flex-1 space-y-4">
             {/* Vos dates avec calendrier */}
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-[#e2f5f2]">
               <div className="flex justify-between items-center mb-3">
                 <h2 className="font-semibold text-[#0F2940] flex items-center gap-2 text-base">
                   <Calendar className="w-5 h-5 text-[#00c9a7]" />
@@ -5019,7 +4751,7 @@ export function BookingPage({ onNavigate, id, search }: any) {
                       setEditedPets(currentPets || 0);
                       setError('');
                     }}
-                    className="p-1.5 rounded-full hover:bg-gray-100 transition-colors text-gray-400 hover:text-[#00c9a7]"
+                    className="p-1.5 rounded-full hover:bg-[#e8faf6] transition-colors text-[#5b6b7a] hover:text-[#00c9a7]"
                     title="Modifier les dates et le nombre de voyageurs"
                   >
                     <Pencil className="w-4 h-4" />
@@ -5046,14 +4778,14 @@ export function BookingPage({ onNavigate, id, search }: any) {
                     <button
                       type="button"
                       onClick={() => setShowGuestDetails(!showGuestDetails)}
-                      className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                      className="w-full flex items-center justify-between px-4 py-3 bg-[#f4fffe] rounded-lg hover:bg-[#e8faf6] transition-colors"
                     >
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-sm text-gray-700">
+                        <span className="font-medium text-sm text-[#1c3b56]">
                           {editedGuests + editedChildren + editedBabies + editedPets} voyageur{(editedGuests + editedChildren + editedBabies + editedPets) > 1 ? 's' : ''}
                         </span>
                         {(editedChildren > 0 || editedBabies > 0 || editedPets > 0) && (
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-[#5b6b7a]">
                             ({editedChildren > 0 ? `${editedChildren} enfant${editedChildren > 1 ? 's' : ''}` : ''}
                             {editedChildren > 0 && (editedBabies > 0 || editedPets > 0) ? ', ' : ''}
                             {editedBabies > 0 ? `${editedBabies} bébé${editedBabies > 1 ? 's' : ''}` : ''}
@@ -5062,100 +4794,100 @@ export function BookingPage({ onNavigate, id, search }: any) {
                           </span>
                         )}
                       </div>
-                      <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showGuestDetails ? 'rotate-180' : ''}`} />
+                      <ChevronDown className={`w-4 h-4 text-[#5b6b7a] transition-transform ${showGuestDetails ? 'rotate-180' : ''}`} />
                     </button>
                     
                     {showGuestDetails && (
-                      <div className="mt-3 space-y-3 bg-gray-50 rounded-lg p-4">
+                      <div className="mt-3 space-y-3 bg-[#f4fffe] rounded-lg p-4">
                         <div className="flex justify-between items-center">
                           <div>
-                            <span className="font-medium text-sm text-gray-700">Adultes</span>
-                            <p className="text-xs text-gray-400">À partir de 13 ans</p>
+                            <span className="font-medium text-sm text-[#1c3b56]">Adultes</span>
+                            <p className="text-xs text-[#5b6b7a]">À partir de 13 ans</p>
                           </div>
                           <div className="flex items-center gap-3">
                             <button 
                               onClick={() => setEditedGuests(Math.max(1, editedGuests - 1))}
-                              className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors bg-white"
+                              className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors bg-white"
                             >
-                              <Minus className="w-4 h-4 text-gray-600" />
+                              <Minus className="w-4 h-4 text-[#5b6b7a]" />
                             </button>
                             <span className="font-medium text-base min-w-[30px] text-center">{editedGuests}</span>
                             <button 
                               onClick={() => setEditedGuests(Math.min(maxGuests, editedGuests + 1))}
-                              className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors bg-white"
+                              className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors bg-white"
                             >
-                              <Plus className="w-4 h-4 text-gray-600" />
+                              <Plus className="w-4 h-4 text-[#5b6b7a]" />
                             </button>
                           </div>
                         </div>
                         
-                        <div className="flex justify-between items-center border-t border-gray-200 pt-3">
+                        <div className="flex justify-between items-center border-t border-[#e2f5f2] pt-3">
                           <div>
-                            <span className="font-medium text-sm text-gray-700">Enfants</span>
-                            <p className="text-xs text-gray-400">De 2 à 12 ans</p>
+                            <span className="font-medium text-sm text-[#1c3b56]">Enfants</span>
+                            <p className="text-xs text-[#5b6b7a]">De 2 à 12 ans</p>
                           </div>
                           <div className="flex items-center gap-3">
                             <button 
                               onClick={() => setEditedChildren(Math.max(0, editedChildren - 1))}
-                              className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors bg-white"
+                              className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors bg-white"
                             >
-                              <Minus className="w-4 h-4 text-gray-600" />
+                              <Minus className="w-4 h-4 text-[#5b6b7a]" />
                             </button>
                             <span className="font-medium text-base min-w-[30px] text-center">{editedChildren}</span>
                             <button 
                               onClick={() => setEditedChildren(Math.min(maxGuests - editedGuests - editedBabies - editedPets, editedChildren + 1))}
-                              className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors bg-white"
+                              className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors bg-white"
                             >
-                              <Plus className="w-4 h-4 text-gray-600" />
+                              <Plus className="w-4 h-4 text-[#5b6b7a]" />
                             </button>
                           </div>
                         </div>
                         
-                        <div className="flex justify-between items-center border-t border-gray-200 pt-3">
+                        <div className="flex justify-between items-center border-t border-[#e2f5f2] pt-3">
                           <div>
-                            <span className="font-medium text-sm text-gray-700">Bébés</span>
-                            <p className="text-xs text-gray-400">Moins de 2 ans</p>
+                            <span className="font-medium text-sm text-[#1c3b56]">Bébés</span>
+                            <p className="text-xs text-[#5b6b7a]">Moins de 2 ans</p>
                           </div>
                           <div className="flex items-center gap-3">
                             <button 
                               onClick={() => setEditedBabies(Math.max(0, editedBabies - 1))}
-                              className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors bg-white"
+                              className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors bg-white"
                             >
-                              <Minus className="w-4 h-4 text-gray-600" />
+                              <Minus className="w-4 h-4 text-[#5b6b7a]" />
                             </button>
                             <span className="font-medium text-base min-w-[30px] text-center">{editedBabies}</span>
                             <button 
                               onClick={() => setEditedBabies(Math.min(maxGuests - editedGuests - editedChildren - editedPets, editedBabies + 1))}
-                              className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors bg-white"
+                              className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors bg-white"
                             >
-                              <Plus className="w-4 h-4 text-gray-600" />
+                              <Plus className="w-4 h-4 text-[#5b6b7a]" />
                             </button>
                           </div>
                         </div>
                         
-                        <div className="flex justify-between items-center border-t border-gray-200 pt-3">
+                        <div className="flex justify-between items-center border-t border-[#e2f5f2] pt-3">
                           <div>
-                            <span className="font-medium text-sm text-gray-700">Animaux domestiques</span>
-                            <p className="text-xs text-gray-400">Chiens, chats, etc.</p>
+                            <span className="font-medium text-sm text-[#1c3b56]">Animaux domestiques</span>
+                            <p className="text-xs text-[#5b6b7a]">Chiens, chats, etc.</p>
                           </div>
                           <div className="flex items-center gap-3">
                             <button 
                               onClick={() => setEditedPets(Math.max(0, editedPets - 1))}
-                              className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors bg-white"
+                              className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors bg-white"
                             >
-                              <Minus className="w-4 h-4 text-gray-600" />
+                              <Minus className="w-4 h-4 text-[#5b6b7a]" />
                             </button>
                             <span className="font-medium text-base min-w-[30px] text-center">{editedPets}</span>
                             <button 
                               onClick={() => setEditedPets(editedPets + 1)}
-                              className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors bg-white"
+                              className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors bg-white"
                             >
-                              <Plus className="w-4 h-4 text-gray-600" />
+                              <Plus className="w-4 h-4 text-[#5b6b7a]" />
                             </button>
                           </div>
                         </div>
                         
-                        <div className="flex justify-between text-xs text-gray-500 border-t border-gray-200 pt-2 mt-1">
+                        <div className="flex justify-between text-xs text-[#5b6b7a] border-t border-[#e2f5f2] pt-2 mt-1">
                           <span>Total voyageurs</span>
                           <span className="font-medium">
                             {editedGuests + editedChildren + editedBabies + editedPets} / {maxGuests} max.
@@ -5184,7 +4916,7 @@ export function BookingPage({ onNavigate, id, search }: any) {
                     <button 
                       onClick={handleSaveDatesAndGuests}
                       disabled={isCheckingAvailability}
-                      className="flex-1 py-2 bg-[#00c9a7] text-white rounded-lg text-sm font-medium hover:bg-[#00b892] transition disabled:opacity-50"
+                      className="flex-1 py-2 bg-[#00c9a7] text-white rounded-lg text-sm font-medium hover:bg-[#00b396] transition disabled:opacity-50"
                     >
                       {isCheckingAvailability ? 'Vérification...' : 'Enregistrer les modifications'}
                     </button>
@@ -5201,7 +4933,7 @@ export function BookingPage({ onNavigate, id, search }: any) {
                         setError('');
                         setAvailabilityStatus('idle');
                       }}
-                      className="flex-1 py-2 border border-gray-300 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-50 transition"
+                      className="flex-1 py-2 border border-[#c9f0e8] text-[#5b6b7a] rounded-lg text-sm font-medium hover:bg-[#f4fffe] transition"
                     >
                       Annuler
                     </button>
@@ -5210,36 +4942,36 @@ export function BookingPage({ onNavigate, id, search }: any) {
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
                   <div>
-                    <p className="text-gray-500 text-xs">Arrivée</p>
+                    <p className="text-[#5b6b7a] text-xs">Arrivée</p>
                     <p className="font-medium text-sm">{formatDisplayDate(currentCheckIn)}</p>
                   </div>
                   <div>
-                    <p className="text-gray-500 text-xs">Départ</p>
+                    <p className="text-[#5b6b7a] text-xs">Départ</p>
                     <p className="font-medium text-sm">{formatDisplayDate(currentCheckOut)}</p>
                   </div>
                   <div>
-                    <p className="text-gray-500 text-xs">Durée</p>
+                    <p className="text-[#5b6b7a] text-xs">Durée</p>
                     <p className="font-medium text-sm">{currentNights} nuit{currentNights > 1 ? 's' : ''}</p>
                   </div>
                   <div>
-                    <p className="text-gray-500 text-xs">Voyageurs</p>
+                    <p className="text-[#5b6b7a] text-xs">Voyageurs</p>
                     <p className="font-medium text-sm">
                       {totalTravelers} pers.
                       {currentChildren > 0 && (
-                        <span className="text-xs text-gray-400 ml-1">
+                        <span className="text-xs text-[#5b6b7a] ml-1">
                           ({currentChildren} enf.
                           {currentBabies > 0 ? `, ${currentBabies} bébé${currentBabies > 1 ? 's' : ''}` : ''}
                           {currentPets > 0 ? `, ${currentPets} animal${currentPets > 1 ? 'x' : ''}` : ''})
                         </span>
                       )}
                       {currentChildren === 0 && currentBabies > 0 && (
-                        <span className="text-xs text-gray-400 ml-1">
+                        <span className="text-xs text-[#5b6b7a] ml-1">
                           ({currentBabies} bébé{currentBabies > 1 ? 's' : ''}
                           {currentPets > 0 ? `, ${currentPets} animal${currentPets > 1 ? 'x' : ''}` : ''})
                         </span>
                       )}
                       {currentChildren === 0 && currentBabies === 0 && currentPets > 0 && (
-                        <span className="text-xs text-gray-400 ml-1">
+                        <span className="text-xs text-[#5b6b7a] ml-1">
                           ({currentPets} animal{currentPets > 1 ? 'x' : ''})
                         </span>
                       )}
@@ -5250,27 +4982,27 @@ export function BookingPage({ onNavigate, id, search }: any) {
             </div>
 
             {/* Vos informations */}
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-[#e2f5f2]">
               <h2 className="font-semibold text-[#0F2940] mb-3 flex items-center gap-2 text-base">
                 <User className="w-5 h-5 text-[#00c9a7]" />
                 Vos informations
               </h2>
               <div className="space-y-2 text-sm">
                 <div className="flex flex-wrap justify-between items-center py-1">
-                  <span className="text-gray-500 text-xs">Nom complet</span>
+                  <span className="text-[#5b6b7a] text-xs">Nom complet</span>
                   <span className="font-medium text-sm">{guestInfo.full_name || '-'}</span>
                 </div>
-                <div className="flex flex-wrap justify-between items-center py-1 border-t border-gray-50">
-                  <span className="text-gray-500 text-xs">Email</span>
+                <div className="flex flex-wrap justify-between items-center py-1 border-t border-[#e2f5f2]">
+                  <span className="text-[#5b6b7a] text-xs">Email</span>
                   <span className="font-medium text-sm break-all">{guestInfo.email || '-'}</span>
                 </div>
-                <div className="flex flex-wrap justify-between items-center py-1 border-t border-gray-50">
-                  <span className="text-gray-500 text-xs">Téléphone</span>
+                <div className="flex flex-wrap justify-between items-center py-1 border-t border-[#e2f5f2]">
+                  <span className="text-[#5b6b7a] text-xs">Téléphone</span>
                   <span className="font-medium text-sm">{guestInfo.phone || '-'}</span>
                 </div>
                 {guestInfo.address && (
-                  <div className="flex flex-wrap justify-between items-center py-1 border-t border-gray-50">
-                    <span className="text-gray-500 text-xs">Adresse</span>
+                  <div className="flex flex-wrap justify-between items-center py-1 border-t border-[#e2f5f2]">
+                    <span className="text-[#5b6b7a] text-xs">Adresse</span>
                     <span className="font-medium text-sm">{guestInfo.address}</span>
                   </div>
                 )}
@@ -5278,7 +5010,7 @@ export function BookingPage({ onNavigate, id, search }: any) {
             </div>
 
             {/* Demandes spéciales */}
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-[#e2f5f2]">
               <h2 className="font-semibold text-[#0F2940] mb-3 flex items-center gap-2 text-base">
                 <MessageCircle className="w-5 h-5 text-[#00c9a7]" />
                 Demandes spéciales
@@ -5287,37 +5019,37 @@ export function BookingPage({ onNavigate, id, search }: any) {
                 value={specialRequests} 
                 onChange={(e) => setSpecialRequests(e.target.value)} 
                 placeholder="Horaires d'arrivée, allergies, demandes particulières..." 
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent resize-none text-sm" 
+                className="w-full px-4 py-3 border border-[#e2f5f2] rounded-xl focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent resize-none text-sm" 
                 rows={3} 
               />
             </div>
           </div>
 
           <div className="lg:w-96 space-y-4">
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 sticky top-20">
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-[#e2f5f2] sticky top-20">
               <h2 className="font-semibold text-[#0F2940] mb-3 text-base">Détail des prix</h2>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">{pricePerNight.toLocaleString()} FCFA × {currentNights} nuits</span>
+                  <span className="text-[#5b6b7a]">{pricePerNight.toLocaleString()} FCFA × {currentNights} nuits</span>
                   <span>{(pricePerNight * currentNights).toLocaleString()} FCFA</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Frais de service (10%)</span>
+                  <span className="text-[#5b6b7a]">Frais de service (10%)</span>
                   <span>{Math.floor(pricePerNight * currentNights * 0.10).toLocaleString()} FCFA</span>
                 </div>
-                <div className="border-t border-gray-200 pt-3 mt-3">
+                <div className="border-t border-[#e2f5f2] pt-3 mt-3">
                   <div className="flex justify-between items-center">
                     <span className="font-semibold">Total</span>
                     <span className="font-bold text-[#00c9a7] text-base sm:text-lg">{total.toLocaleString()} FCFA</span>
                   </div>
-                  <div className="text-right text-xs text-gray-400">{formatEuro(total)}</div>
+                  <div className="text-right text-xs text-[#5b6b7a]">{formatEuro(total)}</div>
                 </div>
               </div>
               
               <button
                 onClick={handleFedapayRedirect}
                 disabled={loading}
-                className="w-full mt-4 bg-gradient-to-r from-[#00c9a7] to-[#00a887] text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 text-sm active:scale-[0.98] flex items-center justify-center gap-2"
+                className="w-full mt-4 bg-[#00c9a7] text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 text-sm active:scale-[0.98] flex items-center justify-center gap-2"
               >
                 <Wallet className="w-4 h-4" />
                 {loading ? 'Préparation...' : 'Payer avec Fedapay'}
@@ -5327,7 +5059,7 @@ export function BookingPage({ onNavigate, id, search }: any) {
                   JSX (aucun effet au clic) — voir audit formulaires. Fedapay gère
                   déjà Mobile Money et carte sur sa page de paiement hébergée. */}
 
-              <div className="mt-3 flex items-center justify-center gap-4 text-xs text-gray-400">
+              <div className="mt-3 flex items-center justify-center gap-4 text-xs text-[#5b6b7a]">
                 <div className="flex items-center gap-1">
                   <Lock className="w-3 h-3" />
                   <span>Paiement sécurisé</span>
@@ -5345,7 +5077,7 @@ export function BookingPage({ onNavigate, id, search }: any) {
               </div>
               <div>
                 <p className="font-medium text-[#0F2940] text-sm">Une question ?</p>
-                <p className="text-xs text-gray-500">Contactez notre support 24/7</p>
+                <p className="text-xs text-[#5b6b7a]">Contactez notre support 24/7</p>
               </div>
             </div>
           </div>
@@ -5434,24 +5166,24 @@ export function SearchPage({ mode, onNavigate }: { mode: 'logements' | 'hotels';
   return (
     <div className="bg-white min-h-screen">
       {/* Barre de recherche */}
-      <div className="bg-gradient-to-r from-[#00c9a7] to-[#0f2940] py-4">
+      <div className="bg-[#0f2940] py-4">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-lg p-4">
+          <div className="bg-white rounded-2xl p-4">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label className="text-xs font-semibold text-[#00c9a7]">DESTINATION</label>
+                <label className="eyebrow text-[var(--bluefin-text-muted)]">Destination</label>
                 <input type="text" placeholder="Où allez-vous ?" value={searchDestination} onChange={(e) => setSearchDestination(e.target.value)} className="w-full mt-1 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#00c9a7]" />
               </div>
               <div>
-                <label className="text-xs font-semibold text-[#00c9a7]">ARRIVÉE</label>
+                <label className="eyebrow text-[var(--bluefin-text-muted)]">Arrivée</label>
                 <input type="date" value={checkIn} onChange={(e) => {}} className="w-full mt-1 p-2 border rounded" disabled />
               </div>
               <div>
-                <label className="text-xs font-semibold text-[#00c9a7]">DÉPART</label>
+                <label className="eyebrow text-[var(--bluefin-text-muted)]">Départ</label>
                 <input type="date" value={checkOut} onChange={(e) => {}} className="w-full mt-1 p-2 border rounded" disabled />
               </div>
               <div className="flex items-end">
-                <button onClick={performSearch} className="w-full bg-[#00c9a7] text-white py-2 rounded-lg font-semibold hover:bg-[#00b396] transition-colors">Rechercher</button>
+                <button onClick={performSearch} className="w-full bg-[#00c9a7] text-white py-2.5 rounded-full font-semibold hover:bg-[#00b396] transition-colors">Rechercher</button>
               </div>
             </div>
           </div>
@@ -5459,19 +5191,19 @@ export function SearchPage({ mode, onNavigate }: { mode: 'logements' | 'hotels';
       </div>
 
       {/* Filtres */}
-      <div className="border-b border-gray-200 sticky top-0 bg-white z-30">
+      <div className="border-b border-[#e2f5f2] sticky top-0 bg-white z-30">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex flex-wrap gap-3 items-center">
             <div className="relative">
-              <button onClick={() => setShowFilterDropdown(!showFilterDropdown)} className="flex items-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-2 text-sm text-[#0f2940] hover:border-[#00c9a7] transition-colors">
+              <button onClick={() => setShowFilterDropdown(!showFilterDropdown)} className="flex items-center gap-2 rounded-full border border-[#c9f0e8] bg-white px-4 py-2 text-sm text-[#0f2940] hover:border-[#00c9a7] transition-colors">
                 <Filter className="w-4 h-4" /><span>Filtres</span><ChevronDown className={`w-4 h-4 transition-transform ${showFilterDropdown ? 'rotate-180' : ''}`} />
               </button>
               {showFilterDropdown && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setShowFilterDropdown(false)} />
-                  <div className="absolute top-full left-0 mt-2 z-50 w-56 rounded-2xl border border-gray-200 bg-white shadow-xl">
+                  <div className="absolute top-full left-0 mt-2 z-50 w-56 rounded-2xl border border-[#e2f5f2] bg-white shadow-xl">
                     {filtersList.map(filter => (
-                      <button key={filter} onClick={() => { setSelectedFilter(filter); setShowFilterDropdown(false); }} className={`w-full px-4 py-3 text-left text-sm transition-colors ${selectedFilter === filter ? 'text-[#00c9a7] font-semibold' : 'text-[#0f2940] hover:bg-gray-50'}`}>
+                      <button key={filter} onClick={() => { setSelectedFilter(filter); setShowFilterDropdown(false); }} className={`w-full px-4 py-3 text-left text-sm transition-colors ${selectedFilter === filter ? 'text-[#00c9a7] font-semibold' : 'text-[#0f2940] hover:bg-[#f4fffe]'}`}>
                         {filter}
                       </button>
                     ))}
@@ -5479,9 +5211,9 @@ export function SearchPage({ mode, onNavigate }: { mode: 'logements' | 'hotels';
                 </>
               )}
             </div>
-            <div className="text-sm text-gray-600">{displayedProperties.length} logements disponibles</div>
+            <div className="text-sm text-[#5b6b7a]">{displayedProperties.length} logements disponibles</div>
           </div>
-          <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm">
+          <div className="flex items-center gap-2 rounded-full border border-[#e2f5f2] bg-white px-4 py-2 text-sm">
             <MapPin className="w-4 h-4 text-[#00c9a7]" />
             <span>{searchDestination || 'Réservez dans une ville du Bénin'}</span>
           </div>
@@ -5496,7 +5228,7 @@ export function SearchPage({ mode, onNavigate }: { mode: 'logements' | 'hotels';
           ))}
         </div>
         {displayedProperties.length === 0 && (
-          <div className="text-center py-12"><p className="text-gray-500">Aucun logement trouvé pour ces critères.</p></div>
+          <div className="text-center py-12"><p className="text-[#5b6b7a]">Aucun logement trouvé pour ces critères.</p></div>
         )}
       </main>
     </div>
@@ -5554,17 +5286,17 @@ export function PopularPage({ onNavigate }: { onNavigate?: (route: Route) => voi
     <div className="min-h-screen bg-white">
       {/* Header avec retour */}
       <div className="sticky top-0 bg-white border-b px-4 py-3 flex items-center gap-4 z-20">
-        <button onClick={() => onNavigate?.({ name: 'home' })} className="p-2 rounded-full hover:bg-gray-100">
+        <button onClick={() => onNavigate?.({ name: 'home' })} className="p-2 rounded-full hover:bg-[#e8faf6]">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-xl font-semibold text-[#0F2940]">Logements populaires · Bénin</h1>
-        <span className="text-sm text-gray-500 ml-auto">{displayedProperties.length} logements</span>
+        <span className="text-sm text-[#5b6b7a] ml-auto">{displayedProperties.length} logements</span>
       </div>
 
       {/* Barre de filtres */}
       <div className="sticky top-[73px] bg-white border-b px-4 py-2 z-10">
         <div className="relative inline-block">
-          <button onClick={() => setShowFilterDropdown(!showFilterDropdown)} className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-300">
+          <button onClick={() => setShowFilterDropdown(!showFilterDropdown)} className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#c9f0e8]">
             <Filter className="w-4 h-4 text-[#00c9a7]"/>
             <span>Trier : {selectedFilter}</span>
             <ChevronDown className="w-4 h-4"/>
@@ -5589,7 +5321,7 @@ export function PopularPage({ onNavigate }: { onNavigate?: (route: Route) => voi
       <div className="p-4">
         {displayedProperties.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-500">Aucun logement trouvé.</p>
+            <p className="text-[#5b6b7a]">Aucun logement trouvé.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -5603,7 +5335,7 @@ export function PopularPage({ onNavigate }: { onNavigate?: (route: Route) => voi
                   className="group cursor-pointer border rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white"
                   onClick={() => setSelectedProperty(property)}
                 >
-                  <div className="relative aspect-[4/3] bg-gray-100">
+                  <div className="relative aspect-[4/3] bg-[#e8faf6]">
                     <img
                       src={imageUrl}
                       alt={property.title}
@@ -5619,7 +5351,7 @@ export function PopularPage({ onNavigate }: { onNavigate?: (route: Route) => voi
                       onClick={(e) => { e.stopPropagation(); toggleFavorite(property); }} 
                       className="absolute top-3 right-3 p-2 rounded-full bg-white/80 hover:bg-white transition-all z-10 backdrop-blur-sm shadow-md"
                     >
-                      <Heart className={`w-5 h-5 transition-all ${isFavorite(property.id) ? 'fill-red-500 text-red-500' : 'text-gray-700'}`} />
+                      <Heart className={`w-5 h-5 transition-all ${isFavorite(property.id) ? 'fill-red-500 text-red-500' : 'text-[#1c3b56]'}`} />
                     </button>
                     {property.rating >= 4.8 && (
                       <div className="absolute bottom-3 left-3 bg-[#00c9a7] text-white text-xs px-2 py-1 rounded-full font-medium shadow-md">
@@ -5633,11 +5365,11 @@ export function PopularPage({ onNavigate }: { onNavigate?: (route: Route) => voi
                       <div className="flex items-center gap-1 text-sm flex-shrink-0">
                         <Star className="w-4 h-4 fill-[#00c9a7] text-[#00c9a7]" />
                         <span className="font-medium">{property.rating}</span>
-                        <span className="text-gray-500">({property.reviews})</span>
+                        <span className="text-[#5b6b7a]">({property.reviews})</span>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-500 mt-1 line-clamp-1">{property.location}</p>
-                    <div className="flex items-center gap-3 mt-2 text-sm text-gray-500">
+                    <p className="text-sm text-[#5b6b7a] mt-1 line-clamp-1">{property.location}</p>
+                    <div className="flex items-center gap-3 mt-2 text-sm text-[#5b6b7a]">
                       {property.beds > 0 && (
                         <div className="flex items-center gap-1">
                           <Bed className="w-4 h-4" />
@@ -5967,10 +5699,10 @@ export function ListingPage({ onNavigate, id }: ListingPageProps) {
         <div className="text-center p-8 max-w-md">
           <div className="text-6xl mb-4">🏠</div>
           <h1 className="text-2xl font-semibold text-[#0F2940] mb-2">Erreur de chargement</h1>
-          <p className="text-gray-500 mb-4">Impossible de récupérer les annonces.</p>
+          <p className="text-[#5b6b7a] mb-4">Impossible de récupérer les annonces.</p>
           <button 
             onClick={() => onNavigate?.({ name: 'home' })} 
-            className="px-6 py-3 bg-[#00c9a7] text-[#0F2940] rounded-full font-semibold hover:bg-[#00b892] transition-colors"
+            className="px-6 py-3 bg-[#00c9a7] text-[#0F2940] rounded-full font-semibold hover:bg-[#00b396] transition-colors"
           >
             Retour à l'accueil
           </button>
@@ -5989,15 +5721,15 @@ export function ListingPage({ onNavigate, id }: ListingPageProps) {
         <div className="text-center p-8 max-w-md">
           <div className="text-6xl mb-4">🏠</div>
           <h1 className="text-2xl font-semibold text-[#0F2940] mb-2">Logement non trouvé</h1>
-          <p className="text-gray-500 mb-4">
+          <p className="text-[#5b6b7a] mb-4">
             Aucun logement ne correspond à l'ID <strong>{id}</strong>
           </p>
-          <p className="text-sm text-gray-400 mb-6">
+          <p className="text-sm text-[#5b6b7a] mb-6">
             Vérifiez que l'URL est correcte ou retournez à l'accueil.
           </p>
           <button 
             onClick={() => onNavigate?.({ name: 'home' })} 
-            className="px-6 py-3 bg-[#00c9a7] text-[#0F2940] rounded-full font-semibold hover:bg-[#00b892] transition-colors"
+            className="px-6 py-3 bg-[#00c9a7] text-[#0F2940] rounded-full font-semibold hover:bg-[#00b396] transition-colors"
           >
             Retour à l'accueil
           </button>
@@ -6349,7 +6081,7 @@ export function CancellationPolicy({
           refundPercentage: 50,
           label: 'Remboursement partiel',
           description: `Annulez avant le ${partialRefundDeadline.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })} pour un remboursement de 50%. Les frais de service ne sont pas remboursés.`,
-          icon: <Clock className="w-5 h-5 text-orange-500" />
+          icon: <Clock className="w-5 h-5 text-[#e0ac1f]" />
         });
       }
       
@@ -6385,7 +6117,7 @@ export function CancellationPolicy({
           refundPercentage: 50,
           label: 'Remboursement partiel',
           description: `Annulez avant le ${partialRefundDeadline.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })} pour un remboursement de 50%. Les frais de service ne sont pas remboursés.`,
-          icon: <Clock className="w-5 h-5 text-orange-500" />
+          icon: <Clock className="w-5 h-5 text-[#e0ac1f]" />
         });
       }
       
@@ -6422,7 +6154,7 @@ export function CancellationPolicy({
           refundPercentage: 50,
           label: 'Remboursement partiel',
           description: `Annulez avant le ${partialRefundDeadline.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })} pour un remboursement de 50%. Les frais de service ne sont pas remboursés.`,
-          icon: <Clock className="w-5 h-5 text-orange-500" />
+          icon: <Clock className="w-5 h-5 text-[#e0ac1f]" />
         });
       }
       
@@ -6455,8 +6187,8 @@ export function CancellationPolicy({
 
   if (!checkInDate) {
     return (
-      <div className="bg-gray-50 rounded-xl p-4 text-center">
-        <p className="text-gray-500 text-sm">
+      <div className="bg-[#f4fffe] rounded-xl p-4 text-center">
+        <p className="text-[#5b6b7a] text-sm">
           Sélectionnez vos dates pour voir la politique d'annulation
         </p>
       </div>
@@ -6464,9 +6196,9 @@ export function CancellationPolicy({
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+    <div className="bg-white border border-[#e2f5f2] rounded-xl overflow-hidden">
       {/* En-tête */} 
-      <div className="bg-gradient-to-r from-[#0F2940] to-[#1a3a52] px-5 py-4">
+      <div className="bg-[#0f2940] px-5 py-4">
         <div className="flex items-center gap-3">
           <Calendar className="w-5 h-5 text-[#00c9a7]" />
           <h3 className="font-semibold text-white">Politique d'annulation</h3>
@@ -6477,7 +6209,7 @@ export function CancellationPolicy({
       {currentRule && (
         <div className={`p-5 border-b ${
           currentRule.refundPercentage === 100 ? 'bg-green-50 border-green-200' :
-          currentRule.refundPercentage === 50 ? 'bg-orange-50 border-orange-200' :
+          currentRule.refundPercentage === 50 ? 'bg-[#fffaeb] border-[#ffe9a8]' :
           'bg-red-50 border-red-200'
         }`}>
           <div className="flex items-start gap-3">
@@ -6487,12 +6219,12 @@ export function CancellationPolicy({
             <div>
               <h4 className={`font-semibold ${
                 currentRule.refundPercentage === 100 ? 'text-green-700' :
-                currentRule.refundPercentage === 50 ? 'text-orange-700' :
+                currentRule.refundPercentage === 50 ? 'text-[#6b4e06]' :
                 'text-red-700'
               }`}>
                 {currentRule.label}
               </h4>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-[#5b6b7a] mt-1">
                 {currentRule.description}
               </p>
             </div>
@@ -6502,7 +6234,7 @@ export function CancellationPolicy({
       
       {/* Liste des règles */}
       <div className="p-5 space-y-4">
-        <p className="text-xs text-gray-500 mb-3 flex items-center gap-1">
+        <p className="text-xs text-[#5b6b7a] mb-3 flex items-center gap-1">
           <AlertCircle className="w-3 h-3" />
           L'heure indiquée est basée sur l'emplacement du logement
         </p>
@@ -6510,23 +6242,23 @@ export function CancellationPolicy({
         {policyRules.map((rule, index) => (
           <div 
             key={index} 
-            className={`pb-3 ${index < policyRules.length - 1 ? 'border-b border-gray-100' : ''}`}
+            className={`pb-3 ${index < policyRules.length - 1 ? 'border-b border-[#e2f5f2]' : ''}`}
           >
             <div className="flex items-start gap-2">
               <div className="flex-shrink-0 mt-0.5">
                 {rule.refundPercentage === 100 ? (
                   <CheckCircle className="w-4 h-4 text-green-500" />
                 ) : rule.refundPercentage === 50 ? (
-                  <Clock className="w-4 h-4 text-orange-500" />
+                  <Clock className="w-4 h-4 text-[#e0ac1f]" />
                 ) : (
                   <XCircle className="w-4 h-4 text-red-400" />
                 )}
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-800">
+                <p className="text-sm font-medium text-[#0f2940]">
                   {rule.label}
                 </p>
-                <p className="text-xs text-gray-500 mt-0.5">
+                <p className="text-xs text-[#5b6b7a] mt-0.5">
                   {rule.description.split('.')[0]}.
                 </p>
               </div>
@@ -6536,8 +6268,8 @@ export function CancellationPolicy({
       </div>
       
       {/* Note supplémentaire */}
-      <div className="bg-gray-50 px-5 py-3 border-t border-gray-100">
-        <p className="text-xs text-gray-500 flex items-center gap-1">
+      <div className="bg-[#f4fffe] px-5 py-3 border-t border-[#e2f5f2]">
+        <p className="text-xs text-[#5b6b7a] flex items-center gap-1">
           <AlertCircle className="w-3 h-3" />
           Les frais de service  ne sont pas remboursés en cas d'annulation partielle.
         </p>
@@ -6805,7 +6537,7 @@ const allProperties = rawProperties.map((property: any) => {
     return (
       <div className="min-h-screen flex flex-col justify-center items-center bg-white p-4">
         <div className="text-red-500 text-xl mb-4">⚠️ Erreur de chargement</div>
-        <p className="text-gray-600 mb-6">Impossible de récupérer les logements.</p>
+        <p className="text-[#5b6b7a] mb-6">Impossible de récupérer les logements.</p>
         <button 
           onClick={() => window.location.reload()} 
           className="px-6 py-2 bg-[#00c9a7] text-white rounded-full"
@@ -6819,40 +6551,40 @@ const allProperties = rawProperties.map((property: any) => {
   return (
     <div className="min-h-screen bg-white">
       {/* Header avec retour */}
-      <div className="sticky top-0 bg-white border-b border-gray-200 px-3 sm:px-4 py-2 sm:py-3 flex items-center gap-2 sm:gap-4 z-20">
+      <div className="sticky top-0 bg-white border-b border-[#e2f5f2] px-3 sm:px-4 py-2 sm:py-3 flex items-center gap-2 sm:gap-4 z-20">
         <button 
           onClick={() => onNavigate?.({ name: 'home' })} 
-          className="p-1.5 sm:p-2 rounded-full hover:bg-gray-100 transition-colors"
+          className="p-1.5 sm:p-2 rounded-full hover:bg-[#e8faf6] transition-colors"
         >
           <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 text-[#0F2940]" />
         </button>
         <h1 className="text-base sm:text-xl font-semibold text-[#0F2940]">Tous les logements · Bénin</h1>
-        <span className="text-xs sm:text-sm text-gray-500 ml-auto">{displayedProperties.length} logements</span>
+        <span className="text-xs sm:text-sm text-[#5b6b7a] ml-auto">{displayedProperties.length} logements</span>
       </div>
 
       {/* Barre de recherche */}
-      <div className="bg-gradient-to-r from-[#00c9a7]/5 to-[#0f2940]/5 px-3 sm:px-4 py-3 sm:py-4 border-b">
+      <div className="bg-[#f4fffe] px-3 sm:px-4 py-3 sm:py-4 border-b">
         <form onSubmit={handleSearch} className="max-w-md mx-auto">
           <div className="relative">
-            <SearchIcon className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+            <SearchIcon className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-[#5b6b7a]" />
             <input
               type="text"
               placeholder="Rechercher par ville ou quartier..."
               value={searchDestination}
               onChange={(e) => setSearchDestination(e.target.value)}
-              className="w-full pl-9 sm:pl-12 pr-3 sm:pr-4 py-2 sm:py-3 text-sm sm:text-base rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent shadow-sm bg-white"
+              className="w-full pl-9 sm:pl-12 pr-3 sm:pr-4 py-2 sm:py-3 text-sm sm:text-base rounded-full border border-[#e2f5f2] focus:outline-none focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent shadow-sm bg-white"
             />
           </div>
         </form>
       </div>
 
       {/* Barre de filtres */}
-      <div className="sticky top-[57px] sm:top-[73px] bg-white border-b border-gray-200 px-3 sm:px-4 py-2 sm:py-3 z-10">
+      <div className="sticky top-[57px] sm:top-[73px] bg-white border-b border-[#e2f5f2] px-3 sm:px-4 py-2 sm:py-3 z-10">
         <div className="flex items-center justify-between flex-wrap gap-2 sm:gap-3">
           <div className="relative">
             <button 
               onClick={() => setShowFilterDropdown(!showFilterDropdown)} 
-              className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-gray-300 hover:border-gray-400 transition-colors bg-white text-sm sm:text-base"
+              className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-[#c9f0e8] hover:border-[#9fb3c4] transition-colors bg-white text-sm sm:text-base"
             >
               <Filter className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#00c9a7]"/>
               <span className="text-xs sm:text-sm">Trier : {selectedFilter}</span>
@@ -6861,11 +6593,11 @@ const allProperties = rawProperties.map((property: any) => {
             {showFilterDropdown && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setShowFilterDropdown(false)} />
-                <div className="absolute top-full left-0 mt-2 bg-white shadow-lg rounded-xl border border-gray-200 w-40 sm:w-48 z-50 py-2">
+                <div className="absolute top-full left-0 mt-2 bg-white shadow-lg rounded-xl border border-[#e2f5f2] w-40 sm:w-48 z-50 py-2">
                   {["Tous", "Prix croissant", "Prix décroissant", "Mieux notés"].map(f => (
                     <div 
                       key={f} 
-                      className={`px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm cursor-pointer hover:bg-gray-50 transition-colors ${selectedFilter === f ? 'text-[#00c9a7] font-medium bg-[#00c9a7]/5' : 'text-gray-700'}`} 
+                      className={`px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm cursor-pointer hover:bg-[#f4fffe] transition-colors ${selectedFilter === f ? 'text-[#00c9a7] font-medium bg-[#00c9a7]/5' : 'text-[#1c3b56]'}`} 
                       onClick={() => { setSelectedFilter(f); setShowFilterDropdown(false); }}
                     >
                       {f}
@@ -6878,7 +6610,7 @@ const allProperties = rawProperties.map((property: any) => {
           
           {searchDestination && (
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <span className="text-[10px] sm:text-xs text-gray-500 bg-gray-100 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full">
+              <span className="text-[10px] sm:text-xs text-[#5b6b7a] bg-[#e8faf6] px-2 sm:px-3 py-0.5 sm:py-1 rounded-full">
                 🔍 {searchDestination.length > 15 ? searchDestination.slice(0, 15) + '...' : searchDestination}
               </span>
               <button 
@@ -6900,7 +6632,7 @@ const allProperties = rawProperties.map((property: any) => {
             <div className="text-center py-8 sm:py-16">
               <div className="text-4xl sm:text-6xl mb-3 sm:mb-4">🏠</div>
               <h2 className="text-base sm:text-xl font-semibold text-[#0F2940] mb-2">Aucun logement trouvé</h2>
-              <p className="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6">
+              <p className="text-xs sm:text-sm text-[#5b6b7a] mb-4 sm:mb-6">
                 {searchDestination 
                   ? `Aucun résultat pour "${searchDestination}"`
                   : "Aucun logement n'est disponible pour le moment."}
@@ -6919,7 +6651,7 @@ const allProperties = rawProperties.map((property: any) => {
               {displayedProperties.map((property) => (
                 <div 
                   key={property.id} 
-                  className="group cursor-pointer border border-gray-200 rounded-xl sm:rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white"
+                  className="group cursor-pointer border border-[#e2f5f2] rounded-xl sm:rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white"
                   onClick={() => onNavigate?.({ name: 'listing', id: property.id.toString() })}
                 >
                   <div className="relative overflow-hidden aspect-[4/3]">
@@ -6933,7 +6665,7 @@ const allProperties = rawProperties.map((property: any) => {
                       onClick={(e) => { e.stopPropagation(); toggleFavorite(property); }} 
                       className="absolute top-1.5 sm:top-3 right-1.5 sm:right-3 p-1 sm:p-1.5 rounded-full bg-white/80 hover:bg-white transition-all z-10 backdrop-blur-sm shadow-md"
                     >
-                      <Heart className={`w-3 h-3 sm:w-4 sm:h-4 transition-all duration-200 ${isFavorite(property.id) ? 'fill-red-500 text-red-500 scale-110' : 'text-gray-700 hover:text-red-500'}`} />
+                      <Heart className={`w-3 h-3 sm:w-4 sm:h-4 transition-all duration-200 ${isFavorite(property.id) ? 'fill-red-500 text-red-500 scale-110' : 'text-[#1c3b56] hover:text-red-500'}`} />
                     </button>
                     {property.rating >= 4.8 && (
                       <div className="absolute bottom-1.5 sm:bottom-3 left-1.5 sm:left-3 bg-[#00c9a7] text-white text-[8px] sm:text-xs px-1 sm:px-2 py-0.5 rounded-full shadow-md">
@@ -6948,14 +6680,14 @@ const allProperties = rawProperties.map((property: any) => {
                       <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
                         <Star className="w-2 h-2 sm:w-3 sm:h-3 fill-[#00c9a7] text-[#00c9a7]" />
                         <span className="font-medium text-[9px] sm:text-xs">{property.rating}</span>
-                        <span className="text-gray-400 text-[8px] sm:text-xs">({property.reviews})</span>
+                        <span className="text-[#5b6b7a] text-[8px] sm:text-xs">({property.reviews})</span>
                       </div>
                     </div>
-                    <p className="text-[9px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1 flex items-center gap-0.5 sm:gap-1 truncate">
+                    <p className="text-[9px] sm:text-xs text-[#5b6b7a] mt-0.5 sm:mt-1 flex items-center gap-0.5 sm:gap-1 truncate">
                       <MapPin className="w-2 h-2 sm:w-3 sm:h-3" />
                       {property.location.length > 25 ? property.location.slice(0, 25) + '...' : property.location}
                     </p>
-                    <div className="flex items-center gap-1 sm:gap-2 mt-1 sm:mt-2 text-[8px] sm:text-xs text-gray-500">
+                    <div className="flex items-center gap-1 sm:gap-2 mt-1 sm:mt-2 text-[8px] sm:text-xs text-[#5b6b7a]">
                       {property.beds > 0 && (
                         <div className="flex items-center gap-0.5 sm:gap-1">
                           <Bed className="w-2 h-2 sm:w-3 sm:h-3" />
@@ -6969,7 +6701,7 @@ const allProperties = rawProperties.map((property: any) => {
                         </div>
                       )}
                     </div>
-                    <div className="mt-1 sm:mt-2 pt-0.5 sm:pt-1 border-t border-gray-100">
+                    <div className="mt-1 sm:mt-2 pt-0.5 sm:pt-1 border-t border-[#e2f5f2]">
                       <p className="font-bold text-[#0F2940] text-[9px] sm:text-xs md:text-sm">{property.priceDisplay}</p>
                     </div>
                   </div>
@@ -6980,7 +6712,7 @@ const allProperties = rawProperties.map((property: any) => {
         </div>
 
         {/* Colonne droite - Carte */}
-        <div className="lg:w-1/2 h-64 sm:h-80 lg:h-auto bg-gray-100 relative border-t lg:border-t-0 lg:border-l border-gray-200">
+        <div className="lg:w-1/2 h-64 sm:h-80 lg:h-auto bg-[#e8faf6] relative border-t lg:border-t-0 lg:border-l border-[#e2f5f2]">
           <div className="lg:sticky lg:top-[115px] h-full">
             <iframe 
               title="Carte des logements au Bénin" 
@@ -7006,7 +6738,7 @@ const allProperties = rawProperties.map((property: any) => {
 // ==================== CONFIRMATION PAGE ====================
 export function ConfirmationPage({ onNavigate }: PageProps & { id?: string }) {
   return (
-    <div className="bg-[#e8fffb] min-h-screen py-16">
+    <div className="bg-[#f4fffe] min-h-screen py-16">
 
             <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="rounded-[2rem] bg-white shadow-[0_20px_80px_rgba(15,41,64,0.08)] p-10 text-center">
@@ -7014,11 +6746,11 @@ export function ConfirmationPage({ onNavigate }: PageProps & { id?: string }) {
             <Check className="w-10 h-10" />
           </div>
           <h1 className="text-3xl font-bold text-[#0f2940] mb-3">Réservation confirmée !</h1>
-          <p className="text-sm text-[#6b7280] mb-6">Votre réservation pour l'annonce a bien été prise en compte. Un message de confirmation a été envoyé sur WhatsApp et par email.</p>
+          <p className="text-sm text-[#5b6b7a] mb-6">Votre réservation pour l'annonce a bien été prise en compte. Un message de confirmation a été envoyé sur WhatsApp et par email.</p>
           <div className="grid gap-3 sm:grid-cols-2">
             <button
               onClick={() => onNavigate?.({ name: 'account-reservations' })}
-              className="bg-[#0f2940] text-white px-6 py-3 rounded-full hover:bg-[#1a3a52] transition-colors"
+              className="bg-[#0f2940] text-white px-6 py-3 rounded-full hover:bg-[#1c3b56] transition-colors"
             >
               Voir mes réservations
             </button>
@@ -7219,7 +6951,7 @@ export function ProfilePage({ onNavigate }: ProfilePageProps) {
   })();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f4fffe] to-[#e8fffb] py-6">
+    <div className="min-h-screen bg-gradient-to-br from-[#f4fffe] to-[#f4fffe] py-6">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Bouton retour */}
         <button
@@ -7235,7 +6967,7 @@ export function ProfilePage({ onNavigate }: ProfilePageProps) {
           <div className="bg-white rounded-[2rem] p-6 sm:p-8 flex-1 shadow-lg">
             {/* En-tête avec avatar */}
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#00c9a7] to-[#0f2940] flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+              <div className="w-20 h-20 rounded-full bg-[#0f2940] flex items-center justify-center text-white text-2xl font-bold shadow-lg">
                 {profile.first_name?.charAt(0) || profile.email?.charAt(0) || 'U'}
                 {profile.last_name?.charAt(0)}
               </div>
@@ -7247,15 +6979,15 @@ export function ProfilePage({ onNavigate }: ProfilePageProps) {
                     {userType}
                   </span>
                 </div>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-[#5b6b7a] mt-1">
                   Membre depuis {profile.created_at ? new Date(profile.created_at).toLocaleDateString('fr-FR') : 'récemment'}
                 </p>
               </div>
               <button
                 onClick={() => setIsEditing(!isEditing)}
-                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                className="p-2 rounded-full hover:bg-[#e8faf6] transition-colors"
               >
-                <Edit2 className="w-5 h-5 text-gray-500" />
+                <Edit2 className="w-5 h-5 text-[#5b6b7a]" />
               </button>
             </div>
 
@@ -7264,49 +6996,49 @@ export function ProfilePage({ onNavigate }: ProfilePageProps) {
               <div className="space-y-4">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Prénom</label>
+                    <label className="block text-sm font-medium text-[#1c3b56] mb-1">Prénom</label>
                     <input
                       type="text"
                       value={editedUser.first_name}
                       onChange={(e) => setEditedUser({ ...editedUser, first_name: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
+                      className="w-full px-4 py-2 border border-[#e2f5f2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+                    <label className="block text-sm font-medium text-[#1c3b56] mb-1">Nom</label>
                     <input
                       type="text"
                       value={editedUser.last_name}
                       onChange={(e) => setEditedUser({ ...editedUser, last_name: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
+                      className="w-full px-4 py-2 border border-[#e2f5f2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <label className="block text-sm font-medium text-[#1c3b56] mb-1">Email</label>
                   <input
                     type="email"
                     value={editedUser.email}
                     onChange={(e) => setEditedUser({ ...editedUser, email: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
+                    className="w-full px-4 py-2 border border-[#e2f5f2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
+                  <label className="block text-sm font-medium text-[#1c3b56] mb-1">Téléphone</label>
                   <input
                     type="tel"
                     value={editedUser.phone}
                     onChange={(e) => setEditedUser({ ...editedUser, phone: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
+                    className="w-full px-4 py-2 border border-[#e2f5f2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+                  <label className="block text-sm font-medium text-[#1c3b56] mb-1">Bio</label>
                   <textarea
                     rows={3}
                     value={editedUser.bio}
                     onChange={(e) => setEditedUser({ ...editedUser, bio: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
+                    className="w-full px-4 py-2 border border-[#e2f5f2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
                     placeholder="Parlez un peu de vous..."
                   />
                 </div>
@@ -7314,13 +7046,13 @@ export function ProfilePage({ onNavigate }: ProfilePageProps) {
                   <button
                     onClick={handleSave}
                     disabled={updateMutation.isPending}
-                    className="flex-1 bg-[#00c9a7] text-white py-2 rounded-xl font-semibold hover:bg-[#00b892] transition-colors disabled:opacity-50"
+                    className="flex-1 bg-[#00c9a7] text-white py-2 rounded-xl font-semibold hover:bg-[#00b396] transition-colors disabled:opacity-50"
                   >
                     {updateMutation.isPending ? 'Enregistrement...' : 'Enregistrer'}
                   </button>
                   <button
                     onClick={() => setIsEditing(false)}
-                    className="flex-1 border border-gray-300 py-2 rounded-xl hover:bg-gray-50 transition-colors"
+                    className="flex-1 border border-[#c9f0e8] py-2 rounded-xl hover:bg-[#f4fffe] transition-colors"
                   >
                     Annuler
                   </button>
@@ -7369,7 +7101,7 @@ export function ProfilePage({ onNavigate }: ProfilePageProps) {
                     Compte vérifié
                   </span>
                   {profile.verification_status === 'verified' && (
-                    <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs">
+                    <span className="px-3 py-1 bg-[#f4fffe] text-[#0f2940] rounded-full text-xs">
                       Identité vérifiée
                     </span>
                   )}
@@ -7406,7 +7138,7 @@ export function ProfilePage({ onNavigate }: ProfilePageProps) {
             {profile.user_type === 'hote' && (
               <button
                 onClick={() => onNavigate?.({ name: hostDashboardRoute })}
-                className="w-full bg-gradient-to-r from-[#00c9a7] to-[#0f2940] text-white px-6 py-4 rounded-2xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                className="w-full bg-[#00c9a7] text-white px-6 py-4 rounded-2xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
               >
                 <Home className="w-5 h-5" />
                 Accéder au dashboard hôte
@@ -7417,7 +7149,7 @@ export function ProfilePage({ onNavigate }: ProfilePageProps) {
             {profile.user_type !== 'hote' && (
               <button
                 onClick={handleBecomeHost}
-                className="w-full bg-gradient-to-r from-[#00c9a7] to-[#0f2940] text-white px-6 py-4 rounded-2xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                className="w-full bg-[#00c9a7] text-white px-6 py-4 rounded-2xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
               >
                 <Home className="w-5 h-5" />
                 Devenir hôte
@@ -7560,11 +7292,11 @@ export function PaymentMethodModal({ isOpen, onClose, onSuccess }: PaymentMethod
       case 'BANK_TRANSFER':
         return (
           <div className="space-y-4">
-            <div className="bg-[#f0fdfb] p-4 rounded-xl border border-[#00c9a7]/20">
+            <div className="bg-[#f4fffe] p-4 rounded-xl border border-[#00c9a7]/20">
               <label className="block text-sm font-medium text-[#0f2940] mb-1">
                 Nom du bénéficiaire <span className="text-red-500">*</span>
               </label>
-              <p className="text-xs text-[#6b7280] mb-2">
+              <p className="text-xs text-[#5b6b7a] mb-2">
                 👤 Ce nom apparaîtra sur les virements reçus
               </p>
               <input
@@ -7635,11 +7367,11 @@ export function PaymentMethodModal({ isOpen, onClose, onSuccess }: PaymentMethod
       case 'MOBILE_MONEY':
         return (
           <div className="space-y-4">
-            <div className="bg-[#f0fdfb] p-4 rounded-xl border border-[#00c9a7]/20">
+            <div className="bg-[#f4fffe] p-4 rounded-xl border border-[#00c9a7]/20">
               <label className="block text-sm font-medium text-[#0f2940] mb-1">
                 Nom du bénéficiaire <span className="text-red-500">*</span>
               </label>
-              <p className="text-xs text-[#6b7280] mb-2">
+              <p className="text-xs text-[#5b6b7a] mb-2">
                 👤 Ce nom apparaîtra sur les transactions Mobile Money
               </p>
               <input
@@ -7688,11 +7420,11 @@ export function PaymentMethodModal({ isOpen, onClose, onSuccess }: PaymentMethod
       case 'PAYPAL':
         return (
           <div className="space-y-4">
-            <div className="bg-[#f0fdfb] p-4 rounded-xl border border-[#00c9a7]/20">
+            <div className="bg-[#f4fffe] p-4 rounded-xl border border-[#00c9a7]/20">
               <label className="block text-sm font-medium text-[#0f2940] mb-1">
                 Nom du bénéficiaire <span className="text-red-500">*</span>
               </label>
-              <p className="text-xs text-[#6b7280] mb-2">
+              <p className="text-xs text-[#5b6b7a] mb-2">
                 👤 Ce nom apparaîtra sur les transactions PayPal
               </p>
               <input
@@ -7742,7 +7474,7 @@ export function PaymentMethodModal({ isOpen, onClose, onSuccess }: PaymentMethod
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-[#e8faf6] rounded-full transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -7756,7 +7488,7 @@ export function PaymentMethodModal({ isOpen, onClose, onSuccess }: PaymentMethod
             <p className="text-lg font-semibold text-[#0f2940]">
               Moyen de paiement enregistré !
             </p>
-            <p className="text-sm text-[#6b7280] mt-2">
+            <p className="text-sm text-[#5b6b7a] mt-2">
               Vous recevrez vos paiements chaque lundi
             </p>
           </div>
@@ -7779,7 +7511,7 @@ export function PaymentMethodModal({ isOpen, onClose, onSuccess }: PaymentMethod
                     onClick={() => setPaymentMethod(option.value as any)}
                     className={`p-3 rounded-xl border-2 text-center transition-all ${
                       paymentMethod === option.value
-                        ? 'border-[#00c9a7] bg-[#f0fdfb] shadow-sm'
+                        ? 'border-[#00c9a7] bg-[#f4fffe] shadow-sm'
                         : 'border-[#e2f5f2] hover:border-[#00c9a7]'
                     }`}
                   >
@@ -7796,8 +7528,8 @@ export function PaymentMethodModal({ isOpen, onClose, onSuccess }: PaymentMethod
             {renderPaymentForm()}
 
             {/* Résumé des infos */}
-            <div className="mt-4 p-3 bg-[#f0fdfb] rounded-xl border border-[#00c9a7]/20">
-              <p className="text-xs text-[#6b7280]">
+            <div className="mt-4 p-3 bg-[#f4fffe] rounded-xl border border-[#00c9a7]/20">
+              <p className="text-xs text-[#5b6b7a]">
                 <span className="font-semibold">💡 Information :</span> Vous recevrez le transfert de vos réservations 
                 <span className="font-medium text-[#0f2940]"> chaque lundi</span> sur le moyen de paiement sélectionné.
               </p>
@@ -7808,14 +7540,14 @@ export function PaymentMethodModal({ isOpen, onClose, onSuccess }: PaymentMethod
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-2 border border-[#e2f5f2] rounded-xl text-[#6b7280] hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-2 border border-[#e2f5f2] rounded-xl text-[#5b6b7a] hover:bg-[#f4fffe] transition-colors"
               >
                 Annuler
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting || !formData.fullName}
-                className="flex-1 px-4 py-2 bg-[#00c9a7] text-white rounded-xl hover:bg-[#00b898] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-2 bg-[#00c9a7] text-white rounded-xl hover:bg-[#00b396] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <>
@@ -7828,7 +7560,7 @@ export function PaymentMethodModal({ isOpen, onClose, onSuccess }: PaymentMethod
               </button>
             </div>
 
-            <p className="text-xs text-[#6b7280] text-center mt-4">
+            <p className="text-xs text-[#5b6b7a] text-center mt-4">
               🔒 Vos informations sont sécurisées et ne seront utilisées que pour les paiements.
             </p>
           </form>
@@ -7939,7 +7671,7 @@ export function AccountPage({ onNavigate }: PageProps) {
                 <CalendarDays className="w-5 h-5 text-[#00c9a7]" />
                 <h3 className="text-xl font-semibold text-[#0f2940]">Mes réservations</h3>
               </div>
-              <p className="text-sm text-[#6b7280]">Voir l'historique de vos voyages et les prochaines séjours.</p>
+              <p className="text-sm text-[#5b6b7a]">Voir l'historique de vos voyages et les prochaines séjours.</p>
             </button>
             
             {/* Favoris */}
@@ -7951,7 +7683,7 @@ export function AccountPage({ onNavigate }: PageProps) {
                 <Heart className="w-5 h-5 text-[#00c9a7]" />
                 <h3 className="text-xl font-semibold text-[#0f2940]">Favoris</h3>
               </div>
-              <p className="text-sm text-[#6b7280]">Retrouvez vos annonces sauvegardées et préparez votre prochaine réservation.</p>
+              <p className="text-sm text-[#5b6b7a]">Retrouvez vos annonces sauvegardées et préparez votre prochaine réservation.</p>
             </button>
 
             {/* ✅ MOYENS DE PAIEMENT - UNIQUEMENT POUR LES HÔTES */}
@@ -7965,7 +7697,7 @@ export function AccountPage({ onNavigate }: PageProps) {
                     <CreditCard className="w-5 h-5 text-[#00c9a7]" />
                     <h3 className="text-xl font-semibold text-[#0f2940]">Moyens de paiement</h3>
                   </div>
-                  <p className="text-sm text-[#6b7280]">Configurez comment recevoir vos paiements.</p>
+                  <p className="text-sm text-[#5b6b7a]">Configurez comment recevoir vos paiements.</p>
                 </button>
 
                 <button
@@ -7982,7 +7714,7 @@ export function AccountPage({ onNavigate }: PageProps) {
                       </div>
                     )}
                   </div>
-                  <p className="text-sm text-[#6b7280]">
+                  <p className="text-sm text-[#5b6b7a]">
                     {paymentInfo?.totalAllTime > 0 
                       ? `💰 Total reçu: ${paymentInfo.totalAllTime.toLocaleString()} FCFA`
                       : 'Consultez vos gains et vos paiements'}
@@ -8005,7 +7737,7 @@ export function AccountPage({ onNavigate }: PageProps) {
                 <ShieldCheck className="w-5 h-5 text-[#00c9a7]" />
                 <h3 className="text-xl font-semibold text-[#0f2940]">Aide & support</h3>
               </div>
-              <p className="text-sm text-[#6b7280]">Accédez à notre centre d'aide et posez toutes vos questions.</p>
+              <p className="text-sm text-[#5b6b7a]">Accédez à notre centre d'aide et posez toutes vos questions.</p>
             </button>
           </div>
         </PageSection>
@@ -8166,14 +7898,14 @@ export function AccountReservationsPage({ onNavigate }: PageProps) {
       <div className="bg-white min-h-screen py-10">
         <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 mb-6">
-            <button onClick={() => onNavigate?.({ name: 'profile' })} className="p-2 rounded-full hover:bg-gray-100">
+            <button onClick={() => onNavigate?.({ name: 'profile' })} className="p-2 rounded-full hover:bg-[#e8faf6]">
               <ArrowLeft className="w-5 h-5" />
             </button>
             <h1 className="text-2xl font-bold text-[#0F2940]">Mes réservations</h1>
           </div>
           <div className="text-center py-20">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00c9a7] mx-auto"></div>
-            <p className="mt-4 text-gray-500">Chargement de vos réservations...</p>
+            <p className="mt-4 text-[#5b6b7a]">Chargement de vos réservations...</p>
           </div>
         </div>
       </div>
@@ -8185,7 +7917,7 @@ export function AccountReservationsPage({ onNavigate }: PageProps) {
       <div className="bg-white min-h-screen py-10">
         <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 mb-6">
-            <button onClick={() => onNavigate?.({ name: 'profile' })} className="p-2 rounded-full hover:bg-gray-100">
+            <button onClick={() => onNavigate?.({ name: 'profile' })} className="p-2 rounded-full hover:bg-[#e8faf6]">
               <ArrowLeft className="w-5 h-5" />
             </button>
             <h1 className="text-2xl font-bold text-[#0F2940]">Mes réservations</h1>
@@ -8218,20 +7950,20 @@ export function AccountReservationsPage({ onNavigate }: PageProps) {
 
   const getStatusColor = (status: string) => {
     const colorMap: Record<string, string> = {
-      'pending': 'bg-yellow-100 text-yellow-800',
+      'pending': 'bg-[#fff3cd] text-[#4a3400]',
       'confirmed': 'bg-green-100 text-green-800',
       'cancelled': 'bg-red-100 text-red-800',
-      'completed': 'bg-blue-100 text-blue-800',
+      'completed': 'bg-[#e8faf6] text-[#0f2940]',
     };
-    return colorMap[status] || 'bg-gray-100 text-gray-800';
+    return colorMap[status] || 'bg-[#e8faf6] text-[#0f2940]';
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'confirmed': return <CheckCircle className="w-5 h-5 text-green-600" />;
-      case 'pending': return <Clock className="w-5 h-5 text-yellow-600" />;
+      case 'pending': return <Clock className="w-5 h-5 text-[#a87c10]" />;
       case 'cancelled': return <XCircle className="w-5 h-5 text-red-600" />;
-      case 'completed': return <Star className="w-5 h-5 text-blue-600" />;
+      case 'completed': return <Star className="w-5 h-5 text-[#00806b]" />;
       default: return null;
     }
   };
@@ -8244,7 +7976,7 @@ export function AccountReservationsPage({ onNavigate }: PageProps) {
           <div className="flex items-center gap-4">
             <button
               onClick={() => onNavigate?.({ name: 'profile' })}
-              className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+              className="p-2 rounded-full hover:bg-[#e8faf6] transition-colors"
             >
               <ArrowLeft className="w-5 h-5 text-[#0F2940]" />
             </button>
@@ -8252,7 +7984,7 @@ export function AccountReservationsPage({ onNavigate }: PageProps) {
           </div>
           <button
             onClick={() => refetch()}
-            className="flex items-center gap-2 text-sm text-gray-500 hover:text-[#00c9a7] transition"
+            className="flex items-center gap-2 text-sm text-[#5b6b7a] hover:text-[#00c9a7] transition"
           >
             <RefreshCw className="w-4 h-4" />
             <span className="hidden sm:inline">Rafraîchir</span>
@@ -8264,19 +7996,19 @@ export function AccountReservationsPage({ onNavigate }: PageProps) {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
             <div className="bg-[#f4fffe] rounded-xl p-3 text-center border border-[#e2f5f2]">
               <div className="text-xl font-bold text-[#0f2940]">{stats.total || 0}</div>
-              <div className="text-xs text-gray-500">Total</div>
+              <div className="text-xs text-[#5b6b7a]">Total</div>
             </div>
             <div className="bg-green-50 rounded-xl p-3 text-center border border-green-200">
               <div className="text-xl font-bold text-green-600">{stats.confirmed || 0}</div>
               <div className="text-xs text-green-600">Confirmées</div>
             </div>
-            <div className="bg-yellow-50 rounded-xl p-3 text-center border border-yellow-200">
-              <div className="text-xl font-bold text-yellow-600">{stats.pending || 0}</div>
-              <div className="text-xs text-yellow-600">En attente</div>
+            <div className="bg-[#fffaeb] rounded-xl p-3 text-center border border-[#ffe9a8]">
+              <div className="text-xl font-bold text-[#a87c10]">{stats.pending || 0}</div>
+              <div className="text-xs text-[#a87c10]">En attente</div>
             </div>
-            <div className="bg-blue-50 rounded-xl p-3 text-center border border-blue-200">
-              <div className="text-xl font-bold text-blue-600">{stats.completed || 0}</div>
-              <div className="text-xs text-blue-600">Terminées</div>
+            <div className="bg-[#f4fffe] rounded-xl p-3 text-center border border-[#c9f0e8]">
+              <div className="text-xl font-bold text-[#00806b]">{stats.completed || 0}</div>
+              <div className="text-xs text-[#00806b]">Terminées</div>
             </div>
           </div>
         )}
@@ -8284,9 +8016,9 @@ export function AccountReservationsPage({ onNavigate }: PageProps) {
         {/* Liste des réservations */}
         {bookings.length === 0 ? (
           <div className="rounded-3xl border border-[#e2f5f2] p-12 bg-[#f4fffe] text-center">
-            <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <Calendar className="w-16 h-16 text-[#9fb3c4] mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-[#0f2940] mb-2">Aucune réservation</h3>
-            <p className="text-gray-500 mb-6">Vous n'avez pas encore effectué de réservation.</p>
+            <p className="text-[#5b6b7a] mb-6">Vous n'avez pas encore effectué de réservation.</p>
             <button
               onClick={() => onNavigate?.({ name: 'home' })}
               className="bg-[#00c9a7] text-white px-6 py-2 rounded-full hover:bg-[#00b396] transition"
@@ -8303,22 +8035,22 @@ export function AccountReservationsPage({ onNavigate }: PageProps) {
               return (
                 <div key={booking.id} className="rounded-2xl sm:rounded-3xl border border-[#e2f5f2] overflow-hidden bg-white hover:shadow-lg transition">
                   {/* En-tête avec statut */}
-                  <div className={`p-3 sm:p-4 border-b ${booking.status === 'confirmed' ? 'bg-green-50' : booking.status === 'pending' ? 'bg-yellow-50' : booking.status === 'cancelled' ? 'bg-red-50' : 'bg-gray-50'}`}>
+                  <div className={`p-3 sm:p-4 border-b ${booking.status === 'confirmed' ? 'bg-green-50' : booking.status === 'pending' ? 'bg-[#fffaeb]' : booking.status === 'cancelled' ? 'bg-red-50' : 'bg-[#f4fffe]'}`}>
                     <div className="flex flex-wrap justify-between items-center gap-2">
                       <div className="flex items-center gap-2">
                         {getStatusIcon(booking.status)}
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(booking.status)}`}>
                           {getStatusLabel(booking.status)}
                         </span>
-                        <span className="text-xs text-gray-500 font-mono hidden sm:inline">
+                        <span className="text-xs text-[#5b6b7a] font-mono hidden sm:inline">
                           Réf: {booking.reference}
                         </span>
                       </div>
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-[#5b6b7a]">
                         {booking.created_at}
                       </span>
                     </div>
-                    <div className="text-xs text-gray-500 font-mono sm:hidden mt-1">
+                    <div className="text-xs text-[#5b6b7a] font-mono sm:hidden mt-1">
                       Réf: {booking.reference}
                     </div>
                   </div>
@@ -8337,8 +8069,8 @@ export function AccountReservationsPage({ onNavigate }: PageProps) {
                           }}
                         />
                       ) : (
-                        <div className="w-full sm:w-24 h-24 rounded-xl bg-gray-200 flex items-center justify-center">
-                          <Home className="w-8 h-8 text-gray-400" />
+                        <div className="w-full sm:w-24 h-24 rounded-xl bg-[#e2f5f2] flex items-center justify-center">
+                          <Home className="w-8 h-8 text-[#5b6b7a]" />
                         </div>
                       )}
                       
@@ -8346,20 +8078,20 @@ export function AccountReservationsPage({ onNavigate }: PageProps) {
                         <h3 className="text-lg sm:text-xl font-semibold text-[#0f2940]">
                           {booking.property?.title || 'Propriété'}
                         </h3>
-                        <p className="text-sm text-gray-500 mt-0.5">
+                        <p className="text-sm text-[#5b6b7a] mt-0.5">
                           {booking.property?.district}, {booking.property?.city}
                         </p>
                         
                         <div className="flex flex-wrap gap-3 sm:gap-4 mt-2 text-xs sm:text-sm">
-                          <div className="flex items-center gap-1 text-gray-600">
+                          <div className="flex items-center gap-1 text-[#5b6b7a]">
                             <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             <span>{booking.dates?.check_in} → {booking.dates?.check_out}</span>
                           </div>
-                          <div className="flex items-center gap-1 text-gray-600">
+                          <div className="flex items-center gap-1 text-[#5b6b7a]">
                             <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             <span>{booking.guests_count} voyageur(s)</span>
                           </div>
-                          <div className="flex items-center gap-1 text-gray-600">
+                          <div className="flex items-center gap-1 text-[#5b6b7a]">
                             <CreditCard className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             <span className="font-medium text-[#00c9a7]">
                               {booking.price_details?.total} FCFA
@@ -8372,10 +8104,10 @@ export function AccountReservationsPage({ onNavigate }: PageProps) {
                     {/* Hôte */}
                     <div className="mt-3 pt-3 border-t flex flex-wrap justify-between items-center gap-2">
                       <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
+                        <div className="w-6 h-6 rounded-full bg-[#e2f5f2] flex items-center justify-center">
                           <span className="text-xs">👤</span>
                         </div>
-                        <span className="text-xs sm:text-sm text-gray-600">
+                        <span className="text-xs sm:text-sm text-[#5b6b7a]">
                           Hôte: {booking.host?.name || 'Non renseigné'}
                         </span>
                       </div>
@@ -8409,7 +8141,7 @@ export function AccountReservationsPage({ onNavigate }: PageProps) {
                       )}
                       
                       {booking.status === 'pending' && !cancellable && (
-                        <div className="flex-1 text-center text-xs sm:text-sm text-gray-500 py-2 bg-gray-100 rounded-xl">
+                        <div className="flex-1 text-center text-xs sm:text-sm text-[#5b6b7a] py-2 bg-[#e8faf6] rounded-xl">
                           En attente de confirmation
                         </div>
                       )}
@@ -8417,7 +8149,7 @@ export function AccountReservationsPage({ onNavigate }: PageProps) {
                       {booking.status === 'completed' && !booking.has_review && (
                         <button
                           onClick={() => onNavigate?.({ name: 'review', id: booking.id?.toString(), bookingData: booking })}
-                          className="flex-1 bg-yellow-500 text-white py-2 rounded-xl text-xs sm:text-sm hover:bg-yellow-600 transition"
+                          className="flex-1 bg-[#ffc93c] text-white py-2 rounded-xl text-xs sm:text-sm hover:bg-[#e0ac1f] transition"
                         >
                           Laisser un avis
                         </button>
@@ -8426,10 +8158,10 @@ export function AccountReservationsPage({ onNavigate }: PageProps) {
 
                     {/* Message d'information sur le remboursement */}
                     {cancellable && booking.status !== 'cancelled' && refundInfo.percentage > 0 && (
-                      <div className="mt-2 p-2 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="mt-2 p-2 bg-[#f4fffe] rounded-lg border border-[#c9f0e8]">
                         <div className="flex items-start gap-2">
-                          <Info className="w-3.5 h-3.5 text-blue-500 mt-0.5 flex-shrink-0" />
-                          <div className="text-xs text-blue-700">
+                          <Info className="w-3.5 h-3.5 text-[#00806b] mt-0.5 flex-shrink-0" />
+                          <div className="text-xs text-[#0f2940]">
                             {refundInfo.message} - <strong>{refundInfo.amount.toLocaleString()} FCFA</strong>
                           </div>
                         </div>
@@ -8469,17 +8201,17 @@ export function AccountReservationsPage({ onNavigate }: PageProps) {
             
             {/* Contenu */}
             <div className="p-4 sm:p-6 max-h-[60vh] overflow-y-auto">
-              <p className="text-gray-700 mb-4 text-sm sm:text-base">
+              <p className="text-[#1c3b56] mb-4 text-sm sm:text-base">
                 Êtes-vous sûr de vouloir annuler cette réservation ?
               </p>
               
               {/* Informations de la réservation */}
-              <div className="bg-gray-50 rounded-xl p-3 sm:p-4 mb-4 text-sm">
+              <div className="bg-[#f4fffe] rounded-xl p-3 sm:p-4 mb-4 text-sm">
                 <p className="font-semibold text-[#0F2940]">{selectedBooking.property?.title}</p>
-                <p className="text-gray-500 text-xs mt-1">
+                <p className="text-[#5b6b7a] text-xs mt-1">
                   📅 {selectedBooking.dates?.check_in} → {selectedBooking.dates?.check_out}
                 </p>
-                <p className="text-gray-500 text-xs">
+                <p className="text-[#5b6b7a] text-xs">
                   👥 {selectedBooking.guests_count} voyageur(s)
                 </p>
                 <p className="text-[#00c9a7] font-semibold text-sm mt-2">
@@ -8488,10 +8220,10 @@ export function AccountReservationsPage({ onNavigate }: PageProps) {
               </div>
               
               {/* Information remboursement */}
-              <div className="bg-blue-50 rounded-xl p-3 mb-4 border border-blue-200">
+              <div className="bg-[#f4fffe] rounded-xl p-3 mb-4 border border-[#c9f0e8]">
                 <div className="flex items-start gap-2">
-                  <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                  <div className="text-xs text-blue-700">
+                  <Info className="w-4 h-4 text-[#00806b] mt-0.5 flex-shrink-0" />
+                  <div className="text-xs text-[#0f2940]">
                     {(() => {
                       const refund = getRefundInfo(selectedBooking);
                       if (refund.percentage === 100) {
@@ -8508,7 +8240,7 @@ export function AccountReservationsPage({ onNavigate }: PageProps) {
               
               {/* Raison de l'annulation */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-[#1c3b56] mb-2">
                   Raison de l'annulation (optionnelle)
                 </label>
                 <textarea
@@ -8516,13 +8248,13 @@ export function AccountReservationsPage({ onNavigate }: PageProps) {
                   onChange={(e) => setCancellationReason(e.target.value)}
                   placeholder="Dites-nous pourquoi vous annulez..."
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+                  className="w-full px-3 py-2 border border-[#e2f5f2] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
                 />
               </div>
             </div>
             
             {/* Boutons d'action - fixés en bas sur mobile */}
-            <div className="p-4 border-t bg-gray-50">
+            <div className="p-4 border-t bg-[#f4fffe]">
               <div className="flex gap-3">
                 <button
                   onClick={() => {
@@ -8530,7 +8262,7 @@ export function AccountReservationsPage({ onNavigate }: PageProps) {
                     setSelectedBooking(null);
                     setCancellationReason('');
                   }}
-                  className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-xl text-sm sm:text-base font-medium hover:bg-gray-100 transition"
+                  className="flex-1 px-4 py-2.5 border border-[#c9f0e8] text-[#1c3b56] rounded-xl text-sm sm:text-base font-medium hover:bg-[#e8faf6] transition"
                 >
                   Retour
                 </button>
@@ -8635,7 +8367,7 @@ function StarRatingInput({
 
   return (
     <div className="flex items-center justify-between py-2.5 gap-3">
-      <span className="text-sm text-gray-700">{label}</span>
+      <span className="text-sm text-[#1c3b56]">{label}</span>
       <div className="flex items-center gap-1" onMouseLeave={() => setHovered(0)}>
         {[1, 2, 3, 4, 5].map((star) => (
           <button
@@ -8649,8 +8381,8 @@ function StarRatingInput({
             <Star
               className={`w-6 h-6 transition ${
                 star <= (hovered || value)
-                  ? 'fill-yellow-500 text-yellow-500'
-                  : 'text-gray-300'
+                  ? 'fill-[#ffc93c] text-[#e0ac1f]'
+                  : 'text-[#9fb3c4]'
               }`}
             />
           </button>
@@ -8736,7 +8468,7 @@ export function ReviewPage({ onNavigate, id, bookingData }: ReviewPageProps) {
     return (
       <div className="bg-white min-h-screen py-10">
         <div className="max-w-[640px] mx-auto px-4 sm:px-6 text-center py-20">
-          <p className="text-gray-500 mb-4">Réservation introuvable.</p>
+          <p className="text-[#5b6b7a] mb-4">Réservation introuvable.</p>
           <button
             onClick={() => onNavigate?.({ name: 'account-reservations' })}
             className="text-[#00c9a7] font-medium"
@@ -8759,7 +8491,7 @@ export function ReviewPage({ onNavigate, id, bookingData }: ReviewPageProps) {
         <div className="flex items-center gap-4 mb-6">
           <button
             onClick={() => onNavigate?.({ name: 'account-reservations' })}
-            className="p-2 rounded-full hover:bg-gray-100"
+            className="p-2 rounded-full hover:bg-[#e8faf6]"
             aria-label="Retour"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -8768,7 +8500,7 @@ export function ReviewPage({ onNavigate, id, bookingData }: ReviewPageProps) {
         </div>
 
         {bookingData?.property?.title && (
-          <div className="bg-gray-50 rounded-xl p-4 mb-6 flex items-center gap-3">
+          <div className="bg-[#f4fffe] rounded-xl p-4 mb-6 flex items-center gap-3">
             {bookingData.property.photo && (
               <img
                 src={bookingData.property.photo}
@@ -8779,7 +8511,7 @@ export function ReviewPage({ onNavigate, id, bookingData }: ReviewPageProps) {
             <div className="min-w-0">
               <p className="font-semibold text-[#0F2940] truncate">{bookingData.property.title}</p>
               {bookingData.dates?.check_in && bookingData.dates?.check_out && (
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-[#5b6b7a]">
                   {bookingData.dates.check_in} — {bookingData.dates.check_out}
                 </p>
               )}
@@ -8788,7 +8520,7 @@ export function ReviewPage({ onNavigate, id, bookingData }: ReviewPageProps) {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="border border-gray-200 rounded-xl p-4">
+          <div className="border border-[#e2f5f2] rounded-xl p-4">
             <StarRatingInput
               label="Note globale"
               value={ratings.rating}
@@ -8796,7 +8528,7 @@ export function ReviewPage({ onNavigate, id, bookingData }: ReviewPageProps) {
             />
           </div>
 
-          <div className="border border-gray-200 rounded-xl p-4 divide-y divide-gray-100">
+          <div className="border border-[#e2f5f2] rounded-xl p-4 divide-y divide-[#e2f5f2]">
             {ratingFields.map(({ key, label }) => (
               <StarRatingInput
                 key={key}
@@ -8808,7 +8540,7 @@ export function ReviewPage({ onNavigate, id, bookingData }: ReviewPageProps) {
           </div>
 
           <div>
-            <label htmlFor="review-comment" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="review-comment" className="block text-sm font-medium text-[#1c3b56] mb-2">
               Votre commentaire
             </label>
             <textarea
@@ -8818,9 +8550,9 @@ export function ReviewPage({ onNavigate, id, bookingData }: ReviewPageProps) {
               rows={5}
               maxLength={2000}
               placeholder="Décrivez votre séjour : ce que vous avez aimé, l'accueil de l'hôte, l'état du logement..."
-              className="w-full border border-gray-300 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7] resize-none"
+              className="w-full border border-[#c9f0e8] rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7] resize-none"
             />
-            <p className={`text-xs mt-1 ${comment.trim().length > 0 && comment.trim().length < 10 ? 'text-red-500' : 'text-gray-400'}`}>
+            <p className={`text-xs mt-1 ${comment.trim().length > 0 && comment.trim().length < 10 ? 'text-red-500' : 'text-[#5b6b7a]'}`}>
               {comment.trim().length}/2000 caractères (minimum 10)
             </p>
           </div>
@@ -8899,7 +8631,7 @@ export function HostDashboardPage({ onNavigate }: HostDashboardPageProps) {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-[#0f2940]">Tableau de bord hôte</h1>
-            <p className="text-gray-500 mt-1">Gérez vos annonces, revenus et réservations</p>
+            <p className="text-[#5b6b7a] mt-1">Gérez vos annonces, revenus et réservations</p>
           </div>
           
           <button
@@ -8915,20 +8647,20 @@ export function HostDashboardPage({ onNavigate }: HostDashboardPageProps) {
         <div className="grid gap-6 lg:grid-cols-4 mb-8">
           <div className="rounded-3xl bg-white border border-[#e2f5f2] p-6 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
-              <div className="text-sm text-[#6b7280]">Revenus estimés du mois</div>
+              <div className="text-sm text-[#5b6b7a]">Revenus estimés du mois</div>
               <DollarSign className="w-5 h-5 text-[#00c9a7]" />
             </div>
             <div className="text-2xl font-bold text-[#0f2940] mt-3">
               {monthlyRevenue.toLocaleString()} FCFA
             </div>
-            <div className="text-xs text-gray-500 mt-2">
+            <div className="text-xs text-[#5b6b7a] mt-2">
               Basé sur {activeProperties.length} propriété{activeProperties.length > 1 ? 's' : ''} active{activeProperties.length > 1 ? 's' : ''}
             </div>
           </div>
 
           <div className="rounded-3xl bg-white border border-[#e2f5f2] p-6 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
-              <div className="text-sm text-[#6b7280]">Propriétés</div>
+              <div className="text-sm text-[#5b6b7a]">Propriétés</div>
               <Home className="w-5 h-5 text-[#00c9a7]" />
             </div>
             <div className="text-2xl font-bold text-[#0f2940] mt-3">
@@ -8936,23 +8668,23 @@ export function HostDashboardPage({ onNavigate }: HostDashboardPageProps) {
             </div>
             <div className="flex gap-3 mt-2 text-xs">
               <span className="text-green-600">{activeProperties.length} active{activeProperties.length > 1 ? 's' : ''}</span>
-              <span className="text-orange-500">{pendingProperties.length} en attente</span>
-              <span className="text-gray-400">{draftProperties.length} brouillon{draftProperties.length > 1 ? 's' : ''}</span>
+              <span className="text-[#e0ac1f]">{pendingProperties.length} en attente</span>
+              <span className="text-[#5b6b7a]">{draftProperties.length} brouillon{draftProperties.length > 1 ? 's' : ''}</span>
             </div>
           </div>
 
           <div className="rounded-3xl bg-white border border-[#e2f5f2] p-6 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
-              <div className="text-sm text-[#6b7280]">Réservations à venir</div>
+              <div className="text-sm text-[#5b6b7a]">Réservations à venir</div>
               <Users className="w-5 h-5 text-[#00c9a7]" />
             </div>
             <div className="text-2xl font-bold text-[#0f2940] mt-3">{totalUpcomingBookings}</div>
-            <div className="text-xs text-gray-500 mt-2">Demandes en attente</div>
+            <div className="text-xs text-[#5b6b7a] mt-2">Demandes en attente</div>
           </div>
 
           <div className="rounded-3xl bg-white border border-[#e2f5f2] p-6 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
-              <div className="text-sm text-[#6b7280]">Messages non lus</div>
+              <div className="text-sm text-[#5b6b7a]">Messages non lus</div>
               <MessageCircle className="w-5 h-5 text-[#00c9a7]" />
             </div>
             <div className="text-2xl font-bold text-[#0f2940] mt-3">0</div>
@@ -8973,8 +8705,8 @@ export function HostDashboardPage({ onNavigate }: HostDashboardPageProps) {
           
           {properties.length === 0 ? (
             <div className="text-center py-8">
-              <Home className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500">Aucune propriété</p>
+              <Home className="w-12 h-12 text-[#9fb3c4] mx-auto mb-3" />
+              <p className="text-[#5b6b7a]">Aucune propriété</p>
               <button onClick={() => onNavigate?.({ name: 'publish' })} className="mt-3 text-[#00c9a7] text-sm hover:underline">
                 Créer ma première annonce
               </button>
@@ -8993,7 +8725,7 @@ export function HostDashboardPage({ onNavigate }: HostDashboardPageProps) {
                     onClick={() => onNavigate?.({ name: 'listing', id: property.id.toString() })}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                      <div className="w-12 h-12 rounded-lg overflow-hidden bg-[#e8faf6] flex-shrink-0">
                         {imageUrl && imageUrl !== '/placeholder.jpg' ? (
                           <img 
                             src={imageUrl} 
@@ -9004,7 +8736,7 @@ export function HostDashboardPage({ onNavigate }: HostDashboardPageProps) {
                             }}
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400">
+                          <div className="w-full h-full flex items-center justify-center text-[#5b6b7a]">
                             <Home className="w-5 h-5" />
                           </div>
                         )}
@@ -9014,27 +8746,27 @@ export function HostDashboardPage({ onNavigate }: HostDashboardPageProps) {
                         <div className="flex items-center gap-2 mt-1">
                           <span className={`text-xs px-2 py-0.5 rounded-full ${
                             property.status === 'active' ? 'bg-green-100 text-green-700' :
-                            property.status === 'pending' ? 'bg-orange-100 text-orange-700' :
-                            'bg-gray-100 text-gray-500'
+                            property.status === 'pending' ? 'bg-[#fff3cd] text-[#6b4e06]' :
+                            'bg-[#e8faf6] text-[#5b6b7a]'
                           }`}>
                             {property.status_label || property.status}
                           </span>
-                          <span className="text-xs text-gray-400">{property.city}, {property.district}</span>
+                          <span className="text-xs text-[#5b6b7a]">{property.city}, {property.district}</span>
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="text-right">
                         <p className="font-semibold text-[#00c9a7]">{property.price_formatted || property.price_per_night?.toLocaleString()} FCFA</p>
-                        <p className="text-xs text-gray-400">/ nuit</p>
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-[#5b6b7a]">/ nuit</p>
+                        <p className="text-xs text-[#5b6b7a]">
                           ≈ {(property.price_per_night * 0.0015).toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €
                         </p>
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-medium">{property.stats?.bookings_count || 0} réservations</p>
                         {property.stats?.pending_bookings > 0 && (
-                          <p className="text-xs text-orange-500">{property.stats.pending_bookings} en attente</p>
+                          <p className="text-xs text-[#e0ac1f]">{property.stats.pending_bookings} en attente</p>
                         )}
                       </div>
                     </div>
@@ -9048,15 +8780,15 @@ export function HostDashboardPage({ onNavigate }: HostDashboardPageProps) {
         {/* Section évaluations */}
         <div className="bg-white rounded-3xl border border-[#e2f5f2] p-6 mb-8">
           <div className="flex items-center gap-2 mb-4">
-            <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+            <Star className="w-5 h-5 text-[#ffc93c] fill-[#ffc93c]" />
             <h3 className="font-semibold text-lg">Évaluations</h3>
           </div>
           
           {properties.every((p: any) => parseFloat(p.average_rating) === 0) ? (
             <div className="text-center py-8">
-              <Star className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500">Aucune évaluation pour le moment</p>
-              <p className="text-sm text-gray-400 mt-1">Les évaluations apparaîtront après les séjours</p>
+              <Star className="w-12 h-12 text-[#9fb3c4] mx-auto mb-3" />
+              <p className="text-[#5b6b7a]">Aucune évaluation pour le moment</p>
+              <p className="text-sm text-[#5b6b7a] mt-1">Les évaluations apparaîtront après les séjours</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -9066,9 +8798,9 @@ export function HostDashboardPage({ onNavigate }: HostDashboardPageProps) {
                     <p className="font-medium">{property.title}</p>
                     <div className="flex items-center gap-1 mt-1">
                       {[1,2,3,4,5].map(star => (
-                        <Star key={star} className={`w-4 h-4 ${star <= Math.round(parseFloat(property.average_rating)) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
+                        <Star key={star} className={`w-4 h-4 ${star <= Math.round(parseFloat(property.average_rating)) ? 'text-[#ffc93c] fill-[#ffc93c]' : 'text-[#9fb3c4]'}`} />
                       ))}
-                      <span className="text-xs text-gray-500 ml-2">({property.reviews_count} avis)</span>
+                      <span className="text-xs text-[#5b6b7a] ml-2">({property.reviews_count} avis)</span>
                     </div>
                   </div>
                   <span className="text-lg font-bold text-[#0f2940]">{parseFloat(property.average_rating).toFixed(1)}</span>
@@ -9087,21 +8819,21 @@ export function HostDashboardPage({ onNavigate }: HostDashboardPageProps) {
                 <Home className="w-5 h-5 text-[#00c9a7] group-hover:scale-110 transition-transform" />
                 <h3 className="text-lg font-semibold text-[#0f2940]">Mes annonces</h3>
               </div>
-              <p className="text-sm text-[#6b7280]">Gérez les offres publiées et leurs performances.</p>
+              <p className="text-sm text-[#5b6b7a]">Gérez les offres publiées et leurs performances.</p>
             </button>
             <button onClick={() => onNavigate?.({ name: 'host-calendrier', id: undefined })} className="rounded-3xl bg-white border border-[#e2f5f2] p-6 text-left hover:shadow-lg transition-all hover:border-[#00c9a7] group">
               <div className="flex items-center gap-3 mb-3">
                 <CalendarDays className="w-5 h-5 text-[#00c9a7] group-hover:scale-110 transition-transform" />
                 <h3 className="text-lg font-semibold text-[#0f2940]">Calendrier</h3>
               </div>
-              <p className="text-sm text-[#6b7280]">Bloquez des dates et gérez les disponibilités.</p>
+              <p className="text-sm text-[#5b6b7a]">Bloquez des dates et gérez les disponibilités.</p>
             </button>
             <button onClick={() => onNavigate?.({ name: 'host-reservations' })} className="rounded-3xl bg-white border border-[#e2f5f2] p-6 text-left hover:shadow-lg transition-all hover:border-[#00c9a7] group">
               <div className="flex items-center gap-3 mb-3">
                 <MessageCircle className="w-5 h-5 text-[#00c9a7] group-hover:scale-110 transition-transform" />
                 <h3 className="text-lg font-semibold text-[#0f2940]">Réservations</h3>
               </div>
-              <p className="text-sm text-[#6b7280]">Consultez les demandes et les séjours en cours.</p>
+              <p className="text-sm text-[#5b6b7a]">Consultez les demandes et les séjours en cours.</p>
             </button>
           </div>
         </div>
@@ -9246,26 +8978,26 @@ const ServiceAvailabilityCalendarPicker = ({
   const dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
   
   return (
-    <div className="bg-white rounded-xl p-4 border border-[#d9efeb]">
+    <div className="bg-white rounded-xl p-4 border border-[#c9f0e8]">
       <div className="flex items-center justify-between mb-4">
         <button 
           onClick={() => setCurrentDate(new Date(year, month - 2, 1))} 
-          className="p-2 rounded-lg hover:bg-gray-100 transition"
+          className="p-2 rounded-lg hover:bg-[#e8faf6] transition"
         >
-          <ChevronLeft className="w-5 h-5 text-gray-600" />
+          <ChevronLeft className="w-5 h-5 text-[#5b6b7a]" />
         </button>
-        <h3 className="font-semibold text-gray-800">{monthNames[month - 1]} {year}</h3>
+        <h3 className="font-semibold text-[#0f2940]">{monthNames[month - 1]} {year}</h3>
         <button 
           onClick={() => setCurrentDate(new Date(year, month, 1))} 
-          className="p-2 rounded-lg hover:bg-gray-100 transition"
+          className="p-2 rounded-lg hover:bg-[#e8faf6] transition"
         >
-          <ChevronRight className="w-5 h-5 text-gray-600" />
+          <ChevronRight className="w-5 h-5 text-[#5b6b7a]" />
         </button>
       </div>
       
       <div className="grid grid-cols-7 gap-1 mb-2">
         {dayNames.map((day) => (
-          <div key={day} className="text-center text-xs font-medium text-gray-500 py-1">{day}</div>
+          <div key={day} className="text-center text-xs font-medium text-[#5b6b7a] py-1">{day}</div>
         ))}
       </div>
       
@@ -9275,18 +9007,18 @@ const ServiceAvailabilityCalendarPicker = ({
           const isSelected = isDateSelected(date);
           const isCurrentMonth = date.getMonth() === month - 1;
           
-          let bgColor = 'hover:bg-gray-50';
-          let textColor = 'text-gray-800';
+          let bgColor = 'hover:bg-[#f4fffe]';
+          let textColor = 'text-[#0f2940]';
           let cursor = 'cursor-pointer';
           
           if (!isCurrentMonth) {
-            textColor = 'text-gray-300';
+            textColor = 'text-[#9fb3c4]';
             cursor = 'cursor-default';
             bgColor = '';
           } else if (isPast) {
-            textColor = 'text-gray-300';
+            textColor = 'text-[#9fb3c4]';
             cursor = 'cursor-not-allowed';
-            bgColor = 'bg-gray-50';
+            bgColor = 'bg-[#f4fffe]';
           } else if (isSelected) {
             bgColor = 'bg-[#00c9a7] text-white';
             textColor = 'text-white';
@@ -9309,13 +9041,13 @@ const ServiceAvailabilityCalendarPicker = ({
         })}
       </div>
       
-      <div className="flex items-center justify-between mt-4 pt-3 border-t border-[#e9f2f0]">
+      <div className="flex items-center justify-between mt-4 pt-3 border-t border-[#e8faf6]">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 bg-[#00c9a7] rounded"></div>
-          <span className="text-xs text-gray-600">Sélectionné</span>
+          <span className="text-xs text-[#5b6b7a]">Sélectionné</span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-[#5b6b7a]">
             {selectedDates.length} date{selectedDates.length > 1 ? 's' : ''} sélectionnée{selectedDates.length > 1 ? 's' : ''}
           </span>
           {selectedDates.length > 0 && (
@@ -9330,8 +9062,8 @@ const ServiceAvailabilityCalendarPicker = ({
         </div>
       </div>
       
-      <div className="mt-3 pt-3 border-t border-[#e9f2f0]">
-        <p className="text-xs text-gray-500">
+      <div className="mt-3 pt-3 border-t border-[#e8faf6]">
+        <p className="text-xs text-[#5b6b7a]">
           💡 Sélectionnez les dates où vous serez disponible pour ce service.
         </p>
       </div>
@@ -9361,14 +9093,14 @@ const ServiceStatCard = ({
 }) => (
   <div className="rounded-3xl bg-white border border-[#e2f5f2] p-6 hover:shadow-lg transition-shadow">
     <div className="flex items-center justify-between">
-      <div className="text-sm text-[#6b7280]">{title}</div>
+      <div className="text-sm text-[#5b6b7a]">{title}</div>
       <Icon className={`w-5 h-5 ${color}`} />
     </div>
     <div className="text-2xl font-bold text-[#0f2940] mt-3">
       {value}
     </div>
     {subtitle && (
-      <div className="text-xs text-gray-500 mt-2">{subtitle}</div>
+      <div className="text-xs text-[#5b6b7a] mt-2">{subtitle}</div>
     )}
     {trend && (
       <div className={`text-xs mt-2 flex items-center gap-1 ${trend.positive ? 'text-green-600' : 'text-red-600'}`}>
@@ -9550,14 +9282,14 @@ export function HostServiceDashboardPage({ onNavigate, mode = 'dashboard' }: Hos
 
   const getStatusClasses = (status: HostService['status']) => {
     const classes: Record<HostService['status'], string> = {
-      draft: 'bg-slate-100 text-slate-700',
-      pending: 'bg-amber-100 text-amber-700',
+      draft: 'bg-[#e8faf6] text-[#1c3b56]',
+      pending: 'bg-[#fff3cd] text-[#6b4e06]',
       active: 'bg-emerald-100 text-emerald-700',
-      inactive: 'bg-gray-100 text-gray-700',
+      inactive: 'bg-[#e8faf6] text-[#1c3b56]',
       rejected: 'bg-rose-100 text-rose-700',
       suspended: 'bg-red-100 text-red-700',
-      completed: 'bg-blue-100 text-blue-700',
-      cancelled: 'bg-gray-100 text-gray-500',
+      completed: 'bg-[#e8faf6] text-[#0f2940]',
+      cancelled: 'bg-[#e8faf6] text-[#5b6b7a]',
     };
     return classes[status] || classes.draft;
   };
@@ -9799,25 +9531,25 @@ export function HostServiceDashboardPage({ onNavigate, mode = 'dashboard' }: Hos
               <h3 className="text-2xl font-bold text-[#0f2940]">
                 {editingService ? 'Modifier le service' : 'Créer un service'}
               </h3>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-[#5b6b7a] mt-1">
                 {editingService ? `Modification de : ${editingService.title}` : 'Remplissez les informations ci-dessous'}
               </p>
             </div>
-            <button onClick={() => { setIsFormOpen(false); resetForm(); }} className="p-2 rounded-full hover:bg-gray-100">
-              <X className="w-5 h-5 text-gray-500" />
+            <button onClick={() => { setIsFormOpen(false); resetForm(); }} className="p-2 rounded-full hover:bg-[#e8faf6]">
+              <X className="w-5 h-5 text-[#5b6b7a]" />
             </button>
           </div>
 
           <form onSubmit={handleFormSubmit} className="space-y-5">
             {/* Titre */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label className="block text-sm font-medium text-[#1c3b56] mb-1.5">
                 Titre du service <span className="text-red-500">*</span>
               </label>
               <input
                 value={formData.title || ''}
                 onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
-                className="w-full rounded-2xl border border-[#d9efeb] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition"
+                className="w-full rounded-2xl border border-[#c9f0e8] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition"
                 placeholder="Ex: Service de Ménage Premium"
                 required
               />
@@ -9826,25 +9558,25 @@ export function HostServiceDashboardPage({ onNavigate, mode = 'dashboard' }: Hos
             {/* Type et Catégorie */}
             <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-medium text-[#1c3b56] mb-1.5">
                   Type de service <span className="text-red-500">*</span>
                 </label>
                 <input
                   value={formData.service_type || ''}
                   onChange={(e) => setFormData((prev) => ({ ...prev, service_type: e.target.value }))}
-                  className="w-full rounded-2xl border border-[#d9efeb] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition"
+                  className="w-full rounded-2xl border border-[#c9f0e8] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition"
                   placeholder="Ex: ménage, jardinage..."
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-medium text-[#1c3b56] mb-1.5">
                   Catégorie
                 </label>
                 <input
                   value={formData.category || ''}
                   onChange={(e) => setFormData((prev) => ({ ...prev, category: e.target.value }))}
-                  className="w-full rounded-2xl border border-[#d9efeb] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition"
+                  className="w-full rounded-2xl border border-[#c9f0e8] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition"
                   placeholder="Ex: Entretien, Jardinage..."
                 />
               </div>
@@ -9852,13 +9584,13 @@ export function HostServiceDashboardPage({ onNavigate, mode = 'dashboard' }: Hos
 
             {/* Lieu */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label className="block text-sm font-medium text-[#1c3b56] mb-1.5">
                 Lieu <span className="text-red-500">*</span>
               </label>
               <input
                 value={formData.location || ''}
                 onChange={(e) => setFormData((prev) => ({ ...prev, location: e.target.value }))}
-                className="w-full rounded-2xl border border-[#d9efeb] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition"
+                className="w-full rounded-2xl border border-[#c9f0e8] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition"
                 placeholder="Ex: Cotonou"
                 required
               />
@@ -9866,7 +9598,7 @@ export function HostServiceDashboardPage({ onNavigate, mode = 'dashboard' }: Hos
 
             {/* Prix */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label className="block text-sm font-medium text-[#1c3b56] mb-1.5">
                 Prix <span className="text-red-500">*</span>
               </label>
               <div>
@@ -9876,7 +9608,7 @@ export function HostServiceDashboardPage({ onNavigate, mode = 'dashboard' }: Hos
                   step="100"
                   value={formData.price || ''}
                   onChange={(e) => setFormData((prev) => ({ ...prev, price: e.target.value }))}
-                  className="w-full rounded-2xl border border-[#d9efeb] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition"
+                  className="w-full rounded-2xl border border-[#c9f0e8] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition"
                   placeholder="Ex: 15000"
                   required
                 />
@@ -9885,7 +9617,7 @@ export function HostServiceDashboardPage({ onNavigate, mode = 'dashboard' }: Hos
 
             {/* Durée */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label className="block text-sm font-medium text-[#1c3b56] mb-1.5">
                 Durée <span className="text-red-500">*</span>
               </label>
               <div>
@@ -9895,12 +9627,12 @@ export function HostServiceDashboardPage({ onNavigate, mode = 'dashboard' }: Hos
                   step="15"
                   value={formData.duration_minutes || 60}
                   onChange={(e) => setFormData((prev) => ({ ...prev, duration_minutes: Number(e.target.value) }))}
-                  className="w-full rounded-2xl border border-[#d9efeb] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition"
+                  className="w-full rounded-2xl border border-[#c9f0e8] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition"
                   placeholder="60"
                   required
                 />
                 {formData.duration_minutes && Number(formData.duration_minutes) > 0 && (
-                  <div className="mt-1 text-xs text-gray-400">
+                  <div className="mt-1 text-xs text-[#5b6b7a]">
                     ≈ {formatDuration(Number(formData.duration_minutes))}
                   </div>
                 )}
@@ -9909,11 +9641,11 @@ export function HostServiceDashboardPage({ onNavigate, mode = 'dashboard' }: Hos
 
             {/* Statut */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Statut</label>
+              <label className="block text-sm font-medium text-[#1c3b56] mb-1.5">Statut</label>
               <select
                 value={formData.status || 'draft'}
                 onChange={(e) => setFormData((prev) => ({ ...prev, status: e.target.value as HostService['status'] }))}
-                className="w-full rounded-2xl border border-[#d9efeb] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition"
+                className="w-full rounded-2xl border border-[#c9f0e8] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition"
               >
                 <option value="draft">📝 Brouillon</option>
                 <option value="pending">⏳ En attente</option>
@@ -9926,14 +9658,14 @@ export function HostServiceDashboardPage({ onNavigate, mode = 'dashboard' }: Hos
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label className="block text-sm font-medium text-[#1c3b56] mb-1.5">
                 Description <span className="text-red-500">*</span>
               </label>
               <textarea
                 rows={4}
                 value={formData.description || ''}
                 onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
-                className="w-full rounded-2xl border border-[#d9efeb] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition"
+                className="w-full rounded-2xl border border-[#c9f0e8] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition"
                 placeholder="Décrivez votre service en détail..."
                 required
               />
@@ -9941,19 +9673,19 @@ export function HostServiceDashboardPage({ onNavigate, mode = 'dashboard' }: Hos
 
             {/* Images */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label className="block text-sm font-medium text-[#1c3b56] mb-1.5">
                 Images du service <span className="text-red-500">*</span>
-                <span className="text-xs text-gray-500 ml-2">
+                <span className="text-xs text-[#5b6b7a] ml-2">
                   ({serviceImageFiles.length}/{MIN_SERVICE_IMAGES} minimum)
                 </span>
               </label>
               
-              <div className="flex flex-col items-center justify-center w-full border-2 border-dashed border-[#d9efeb] rounded-2xl p-4 hover:border-[#00c9a7] transition bg-[#f8fffe]">
+              <div className="flex flex-col items-center justify-center w-full border-2 border-dashed border-[#c9f0e8] rounded-2xl p-4 hover:border-[#00c9a7] transition bg-[#f4fffe]">
                 <label htmlFor="gallery-upload" className="cursor-pointer text-center">
-                  <div className="text-sm text-gray-500">
+                  <div className="text-sm text-[#5b6b7a]">
                     <span className="font-semibold text-[#00c9a7]">Cliquez pour ajouter</span> ou glissez-déposez
                   </div>
-                  <p className="text-xs text-gray-400 mt-1">PNG, JPG, JPEG, WEBP (max 5MB)</p>
+                  <p className="text-xs text-[#5b6b7a] mt-1">PNG, JPG, JPEG, WEBP (max 5MB)</p>
                   <input
                     id="gallery-upload"
                     type="file"
@@ -9982,7 +9714,7 @@ export function HostServiceDashboardPage({ onNavigate, mode = 'dashboard' }: Hos
               {serviceImages.length > 0 && (
                 <div className="mt-4 grid grid-cols-3 sm:grid-cols-4 gap-3">
                   {serviceImages.map((image, index) => (
-                    <div key={index} className="relative group aspect-square rounded-2xl overflow-hidden border border-[#d9efeb]">
+                    <div key={index} className="relative group aspect-square rounded-2xl overflow-hidden border border-[#c9f0e8]">
                       <img src={image} alt={`Image ${index + 1}`} className="w-full h-full object-cover" />
                       <button
                         type="button"
@@ -10002,9 +9734,9 @@ export function HostServiceDashboardPage({ onNavigate, mode = 'dashboard' }: Hos
 
             {/* Disponibilités */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label className="block text-sm font-medium text-[#1c3b56] mb-1.5">
                 Disponibilités
-                <span className="text-xs text-gray-500 ml-2">
+                <span className="text-xs text-[#5b6b7a] ml-2">
                   ({selectedAvailabilityDates.length} date{selectedAvailabilityDates.length > 1 ? 's' : ''} sélectionnée{selectedAvailabilityDates.length > 1 ? 's' : ''})
                 </span>
               </label>
@@ -10023,11 +9755,11 @@ export function HostServiceDashboardPage({ onNavigate, mode = 'dashboard' }: Hos
             </div>
 
             {/* Boutons */}
-            <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-[#e9f2f0]">
+            <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-[#e8faf6]">
               <button
                 type="button"
                 onClick={() => { setIsFormOpen(false); resetForm(); }}
-                className="w-full sm:w-auto px-6 py-3.5 rounded-full border border-[#d9efeb] text-[#0f2940] font-medium hover:bg-gray-50 transition"
+                className="w-full sm:w-auto px-6 py-3.5 rounded-full border border-[#c9f0e8] text-[#0f2940] font-medium hover:bg-[#f4fffe] transition"
               >
                 Annuler
               </button>
@@ -10070,12 +9802,12 @@ export function HostServiceDashboardPage({ onNavigate, mode = 'dashboard' }: Hos
             <div className="flex items-center gap-4">
               <button 
                 onClick={() => onNavigate?.({ name: 'host-service-dashboard' })} 
-                className="p-2 rounded-full hover:bg-gray-100 transition"
+                className="p-2 rounded-full hover:bg-[#e8faf6] transition"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
               <h1 className="text-3xl font-bold text-[#0f2940]">Mes services</h1>
-              <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+              <span className="text-sm text-[#5b6b7a] bg-[#e8faf6] px-3 py-1 rounded-full">
                 {filteredServices.length}
               </span>
             </div>
@@ -10096,7 +9828,7 @@ export function HostServiceDashboardPage({ onNavigate, mode = 'dashboard' }: Hos
                 className={`px-4 py-2 rounded-full text-sm transition ${
                   selectedFilter === filter 
                     ? 'bg-[#00c9a7] text-white shadow-md' 
-                    : 'bg-white border border-[#d9efeb] text-[#0f2940] hover:border-[#00c9a7]'
+                    : 'bg-white border border-[#c9f0e8] text-[#0f2940] hover:border-[#00c9a7]'
                 }`}
               >
                 {filter === 'all' ? 'Tous' : getStatusLabel(filter)}
@@ -10106,9 +9838,9 @@ export function HostServiceDashboardPage({ onNavigate, mode = 'dashboard' }: Hos
 
           {filteredServices.length === 0 ? (
             <div className="bg-white rounded-3xl border border-[#e2f5f2] p-12 text-center">
-              <Briefcase className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 text-lg mb-2">Aucun service</p>
-              <p className="text-gray-400 text-sm">
+              <Briefcase className="w-16 h-16 text-[#9fb3c4] mx-auto mb-4" />
+              <p className="text-[#5b6b7a] text-lg mb-2">Aucun service</p>
+              <p className="text-[#5b6b7a] text-sm">
                 {selectedFilter !== 'all' 
                   ? `Aucun service avec le statut "${getStatusLabel(selectedFilter)}"` 
                   : 'Commencez par créer votre premier service !'}
@@ -10126,7 +9858,7 @@ export function HostServiceDashboardPage({ onNavigate, mode = 'dashboard' }: Hos
                 <div key={service.id} className="bg-white rounded-3xl border border-[#e2f5f2] p-6 shadow-sm hover:shadow-lg transition-all hover:border-[#00c9a7]">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <div className="w-16 h-16 rounded-2xl overflow-hidden bg-gray-100 flex-shrink-0 flex items-center justify-center">
+                      <div className="w-16 h-16 rounded-2xl overflow-hidden bg-[#e8faf6] flex-shrink-0 flex items-center justify-center">
                         {service.images && service.images.length > 0 ? (
                           <img 
                             src={typeof service.images[0] === 'string' ? service.images[0] : service.images[0]?.url || '/placeholder.jpg'} 
@@ -10135,7 +9867,7 @@ export function HostServiceDashboardPage({ onNavigate, mode = 'dashboard' }: Hos
                             onError={(e) => (e.target as HTMLImageElement).src = '/placeholder.jpg'}
                           />
                         ) : (
-                          <Briefcase className="w-6 h-6 text-gray-400" />
+                          <Briefcase className="w-6 h-6 text-[#5b6b7a]" />
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
@@ -10148,35 +9880,35 @@ export function HostServiceDashboardPage({ onNavigate, mode = 'dashboard' }: Hos
                             <span className="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full">✓ Publié</span>
                           )}
                         </div>
-                        <p className="text-sm text-gray-500 mt-1 flex items-center gap-1 truncate">
+                        <p className="text-sm text-[#5b6b7a] mt-1 flex items-center gap-1 truncate">
                           <MapPin className="w-4 h-4 flex-shrink-0" /> 
                           <span className="truncate">{service.location || service.city || 'Localisation non définie'}</span>
                         </p>
                       </div>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <p className="text-xs text-gray-500">Tarif</p>
+                      <p className="text-xs text-[#5b6b7a]">Tarif</p>
                       <p className="text-xl font-bold text-[#00c9a7]">{formatPriceBoth(service.price || 0)}</p>
-                      <p className="text-xs text-gray-400">{formatDuration(service.duration_minutes || 60)}</p>
+                      <p className="text-xs text-[#5b6b7a]">{formatDuration(service.duration_minutes || 60)}</p>
                     </div>
                   </div>
 
-                  <p className="text-sm text-gray-600 mt-4 line-clamp-2">
+                  <p className="text-sm text-[#5b6b7a] mt-4 line-clamp-2">
                     {service.description || 'Aucune description disponible'}
                   </p>
 
                   <div className="grid grid-cols-3 gap-3 mt-5">
-                    <div className="bg-[#f7fbfa] rounded-xl p-3 text-center border border-[#ebf7f4]">
+                    <div className="bg-[#f4fffe] rounded-xl p-3 text-center border border-[#e8faf6]">
                       <p className="text-lg font-semibold text-[#0f2940]">{formatDuration(service.duration_minutes || 60)}</p>
-                      <p className="text-xs text-gray-500">Durée</p>
+                      <p className="text-xs text-[#5b6b7a]">Durée</p>
                     </div>
-                    <div className="bg-[#f7fbfa] rounded-xl p-3 text-center border border-[#ebf7f4]">
+                    <div className="bg-[#f4fffe] rounded-xl p-3 text-center border border-[#e8faf6]">
                       <p className="text-lg font-semibold text-[#0f2940]">{service.stats?.bookings_count || 0}</p>
-                      <p className="text-xs text-gray-500">Réservations</p>
+                      <p className="text-xs text-[#5b6b7a]">Réservations</p>
                     </div>
-                    <div className="bg-[#f7fbfa] rounded-xl p-3 text-center border border-[#ebf7f4]">
+                    <div className="bg-[#f4fffe] rounded-xl p-3 text-center border border-[#e8faf6]">
                       <p className="text-lg font-semibold text-[#0f2940]">{service.reviews_count || 0}</p>
-                      <p className="text-xs text-gray-500">Avis</p>
+                      <p className="text-xs text-[#5b6b7a]">Avis</p>
                     </div>
                   </div>
 
@@ -10210,7 +9942,7 @@ export function HostServiceDashboardPage({ onNavigate, mode = 'dashboard' }: Hos
       <div className="min-h-screen bg-[#f4fffe] py-10">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 mb-8">
-            <button onClick={() => onNavigate?.({ name: 'host-service-dashboard' })} className="p-2 rounded-full hover:bg-gray-100">
+            <button onClick={() => onNavigate?.({ name: 'host-service-dashboard' })} className="p-2 rounded-full hover:bg-[#e8faf6]">
               <ArrowLeft className="w-5 h-5" />
             </button>
             <h1 className="text-3xl font-bold text-[#0f2940]">Calendrier des services</h1>
@@ -10233,15 +9965,15 @@ export function HostServiceDashboardPage({ onNavigate, mode = 'dashboard' }: Hos
       <div className="min-h-screen bg-[#f4fffe] py-10">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 mb-8">
-            <button onClick={() => onNavigate?.({ name: 'host-service-dashboard' })} className="p-2 rounded-full hover:bg-gray-100">
+            <button onClick={() => onNavigate?.({ name: 'host-service-dashboard' })} className="p-2 rounded-full hover:bg-[#e8faf6]">
               <ArrowLeft className="w-5 h-5" />
             </button>
             <h1 className="text-3xl font-bold text-[#0f2940]">Réservations services</h1>
           </div>
           <div className="bg-white rounded-3xl border border-[#e2f5f2] p-12 text-center">
-            <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500 text-lg mb-2">Aucune réservation</p>
-            <p className="text-gray-400 text-sm">Vous n'avez pas encore de réservations.</p>
+            <Calendar className="w-16 h-16 text-[#9fb3c4] mx-auto mb-4" />
+            <p className="text-[#5b6b7a] text-lg mb-2">Aucune réservation</p>
+            <p className="text-[#5b6b7a] text-sm">Vous n'avez pas encore de réservations.</p>
           </div>
         </div>
       </div>
@@ -10260,7 +9992,7 @@ export function HostServiceDashboardPage({ onNavigate, mode = 'dashboard' }: Hos
               <Briefcase className="w-8 h-8 text-[#00c9a7]" />
               Tableau de bord Services
             </h1>
-            <p className="text-gray-500 mt-1">
+            <p className="text-[#5b6b7a] mt-1">
               {services.length} service{services.length > 1 ? 's' : ''} au total
             </p>
           </div>
@@ -10300,7 +10032,7 @@ export function HostServiceDashboardPage({ onNavigate, mode = 'dashboard' }: Hos
             title="Évaluations"
             value="Non noté"
             icon={Star}
-            color="text-yellow-400"
+            color="text-[#ffc93c]"
             subtitle="Aucun avis"
           />
         </div>
@@ -10310,7 +10042,7 @@ export function HostServiceDashboardPage({ onNavigate, mode = 'dashboard' }: Hos
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="font-semibold text-lg text-[#0f2940]">🔧 Mes services</h3>
-              <p className="text-sm text-gray-500 mt-0.5">
+              <p className="text-sm text-[#5b6b7a] mt-0.5">
                 {services.length === 0 
                   ? 'Vous n\'avez pas encore créé de service' 
                   : `${services.length} service${services.length > 1 ? 's' : ''} au total`
@@ -10328,29 +10060,29 @@ export function HostServiceDashboardPage({ onNavigate, mode = 'dashboard' }: Hos
           
           {services.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-2">
-              <div className="bg-[#f7fbfa] rounded-xl p-3 text-center border border-[#ebf7f4]">
+              <div className="bg-[#f4fffe] rounded-xl p-3 text-center border border-[#e8faf6]">
                 <p className="text-2xl font-bold text-[#0f2940]">{stats.active}</p>
-                <p className="text-xs text-gray-500">Actifs</p>
+                <p className="text-xs text-[#5b6b7a]">Actifs</p>
               </div>
-              <div className="bg-[#f7fbfa] rounded-xl p-3 text-center border border-[#ebf7f4]">
+              <div className="bg-[#f4fffe] rounded-xl p-3 text-center border border-[#e8faf6]">
                 <p className="text-2xl font-bold text-[#0f2940]">{stats.pending}</p>
-                <p className="text-xs text-gray-500">En attente</p>
+                <p className="text-xs text-[#5b6b7a]">En attente</p>
               </div>
-              <div className="bg-[#f7fbfa] rounded-xl p-3 text-center border border-[#ebf7f4]">
+              <div className="bg-[#f4fffe] rounded-xl p-3 text-center border border-[#e8faf6]">
                 <p className="text-2xl font-bold text-[#0f2940]">{stats.drafts}</p>
-                <p className="text-xs text-gray-500">Brouillons</p>
+                <p className="text-xs text-[#5b6b7a]">Brouillons</p>
               </div>
-              <div className="bg-[#f7fbfa] rounded-xl p-3 text-center border border-[#ebf7f4]">
+              <div className="bg-[#f4fffe] rounded-xl p-3 text-center border border-[#e8faf6]">
                 <p className="text-2xl font-bold text-[#00c9a7]">{stats.total_bookings}</p>
-                <p className="text-xs text-gray-500">Réservations</p>
+                <p className="text-xs text-[#5b6b7a]">Réservations</p>
               </div>
             </div>
           )}
 
           {services.length === 0 && (
             <div className="text-center py-6">
-              <Briefcase className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500 text-sm">Commencez par créer votre premier service !</p>
+              <Briefcase className="w-12 h-12 text-[#9fb3c4] mx-auto mb-3" />
+              <p className="text-[#5b6b7a] text-sm">Commencez par créer votre premier service !</p>
               <button 
                 onClick={openCreateModal}
                 className="mt-3 bg-[#00c9a7] text-white px-6 py-2 rounded-full hover:bg-[#00b396] transition"
@@ -10373,7 +10105,7 @@ export function HostServiceDashboardPage({ onNavigate, mode = 'dashboard' }: Hos
                 <CalendarDays className="w-5 h-5 text-[#00c9a7] group-hover:scale-110 transition-transform" />
                 <h3 className="text-lg font-semibold text-[#0f2940]">Calendrier</h3>
               </div>
-              <p className="text-sm text-[#6b7280]">Gérez vos disponibilités et réservations</p>
+              <p className="text-sm text-[#5b6b7a]">Gérez vos disponibilités et réservations</p>
             </button>
             
             <button 
@@ -10384,7 +10116,7 @@ export function HostServiceDashboardPage({ onNavigate, mode = 'dashboard' }: Hos
                 <Users className="w-5 h-5 text-[#00c9a7] group-hover:scale-110 transition-transform" />
                 <h3 className="text-lg font-semibold text-[#0f2940]">Réservations</h3>
               </div>
-              <p className="text-sm text-[#6b7280]">Consultez les demandes de services</p>
+              <p className="text-sm text-[#5b6b7a]">Consultez les demandes de services</p>
             </button>
           </div>
         </div>
@@ -10543,26 +10275,26 @@ const AvailabilityCalendarPicker = ({
   const dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
   
   return (
-    <div className="bg-white rounded-xl p-4 border border-[#d9efeb]">
+    <div className="bg-white rounded-xl p-4 border border-[#c9f0e8]">
       <div className="flex items-center justify-between mb-4">
         <button 
           onClick={() => setCurrentDate(new Date(year, month - 2, 1))} 
-          className="p-2 rounded-lg hover:bg-gray-100 transition"
+          className="p-2 rounded-lg hover:bg-[#e8faf6] transition"
         >
-          <ChevronLeft className="w-5 h-5 text-gray-600" />
+          <ChevronLeft className="w-5 h-5 text-[#5b6b7a]" />
         </button>
-        <h3 className="font-semibold text-gray-800">{monthNames[month - 1]} {year}</h3>
+        <h3 className="font-semibold text-[#0f2940]">{monthNames[month - 1]} {year}</h3>
         <button 
           onClick={() => setCurrentDate(new Date(year, month, 1))} 
-          className="p-2 rounded-lg hover:bg-gray-100 transition"
+          className="p-2 rounded-lg hover:bg-[#e8faf6] transition"
         >
-          <ChevronRight className="w-5 h-5 text-gray-600" />
+          <ChevronRight className="w-5 h-5 text-[#5b6b7a]" />
         </button>
       </div>
       
       <div className="grid grid-cols-7 gap-1 mb-2">
         {dayNames.map((day) => (
-          <div key={day} className="text-center text-xs font-medium text-gray-500 py-1">{day}</div>
+          <div key={day} className="text-center text-xs font-medium text-[#5b6b7a] py-1">{day}</div>
         ))}
       </div>
       
@@ -10572,18 +10304,18 @@ const AvailabilityCalendarPicker = ({
           const isSelected = isDateSelected(date);
           const isCurrentMonth = date.getMonth() === month - 1;
           
-          let bgColor = 'hover:bg-gray-50';
-          let textColor = 'text-gray-800';
+          let bgColor = 'hover:bg-[#f4fffe]';
+          let textColor = 'text-[#0f2940]';
           let cursor = 'cursor-pointer';
           
           if (!isCurrentMonth) {
-            textColor = 'text-gray-300';
+            textColor = 'text-[#9fb3c4]';
             cursor = 'cursor-default';
             bgColor = '';
           } else if (isPast) {
-            textColor = 'text-gray-300';
+            textColor = 'text-[#9fb3c4]';
             cursor = 'cursor-not-allowed';
-            bgColor = 'bg-gray-50';
+            bgColor = 'bg-[#f4fffe]';
           } else if (isSelected) {
             bgColor = 'bg-[#00c9a7] text-white';
             textColor = 'text-white';
@@ -10606,13 +10338,13 @@ const AvailabilityCalendarPicker = ({
         })}
       </div>
       
-      <div className="flex items-center justify-between mt-4 pt-3 border-t border-[#e9f2f0]">
+      <div className="flex items-center justify-between mt-4 pt-3 border-t border-[#e8faf6]">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 bg-[#00c9a7] rounded"></div>
-          <span className="text-xs text-gray-600">Sélectionné</span>
+          <span className="text-xs text-[#5b6b7a]">Sélectionné</span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-[#5b6b7a]">
             {selectedDates.length} date{selectedDates.length > 1 ? 's' : ''} sélectionnée{selectedDates.length > 1 ? 's' : ''}
           </span>
           {selectedDates.length > 0 && (
@@ -10786,10 +10518,10 @@ const updateExperienceMutation = useMutation({
 
   const getStatusClasses = (status: HostExperience['status']) => {
     const classes: Record<HostExperience['status'], string> = {
-      draft: 'bg-slate-100 text-slate-700',
-      pending: 'bg-amber-100 text-amber-700',
+      draft: 'bg-[#e8faf6] text-[#1c3b56]',
+      pending: 'bg-[#fff3cd] text-[#6b4e06]',
       active: 'bg-emerald-100 text-emerald-700',
-      inactive: 'bg-gray-100 text-gray-700',
+      inactive: 'bg-[#e8faf6] text-[#1c3b56]',
       rejected: 'bg-rose-100 text-rose-700',
       suspended: 'bg-red-100 text-red-700',
     };
@@ -10994,25 +10726,25 @@ const updateExperienceMutation = useMutation({
               <h3 className="text-2xl font-bold text-[#0f2940]">
                 {editingExperience ? 'Modifier l\'expérience' : 'Créer une expérience'}
               </h3>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-[#5b6b7a] mt-1">
                 {editingExperience ? `Modification de : ${editingExperience.name}` : 'Remplissez les informations ci-dessous'}
               </p>
             </div>
-            <button onClick={() => setIsFormOpen(false)} className="p-2 rounded-full hover:bg-gray-100">
-              <X className="w-5 h-5 text-gray-500" />
+            <button onClick={() => setIsFormOpen(false)} className="p-2 rounded-full hover:bg-[#e8faf6]">
+              <X className="w-5 h-5 text-[#5b6b7a]" />
             </button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Nom */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label className="block text-sm font-medium text-[#1c3b56] mb-1.5">
                 Nom de l'expérience <span className="text-red-500">*</span>
               </label>
               <input
                 value={formData.name || ''}
                 onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-                className="w-full rounded-2xl border border-[#d9efeb] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition"
+                className="w-full rounded-2xl border border-[#c9f0e8] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition"
                 placeholder="Ex: Découverte culinaire à Cotonou"
                 required
               />
@@ -11021,19 +10753,19 @@ const updateExperienceMutation = useMutation({
             {/* Lieu et Prix */}
             <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-medium text-[#1c3b56] mb-1.5">
                   Lieu <span className="text-red-500">*</span>
                 </label>
                 <input
                   value={formData.location || ''}
                   onChange={(e) => setFormData((prev) => ({ ...prev, location: e.target.value }))}
-                  className="w-full rounded-2xl border border-[#d9efeb] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition"
+                  className="w-full rounded-2xl border border-[#c9f0e8] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition"
                   placeholder="Ex: Ouidah"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-medium text-[#1c3b56] mb-1.5">
                   Prix (FCFA) <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -11041,7 +10773,7 @@ const updateExperienceMutation = useMutation({
                   min="0"
                   value={formData.price || ''}
                   onChange={(e) => setFormData((prev) => ({ ...prev, price: e.target.value }))}
-                  className="w-full rounded-2xl border border-[#d9efeb] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition"
+                  className="w-full rounded-2xl border border-[#c9f0e8] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition"
                   placeholder="Ex: 25000"
                   required
                 />
@@ -11051,7 +10783,7 @@ const updateExperienceMutation = useMutation({
             {/* Capacité et Statut */}
             <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-medium text-[#1c3b56] mb-1.5">
                   Places disponibles <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -11059,17 +10791,17 @@ const updateExperienceMutation = useMutation({
                   min="1"
                   value={formData.capacity || ''}
                   onChange={(e) => setFormData((prev) => ({ ...prev, capacity: e.target.value }))}
-                  className="w-full rounded-2xl border border-[#d9efeb] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition"
+                  className="w-full rounded-2xl border border-[#c9f0e8] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition"
                   placeholder="Ex: 10"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Statut</label>
+                <label className="block text-sm font-medium text-[#1c3b56] mb-1.5">Statut</label>
                 <select
                   value={formData.status || 'draft'}
                   onChange={(e) => setFormData((prev) => ({ ...prev, status: e.target.value as HostExperience['status'] }))}
-                  className="w-full rounded-2xl border border-[#d9efeb] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition"
+                  className="w-full rounded-2xl border border-[#c9f0e8] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition"
                 >
                   <option value="draft">📝 Brouillon</option>
                   <option value="pending">⏳ En attente</option>
@@ -11083,14 +10815,14 @@ const updateExperienceMutation = useMutation({
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label className="block text-sm font-medium text-[#1c3b56] mb-1.5">
                 Description <span className="text-red-500">*</span>
               </label>
               <textarea
                 rows={4}
                 value={formData.description || ''}
                 onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
-                className="w-full rounded-2xl border border-[#d9efeb] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition"
+                className="w-full rounded-2xl border border-[#c9f0e8] px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition"
                 placeholder="Décrivez votre expérience en détail..."
                 required
               />
@@ -11098,19 +10830,19 @@ const updateExperienceMutation = useMutation({
 
             {/* Images */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label className="block text-sm font-medium text-[#1c3b56] mb-1.5">
                 Images de l'expérience <span className="text-red-500">*</span>
-                <span className="text-xs text-gray-500 ml-2">
+                <span className="text-xs text-[#5b6b7a] ml-2">
                   ({experienceImageFiles.length}/{MIN_EXPERIENCE_IMAGES} minimum)
                 </span>
               </label>
               
-              <div className="flex flex-col items-center justify-center w-full border-2 border-dashed border-[#d9efeb] rounded-2xl p-4 hover:border-[#00c9a7] transition bg-[#f8fffe]">
+              <div className="flex flex-col items-center justify-center w-full border-2 border-dashed border-[#c9f0e8] rounded-2xl p-4 hover:border-[#00c9a7] transition bg-[#f4fffe]">
                 <label htmlFor="gallery-upload" className="cursor-pointer text-center">
-                  <div className="text-sm text-gray-500">
+                  <div className="text-sm text-[#5b6b7a]">
                     <span className="font-semibold text-[#00c9a7]">Cliquez pour ajouter</span> ou glissez-déposez
                   </div>
-                  <p className="text-xs text-gray-400 mt-1">PNG, JPG, JPEG, WEBP (max 5MB)</p>
+                  <p className="text-xs text-[#5b6b7a] mt-1">PNG, JPG, JPEG, WEBP (max 5MB)</p>
                   <input
                     id="gallery-upload"
                     type="file"
@@ -11140,7 +10872,7 @@ const updateExperienceMutation = useMutation({
               {experienceImages.length > 0 && (
                 <div className="mt-4 grid grid-cols-3 sm:grid-cols-4 gap-3">
                   {experienceImages.map((image, index) => (
-                    <div key={index} className="relative group aspect-square rounded-2xl overflow-hidden border border-[#d9efeb]">
+                    <div key={index} className="relative group aspect-square rounded-2xl overflow-hidden border border-[#c9f0e8]">
                       <img src={image} alt={`Image ${index + 1}`} className="w-full h-full object-cover" />
                       <button
                         type="button"
@@ -11161,7 +10893,7 @@ const updateExperienceMutation = useMutation({
             {/* Étapes */}
             <div>
               <div className="flex items-center justify-between mb-3">
-                <label className="block text-sm font-medium text-gray-700">Étapes du programme <span className="text-red-500">*</span></label>
+                <label className="block text-sm font-medium text-[#1c3b56]">Étapes du programme <span className="text-red-500">*</span></label>
                 <button
                   type="button"
                   onClick={() => setStepItems(prev => [...prev, { description: '', image: '' }])}
@@ -11173,7 +10905,7 @@ const updateExperienceMutation = useMutation({
 
               <div className="space-y-4">
                 {stepItems.map((step, index) => (
-                  <div key={index} className="rounded-2xl border border-[#d9efeb] p-4 bg-white shadow-sm">
+                  <div key={index} className="rounded-2xl border border-[#c9f0e8] p-4 bg-white shadow-sm">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
                         <span className="w-6 h-6 rounded-full bg-[#00c9a7] text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
@@ -11197,10 +10929,10 @@ const updateExperienceMutation = useMutation({
 
                     <div className="space-y-3">
                       <div>
-                        <label className="block text-xs text-gray-600 mb-1.5">Image de l'étape</label>
+                        <label className="block text-xs text-[#5b6b7a] mb-1.5">Image de l'étape</label>
                         <div className="flex items-center gap-3">
-                          <label htmlFor={`step-image-${index}`} className="flex-1 flex items-center justify-center px-4 py-2.5 border-2 border-dashed border-[#d9efeb] rounded-xl cursor-pointer hover:border-[#00c9a7] transition bg-[#f8fffe]">
-                            <span className="text-sm text-gray-500">
+                          <label htmlFor={`step-image-${index}`} className="flex-1 flex items-center justify-center px-4 py-2.5 border-2 border-dashed border-[#c9f0e8] rounded-xl cursor-pointer hover:border-[#00c9a7] transition bg-[#f4fffe]">
+                            <span className="text-sm text-[#5b6b7a]">
                               {step.image ? 'Changer l\'image' : 'Ajouter une image'}
                             </span>
                             <input
@@ -11230,14 +10962,14 @@ const updateExperienceMutation = useMutation({
                       </div>
 
                       <div>
-                        <label className="block text-xs text-gray-600 mb-1.5">Description</label>
+                        <label className="block text-xs text-[#5b6b7a] mb-1.5">Description</label>
                         <textarea
                           rows={3}
                           value={step.description}
                           onChange={(e) => setStepItems(prev => prev.map((item, idx) => 
                             idx === index ? { ...item, description: e.target.value } : item
                           ))}
-                          className="w-full rounded-xl border border-[#d9efeb] px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition resize-none"
+                          className="w-full rounded-xl border border-[#c9f0e8] px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition resize-none"
                           placeholder="Décrivez cette étape..."
                         />
                       </div>
@@ -11249,9 +10981,9 @@ const updateExperienceMutation = useMutation({
 
             {/* ✅ Disponibilités - CALENDRIER INTERACTIF */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label className="block text-sm font-medium text-[#1c3b56] mb-1.5">
                 Disponibilités
-                <span className="text-xs text-gray-500 ml-2">
+                <span className="text-xs text-[#5b6b7a] ml-2">
                   ({selectedAvailabilityDates.length} date{selectedAvailabilityDates.length > 1 ? 's' : ''} sélectionnée{selectedAvailabilityDates.length > 1 ? 's' : ''})
                 </span>
               </label>
@@ -11270,10 +11002,10 @@ const updateExperienceMutation = useMutation({
               
               {selectedAvailabilityDates.length > 0 && (
                 <div className="mt-3">
-                  <p className="text-xs text-gray-500 mb-1.5">Dates sélectionnées :</p>
+                  <p className="text-xs text-[#5b6b7a] mb-1.5">Dates sélectionnées :</p>
                   <div className="flex flex-wrap gap-2">
                     {selectedAvailabilityDates.map((date, index) => (
-                      <span key={index} className="inline-flex items-center gap-1.5 text-xs bg-[#f7fbfa] border border-[#d9efeb] rounded-full px-3 py-1">
+                      <span key={index} className="inline-flex items-center gap-1.5 text-xs bg-[#f4fffe] border border-[#c9f0e8] rounded-full px-3 py-1">
                         {new Date(date).toLocaleDateString('fr-FR', { 
                           weekday: 'short', 
                           day: 'numeric', 
@@ -11292,7 +11024,7 @@ const updateExperienceMutation = useMutation({
                 </div>
               )}
               
-              <p className="text-xs text-[#6b7280] mt-3">
+              <p className="text-xs text-[#5b6b7a] mt-3">
                 💡 Cliquez sur les dates dans le calendrier pour les sélectionner ou les désélectionner.
                 <br />
                 Chaque date sélectionnée sera disponible avec les créneaux 09:00, 14:00 et 18:00.
@@ -11300,14 +11032,14 @@ const updateExperienceMutation = useMutation({
             </div>
 
             {/* Boutons */}
-            <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-[#e9f2f0]">
+            <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4 border-t border-[#e8faf6]">
               <button
                 type="button"
                 onClick={() => {
                   setIsFormOpen(false);
                   resetForm();
                 }}
-                className="w-full sm:w-auto px-6 py-3.5 rounded-full border border-[#d9efeb] text-[#0f2940] font-medium hover:bg-gray-50 transition"
+                className="w-full sm:w-auto px-6 py-3.5 rounded-full border border-[#c9f0e8] text-[#0f2940] font-medium hover:bg-[#f4fffe] transition"
               >
                 Annuler
               </button>
@@ -11344,7 +11076,7 @@ const updateExperienceMutation = useMutation({
       <div className="min-h-screen bg-[#f4fffe] py-10">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 mb-8">
-            <button onClick={() => onNavigate?.({ name: 'host-experience-dashboard' })} className="p-2 rounded-full hover:bg-gray-100">
+            <button onClick={() => onNavigate?.({ name: 'host-experience-dashboard' })} className="p-2 rounded-full hover:bg-[#e8faf6]">
               <ArrowLeft className="w-5 h-5" />
             </button>
             <h1 className="text-3xl font-bold text-[#0f2940]">Calendrier des expériences</h1>
@@ -11357,13 +11089,13 @@ const updateExperienceMutation = useMutation({
                 onClearAll={() => {}}
               />
             </div>
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-[#e2f5f2]">
               <h3 className="font-semibold text-lg mb-4">Disponibilités</h3>
               {selectedDate ? (
                 <div className="space-y-4">
-                  <p className="text-sm text-gray-600">Date: <span className="font-medium text-[#0f2940]">{selectedDate}</span></p>
+                  <p className="text-sm text-[#5b6b7a]">Date: <span className="font-medium text-[#0f2940]">{selectedDate}</span></p>
                   <div className="bg-[#f4fffe] rounded-xl p-4">
-                    <p className="text-sm text-gray-500">Expériences disponibles:</p>
+                    <p className="text-sm text-[#5b6b7a]">Expériences disponibles:</p>
                     {experiences.filter(e => e.status === 'active').map(exp => (
                       <div key={exp.id} className="flex items-center justify-between p-2 bg-white rounded-lg shadow-sm mt-2">
                         <span className="text-sm font-medium">{exp.name}</span>
@@ -11371,12 +11103,12 @@ const updateExperienceMutation = useMutation({
                       </div>
                     ))}
                     {experiences.filter(e => e.status === 'active').length === 0 && (
-                      <p className="text-sm text-gray-400 mt-2">Aucune expérience disponible</p>
+                      <p className="text-sm text-[#5b6b7a] mt-2">Aucune expérience disponible</p>
                     )}
                   </div>
                 </div>
               ) : (
-                <p className="text-gray-500 text-center py-8">Sélectionnez une date</p>
+                <p className="text-[#5b6b7a] text-center py-8">Sélectionnez une date</p>
               )}
             </div>
           </div>
@@ -11401,7 +11133,7 @@ const updateExperienceMutation = useMutation({
       <div className="min-h-screen bg-[#f4fffe] py-10">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 mb-8">
-            <button onClick={() => onNavigate?.({ name: 'host-experience-dashboard' })} className="p-2 rounded-full hover:bg-gray-100">
+            <button onClick={() => onNavigate?.({ name: 'host-experience-dashboard' })} className="p-2 rounded-full hover:bg-[#e8faf6]">
               <ArrowLeft className="w-5 h-5" />
             </button>
             <h1 className="text-3xl font-bold text-[#0f2940]">Réservations expériences</h1>
@@ -11409,9 +11141,9 @@ const updateExperienceMutation = useMutation({
           
           {allBookings.length === 0 ? (
             <div className="bg-white rounded-3xl border border-[#e2f5f2] p-12 text-center">
-              <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 text-lg mb-2">Aucune réservation</p>
-              <p className="text-gray-400 text-sm">Vous n'avez pas encore de réservations.</p>
+              <Calendar className="w-16 h-16 text-[#9fb3c4] mx-auto mb-4" />
+              <p className="text-[#5b6b7a] text-lg mb-2">Aucune réservation</p>
+              <p className="text-[#5b6b7a] text-sm">Vous n'avez pas encore de réservations.</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -11420,15 +11152,15 @@ const updateExperienceMutation = useMutation({
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
                       <h3 className="font-semibold text-[#0f2940] text-lg">{booking.experience?.name || 'Expérience'}</h3>
-                      <p className="text-sm text-gray-500 mt-1">Voyageur: {booking.guest_name || 'Client'}</p>
+                      <p className="text-sm text-[#5b6b7a] mt-1">Voyageur: {booking.guest_name || 'Client'}</p>
                       <div className="flex flex-wrap gap-2 mt-2">
-                        <span className="text-xs px-2 py-1 rounded-full bg-yellow-100 text-yellow-700">En attente</span>
-                        <span className="text-xs text-gray-400">{booking.date || '-'}</span>
+                        <span className="text-xs px-2 py-1 rounded-full bg-[#fff3cd] text-[#6b4e06]">En attente</span>
+                        <span className="text-xs text-[#5b6b7a]">{booking.date || '-'}</span>
                       </div>
                     </div>
                     <div className="text-right">
                       <p className="font-bold text-[#00c9a7]">{formatPrice(Number(booking.amount || 0))} FCFA</p>
-                      <p className="text-xs text-gray-400">{booking.participants || 1} participant</p>
+                      <p className="text-xs text-[#5b6b7a]">{booking.participants || 1} participant</p>
                     </div>
                   </div>
                 </div>
@@ -11449,12 +11181,12 @@ const updateExperienceMutation = useMutation({
             <div className="flex items-center gap-4">
               <button 
                 onClick={() => onNavigate?.({ name: 'host-experience-dashboard' })} 
-                className="p-2 rounded-full hover:bg-gray-100 transition"
+                className="p-2 rounded-full hover:bg-[#e8faf6] transition"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
               <h1 className="text-3xl font-bold text-[#0f2940]">Mes expériences</h1>
-              <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+              <span className="text-sm text-[#5b6b7a] bg-[#e8faf6] px-3 py-1 rounded-full">
                 {filteredExperiences.length}
               </span>
             </div>
@@ -11478,7 +11210,7 @@ const updateExperienceMutation = useMutation({
                 className={`px-4 py-2 rounded-full text-sm transition ${
                   selectedFilter === filter 
                     ? 'bg-[#00c9a7] text-white shadow-md' 
-                    : 'bg-white border border-[#d9efeb] text-[#0f2940] hover:border-[#00c9a7]'
+                    : 'bg-white border border-[#c9f0e8] text-[#0f2940] hover:border-[#00c9a7]'
                 }`}
               >
                 {filter === 'all' ? 'Toutes' : getStatusLabel(filter)}
@@ -11488,9 +11220,9 @@ const updateExperienceMutation = useMutation({
 
           {filteredExperiences.length === 0 ? (
             <div className="bg-white rounded-3xl border border-[#e2f5f2] p-12 text-center">
-              <Lightbulb className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 text-lg mb-2">Aucune expérience</p>
-              <p className="text-gray-400 text-sm">Commencez par créer votre première expérience !</p>
+              <Lightbulb className="w-16 h-16 text-[#9fb3c4] mx-auto mb-4" />
+              <p className="text-[#5b6b7a] text-lg mb-2">Aucune expérience</p>
+              <p className="text-[#5b6b7a] text-sm">Commencez par créer votre première expérience !</p>
               <button 
                 onClick={() => {
                   console.log('📝 Ouverture création depuis vide');
@@ -11542,7 +11274,7 @@ const updateExperienceMutation = useMutation({
                   <div key={experience.id} className="bg-white rounded-3xl border border-[#e2f5f2] p-6 shadow-sm hover:shadow-lg transition-all hover:border-[#00c9a7]">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <div className="w-16 h-16 rounded-2xl overflow-hidden bg-gray-100 flex-shrink-0">
+                        <div className="w-16 h-16 rounded-2xl overflow-hidden bg-[#e8faf6] flex-shrink-0">
                           {imageUrl && imageUrl !== '/placeholder.jpg' ? (
                             <img 
                               src={imageUrl} 
@@ -11553,7 +11285,7 @@ const updateExperienceMutation = useMutation({
                               }}
                             />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-400">
+                            <div className="w-full h-full flex items-center justify-center text-[#5b6b7a]">
                               <Lightbulb className="w-6 h-6" />
                             </div>
                           )}
@@ -11568,44 +11300,44 @@ const updateExperienceMutation = useMutation({
                               <span className="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full">✓ Publiée</span>
                             )}
                           </div>
-                          <p className="text-sm text-gray-500 mt-1 flex items-center gap-1 truncate">
+                          <p className="text-sm text-[#5b6b7a] mt-1 flex items-center gap-1 truncate">
                             <MapPin className="w-4 h-4 flex-shrink-0" /> 
                             <span className="truncate">{experience.location || 'Localisation non définie'}</span>
                           </p>
                         </div>
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <p className="text-xs text-gray-500">Tarif</p>
+                        <p className="text-xs text-[#5b6b7a]">Tarif</p>
                         <p className="text-xl font-bold text-[#00c9a7]">{formatPrice(price)} FCFA</p>
-                        <p className="text-xs text-gray-400">/ personne</p>
+                        <p className="text-xs text-[#5b6b7a]">/ personne</p>
                       </div>
                     </div>
 
-                    <p className="text-sm text-gray-600 mt-4 line-clamp-2">
+                    <p className="text-sm text-[#5b6b7a] mt-4 line-clamp-2">
                       {experience.description || 'Aucune description disponible'}
                     </p>
 
                     <div className="grid grid-cols-4 gap-3 mt-5">
-                      <div className="bg-[#f7fbfa] rounded-xl p-3 text-center border border-[#ebf7f4]">
+                      <div className="bg-[#f4fffe] rounded-xl p-3 text-center border border-[#e8faf6]">
                         <p className="text-lg font-semibold text-[#0f2940]">{stepsCount}</p>
-                        <p className="text-xs text-gray-500">Étapes</p>
+                        <p className="text-xs text-[#5b6b7a]">Étapes</p>
                       </div>
-                      <div className="bg-[#f7fbfa] rounded-xl p-3 text-center border border-[#ebf7f4]">
+                      <div className="bg-[#f4fffe] rounded-xl p-3 text-center border border-[#e8faf6]">
                         <p className="text-lg font-semibold text-[#0f2940]">{capacity || '-'}</p>
-                        <p className="text-xs text-gray-500">Places</p>
+                        <p className="text-xs text-[#5b6b7a]">Places</p>
                       </div>
-                      <div className="bg-[#f7fbfa] rounded-xl p-3 text-center border border-[#ebf7f4]">
+                      <div className="bg-[#f4fffe] rounded-xl p-3 text-center border border-[#e8faf6]">
                         <p className="text-lg font-semibold text-[#0f2940]">{Math.max(capacity - bookingsCount, 0)}</p>
-                        <p className="text-xs text-gray-500">Restantes</p>
+                        <p className="text-xs text-[#5b6b7a]">Restantes</p>
                       </div>
-                      <div className="bg-[#f7fbfa] rounded-xl p-3 text-center border border-[#ebf7f4]">
+                      <div className="bg-[#f4fffe] rounded-xl p-3 text-center border border-[#e8faf6]">
                         <p className="text-lg font-semibold text-[#0f2940]">{bookingsCount}</p>
-                        <p className="text-xs text-gray-500">Réservations</p>
+                        <p className="text-xs text-[#5b6b7a]">Réservations</p>
                       </div>
                     </div>
 
                     {experience.moderation_notes && (
-                      <div className="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm text-amber-800">
+                      <div className="mt-4 bg-[#fffaeb] border border-[#ffe9a8] rounded-xl p-3 text-sm text-[#4a3400]">
                         <p className="font-semibold mb-1">📝 Note de modération</p>
                         <p className="text-sm">{experience.moderation_notes}</p>
                       </div>
@@ -11626,7 +11358,7 @@ const updateExperienceMutation = useMutation({
                           console.log('🔘 Clic sur Détails pour:', experience.name);
                           setSelectedExperience(experience);
                         }} 
-                        className="flex-1 min-w-[80px] px-4 py-2 rounded-full border border-[#d9efeb] text-[#0f2940] font-medium hover:border-[#00c9a7] transition flex items-center justify-center gap-1"
+                        className="flex-1 min-w-[80px] px-4 py-2 rounded-full border border-[#c9f0e8] text-[#0f2940] font-medium hover:border-[#00c9a7] transition flex items-center justify-center gap-1"
                       >
                         Détails
                       </button>
@@ -11677,7 +11409,7 @@ const updateExperienceMutation = useMutation({
               <Lightbulb className="w-8 h-8 text-[#00c9a7]" />
               Tableau de bord Expériences
             </h1>
-            <p className="text-gray-500 mt-1">Gérez vos expériences, revenus et réservations</p>
+            <p className="text-[#5b6b7a] mt-1">Gérez vos expériences, revenus et réservations</p>
           </div>
           <button 
             onClick={openCreateModal} 
@@ -11692,38 +11424,38 @@ const updateExperienceMutation = useMutation({
         <div className="grid gap-6 lg:grid-cols-4 mb-8">
           <div className="rounded-3xl bg-white border border-[#e2f5f2] p-6 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
-              <div className="text-sm text-[#6b7280]">Revenus du mois</div>
+              <div className="text-sm text-[#5b6b7a]">Revenus du mois</div>
               <DollarSign className="w-5 h-5 text-[#00c9a7]" />
             </div>
             <div className="text-2xl font-bold text-[#0f2940] mt-3">{formatPrice(monthlyRevenue)} FCFA</div>
-            <div className="text-xs text-gray-500 mt-2">{stats.active} expérience{stats.active > 1 ? 's' : ''} active{stats.active > 1 ? 's' : ''}</div>
+            <div className="text-xs text-[#5b6b7a] mt-2">{stats.active} expérience{stats.active > 1 ? 's' : ''} active{stats.active > 1 ? 's' : ''}</div>
           </div>
 
           <div className="rounded-3xl bg-white border border-[#e2f5f2] p-6 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
-              <div className="text-sm text-[#6b7280]">Expériences</div>
+              <div className="text-sm text-[#5b6b7a]">Expériences</div>
               <Lightbulb className="w-5 h-5 text-[#00c9a7]" />
             </div>
             <div className="text-2xl font-bold text-[#0f2940] mt-3">{stats.total}</div>
             <div className="flex gap-3 mt-1 text-xs">
               <span className="text-green-600">{stats.active} active</span>
-              <span className="text-orange-500">{stats.pending} en attente</span>
-              <span className="text-slate-500">{stats.drafts} brouillon</span>
+              <span className="text-[#e0ac1f]">{stats.pending} en attente</span>
+              <span className="text-[#5b6b7a]">{stats.drafts} brouillon</span>
             </div>
           </div>
 
           <div className="rounded-3xl bg-white border border-[#e2f5f2] p-6 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
-              <div className="text-sm text-[#6b7280]">Réservations</div>
+              <div className="text-sm text-[#5b6b7a]">Réservations</div>
               <Users className="w-5 h-5 text-[#00c9a7]" />
             </div>
             <div className="text-2xl font-bold text-[#0f2940] mt-3">{totalBookings}</div>
-            <div className="text-xs text-gray-500 mt-2">Total des réservations</div>
+            <div className="text-xs text-[#5b6b7a] mt-2">Total des réservations</div>
           </div>
 
           <div className="rounded-3xl bg-white border border-[#e2f5f2] p-6 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
-              <div className="text-sm text-[#6b7280]">Messages</div>
+              <div className="text-sm text-[#5b6b7a]">Messages</div>
               <MessageCircle className="w-5 h-5 text-[#00c9a7]" />
             </div>
             <div className="text-2xl font-bold text-[#0f2940] mt-3">0</div>
@@ -11736,7 +11468,7 @@ const updateExperienceMutation = useMutation({
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="font-semibold text-lg text-[#0f2940]">🎯 Mes expériences</h3>
-              <p className="text-sm text-gray-500 mt-0.5">
+              <p className="text-sm text-[#5b6b7a] mt-0.5">
                 {experiences.length === 0 
                   ? 'Vous n\'avez pas encore créé d\'expérience' 
                   : `${experiences.length} expérience${experiences.length > 1 ? 's' : ''} au total`
@@ -11755,21 +11487,21 @@ const updateExperienceMutation = useMutation({
           {/* Statistiques rapides */}
           {experiences.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-2">
-              <div className="bg-[#f7fbfa] rounded-xl p-3 text-center border border-[#ebf7f4]">
+              <div className="bg-[#f4fffe] rounded-xl p-3 text-center border border-[#e8faf6]">
                 <p className="text-2xl font-bold text-[#0f2940]">{stats.active}</p>
-                <p className="text-xs text-gray-500">Actives</p>
+                <p className="text-xs text-[#5b6b7a]">Actives</p>
               </div>
-              <div className="bg-[#f7fbfa] rounded-xl p-3 text-center border border-[#ebf7f4]">
+              <div className="bg-[#f4fffe] rounded-xl p-3 text-center border border-[#e8faf6]">
                 <p className="text-2xl font-bold text-[#0f2940]">{stats.pending}</p>
-                <p className="text-xs text-gray-500">En attente</p>
+                <p className="text-xs text-[#5b6b7a]">En attente</p>
               </div>
-              <div className="bg-[#f7fbfa] rounded-xl p-3 text-center border border-[#ebf7f4]">
+              <div className="bg-[#f4fffe] rounded-xl p-3 text-center border border-[#e8faf6]">
                 <p className="text-2xl font-bold text-[#0f2940]">{stats.drafts}</p>
-                <p className="text-xs text-gray-500">Brouillons</p>
+                <p className="text-xs text-[#5b6b7a]">Brouillons</p>
               </div>
-              <div className="bg-[#f7fbfa] rounded-xl p-3 text-center border border-[#ebf7f4]">
+              <div className="bg-[#f4fffe] rounded-xl p-3 text-center border border-[#e8faf6]">
                 <p className="text-2xl font-bold text-[#00c9a7]">{totalBookings}</p>
-                <p className="text-xs text-gray-500">Réservations</p>
+                <p className="text-xs text-[#5b6b7a]">Réservations</p>
               </div>
             </div>
           )}
@@ -11777,8 +11509,8 @@ const updateExperienceMutation = useMutation({
           {/* Message si aucune expérience */}
           {experiences.length === 0 && (
             <div className="text-center py-6">
-              <Lightbulb className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500 text-sm">Commencez par créer votre première expérience !</p>
+              <Lightbulb className="w-12 h-12 text-[#9fb3c4] mx-auto mb-3" />
+              <p className="text-[#5b6b7a] text-sm">Commencez par créer votre première expérience !</p>
             </div>
           )}
         </div>
@@ -11786,13 +11518,13 @@ const updateExperienceMutation = useMutation({
         {/* Évaluations */}
         <div className="bg-white rounded-3xl border border-[#e2f5f2] p-6 mb-8">
           <div className="flex items-center gap-2 mb-4">
-            <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+            <Star className="w-5 h-5 text-[#ffc93c] fill-[#ffc93c]" />
             <h3 className="font-semibold text-lg text-[#0f2940]">Évaluations</h3>
           </div>
           <div className="text-center py-8">
-            <Star className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500">Aucune évaluation pour le moment</p>
-            <p className="text-sm text-gray-400 mt-1">Les évaluations apparaîtront après les expériences</p>
+            <Star className="w-12 h-12 text-[#9fb3c4] mx-auto mb-3" />
+            <p className="text-[#5b6b7a]">Aucune évaluation pour le moment</p>
+            <p className="text-sm text-[#5b6b7a] mt-1">Les évaluations apparaîtront après les expériences</p>
           </div>
         </div>
 
@@ -11809,7 +11541,7 @@ const updateExperienceMutation = useMutation({
                 <CalendarDays className="w-5 h-5 text-[#00c9a7] group-hover:scale-110 transition-transform" />
                 <h3 className="text-lg font-semibold text-[#0f2940]">Calendrier</h3>
               </div>
-              <p className="text-sm text-[#6b7280]">Gérez vos disponibilités et réservations</p>
+              <p className="text-sm text-[#5b6b7a]">Gérez vos disponibilités et réservations</p>
             </button>
             
             {/* Lien vers Réservations */}
@@ -11821,7 +11553,7 @@ const updateExperienceMutation = useMutation({
                 <Users className="w-5 h-5 text-[#00c9a7] group-hover:scale-110 transition-transform" />
                 <h3 className="text-lg font-semibold text-[#0f2940]">Réservations</h3>
               </div>
-              <p className="text-sm text-[#6b7280]">Consultez les demandes et les expériences en cours</p>
+              <p className="text-sm text-[#5b6b7a]">Consultez les demandes et les expériences en cours</p>
             </button>
           </div>
         </div>
@@ -11892,7 +11624,7 @@ const ChatView = ({
 
   if (!selectedConversation) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center text-gray-400 p-4">
+      <div className="flex-1 flex flex-col items-center justify-center text-[#5b6b7a] p-4">
         <MessageCircle className="w-16 h-16 mb-4 opacity-50" />
         <p className="text-lg font-medium text-center">Sélectionnez une conversation</p>
         <p className="text-sm text-center">Les messages des voyageurs apparaissent ici</p>
@@ -11938,8 +11670,8 @@ const ChatView = ({
             {guestName.charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-gray-900 truncate">{guestName}</p>
-            <div className="flex items-center gap-1 text-xs text-gray-500 truncate">
+            <p className="font-semibold text-[#0f2940] truncate">{guestName}</p>
+            <div className="flex items-center gap-1 text-xs text-[#5b6b7a] truncate">
               <Sparkles className="w-3 h-3 flex-shrink-0 text-[#00c9a7]" />
               <span className="truncate">{experienceName}</span>
               {experienceLocation && (
@@ -11952,8 +11684,8 @@ const ChatView = ({
             </div>
           </div>
           {selectedConversation.guest.phone && (
-            <a href={`tel:${selectedConversation.guest.phone}`} className="p-2 rounded-full hover:bg-gray-100 transition flex-shrink-0">
-              <Phone className="w-4 h-4 text-gray-500" />
+            <a href={`tel:${selectedConversation.guest.phone}`} className="p-2 rounded-full hover:bg-[#e8faf6] transition flex-shrink-0">
+              <Phone className="w-4 h-4 text-[#5b6b7a]" />
             </a>
           )}
         </div>
@@ -11962,15 +11694,15 @@ const ChatView = ({
       {/* Messages */}
       <div 
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 bg-gray-50"
+        className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 bg-[#f4fffe]"
       >
         {messagesLoading ? (
           <div className="text-center py-10">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00c9a7] mx-auto"></div>
-            <p className="text-gray-500 mt-2 text-sm">Chargement des messages...</p>
+            <p className="text-[#5b6b7a] mt-2 text-sm">Chargement des messages...</p>
           </div>
         ) : messages.length === 0 ? (
-          <div className="text-center py-10 text-gray-400">
+          <div className="text-center py-10 text-[#5b6b7a]">
             <MessageCircle className="w-12 h-12 mx-auto mb-2 opacity-50" />
             <p className="text-sm">Aucun message</p>
             <p className="text-xs mt-1">Soyez le premier à répondre !</p>
@@ -11981,10 +11713,10 @@ const ChatView = ({
             return (
               <div key={msg.id} className={`flex ${isFromMe ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[85%] sm:max-w-[70%] rounded-2xl p-3 ${
-                  isFromMe ? 'bg-[#00c9a7] text-white' : 'bg-white text-gray-800 shadow-sm'
+                  isFromMe ? 'bg-[#00c9a7] text-white' : 'bg-white text-[#0f2940] shadow-sm'
                 }`}>
                   <p className="text-sm sm:text-base whitespace-pre-wrap break-words">{msg.message}</p>
-                  <p className={`text-xs mt-1 ${isFromMe ? 'text-white/70' : 'text-gray-400'}`}>
+                  <p className={`text-xs mt-1 ${isFromMe ? 'text-white/70' : 'text-[#5b6b7a]'}`}>
                     {messageTime(msg.created_at)}
                   </p>
                 </div>
@@ -12016,7 +11748,7 @@ const ChatView = ({
           <button
             onClick={handleSend}
             disabled={!messageInput.trim() || isSending}
-            className="bg-[#00c9a7] text-white rounded-full p-2.5 sm:p-3 disabled:opacity-50 hover:bg-[#00b89a] transition flex-shrink-0"
+            className="bg-[#00c9a7] text-white rounded-full p-2.5 sm:p-3 disabled:opacity-50 hover:bg-[#00b396] transition flex-shrink-0"
           >
             {isSending ? (
               <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white" />
@@ -12025,7 +11757,7 @@ const ChatView = ({
             )}
           </button>
         </div>
-        <p className="text-[10px] sm:text-xs text-gray-400 mt-1.5 text-center">
+        <p className="text-[10px] sm:text-xs text-[#5b6b7a] mt-1.5 text-center">
           💡 Répondez aux voyageurs pour confirmer les disponibilités
         </p>
       </div>
@@ -12124,7 +11856,7 @@ export function HostExperienceMessagesPage({ onNavigate, id }: HostExperienceMes
       <div className="bg-[#f4fffe] min-h-screen py-10 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00c9a7] mx-auto"></div>
-          <p className="text-gray-600 mt-4">Chargement des conversations...</p>
+          <p className="text-[#5b6b7a] mt-4">Chargement des conversations...</p>
         </div>
       </div>
     );
@@ -12141,13 +11873,13 @@ export function HostExperienceMessagesPage({ onNavigate, id }: HostExperienceMes
               <span className="hidden sm:inline">Messages expériences</span>
               <span className="sm:hidden">Messages</span>
             </h1>
-            <p className="text-xs sm:text-sm text-gray-500 mt-0.5 hidden sm:block">
+            <p className="text-xs sm:text-sm text-[#5b6b7a] mt-0.5 hidden sm:block">
               Gérez vos conversations avec les voyageurs
             </p>
           </div>
           <button 
             onClick={() => onNavigate?.({ name: 'host-experience-dashboard' })} 
-            className="text-xs sm:text-sm text-gray-500 hover:text-[#00c9a7] transition flex items-center gap-1"
+            className="text-xs sm:text-sm text-[#5b6b7a] hover:text-[#00c9a7] transition flex items-center gap-1"
           >
             <ArrowLeft className="w-4 h-4" />
             <span className="hidden sm:inline">Retour</span>
@@ -12168,7 +11900,7 @@ export function HostExperienceMessagesPage({ onNavigate, id }: HostExperienceMes
             {mobileMenuOpen && (
               <button 
                 onClick={() => setMobileMenuOpen(false)}
-                className="lg:hidden absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100"
+                className="lg:hidden absolute top-4 right-4 p-2 rounded-full hover:bg-[#e8faf6]"
               >
                 ✕
               </button>
@@ -12187,7 +11919,7 @@ export function HostExperienceMessagesPage({ onNavigate, id }: HostExperienceMes
             
             <div className="divide-y max-h-[calc(100vh-200px)] overflow-y-auto">
               {conversations.length === 0 ? (
-                <div className="p-8 text-center text-gray-400">
+                <div className="p-8 text-center text-[#5b6b7a]">
                   <MessageCircle className="w-12 h-12 mx-auto mb-2 opacity-50" />
                   <p>Aucune conversation</p>
                   <p className="text-sm mt-1">Les voyageurs vous contacteront ici</p>
@@ -12202,14 +11934,14 @@ export function HostExperienceMessagesPage({ onNavigate, id }: HostExperienceMes
                     <button
                       key={index}
                       onClick={() => handleSelectConversation(conv)}
-                      className={`w-full text-left p-3 sm:p-4 hover:bg-gray-50 transition ${
-                        isSelected ? 'bg-gray-100' : ''
+                      className={`w-full text-left p-3 sm:p-4 hover:bg-[#f4fffe] transition ${
+                        isSelected ? 'bg-[#e8faf6]' : ''
                       }`}
                     >
                       <div className="flex justify-between items-start">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <p className="font-medium text-gray-900 text-sm sm:text-base truncate">
+                            <p className="font-medium text-[#0f2940] text-sm sm:text-base truncate">
                               {guestName}
                             </p>
                             {conv.unread_count > 0 && (
@@ -12218,19 +11950,19 @@ export function HostExperienceMessagesPage({ onNavigate, id }: HostExperienceMes
                               </span>
                             )}
                           </div>
-                          <p className="text-xs sm:text-sm text-gray-500 truncate">{experienceName}</p>
+                          <p className="text-xs sm:text-sm text-[#5b6b7a] truncate">{experienceName}</p>
                           {conv.experience.location && (
-                            <p className="text-xs text-gray-400 truncate">📍 {conv.experience.location}</p>
+                            <p className="text-xs text-[#5b6b7a] truncate">📍 {conv.experience.location}</p>
                           )}
                         </div>
                         {conv.last_message && (
-                          <span className="text-[10px] sm:text-xs text-gray-400 flex-shrink-0 ml-2">
+                          <span className="text-[10px] sm:text-xs text-[#5b6b7a] flex-shrink-0 ml-2">
                             {conv.last_message.sent_at}
                           </span>
                         )}
                       </div>
                       {conv.last_message && (
-                        <p className="text-xs text-gray-400 mt-2 truncate">
+                        <p className="text-xs text-[#5b6b7a] mt-2 truncate">
                           {conv.last_message.preview || conv.last_message.message}
                         </p>
                       )}
@@ -12246,9 +11978,9 @@ export function HostExperienceMessagesPage({ onNavigate, id }: HostExperienceMes
             {/* Bouton menu mobile pour afficher les conversations */}
             <button 
               onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden absolute top-3 left-3 z-10 p-2 rounded-full bg-white shadow-md hover:bg-gray-50"
+              className="lg:hidden absolute top-3 left-3 z-10 p-2 rounded-full bg-white shadow-md hover:bg-[#f4fffe]"
             >
-              <Menu className="w-5 h-5 text-gray-600" />
+              <Menu className="w-5 h-5 text-[#5b6b7a]" />
             </button>
 
             <ChatView 
@@ -12729,7 +12461,7 @@ export function HostListingsPage({ onNavigate }: HostListingsPageProps) {
     return (
       <div className="text-center py-10 text-red-500">
         <p>Erreur de chargement des annonces</p>
-        <button onClick={() => refetch()} className="mt-4 bg-[#00c9a7] text-white px-6 py-2 rounded-full hover:bg-[#00b892] transition">Réessayer</button>
+        <button onClick={() => refetch()} className="mt-4 bg-[#00c9a7] text-white px-6 py-2 rounded-full hover:bg-[#00b396] transition">Réessayer</button>
       </div>
     );
   }
@@ -12744,32 +12476,32 @@ export function HostListingsPage({ onNavigate }: HostListingsPageProps) {
             <div className="space-y-4">
               {properties.length === 0 ? (
                 <div className="text-center py-12">
-                  <p className="text-gray-500">Vous n'avez pas encore d'annonce.</p>
-                  <button onClick={() => onNavigate?.({ name: 'publish' })} className="mt-4 bg-[#00c9a7] text-white px-6 py-2 rounded-full hover:bg-[#00b892] transition">Créer ma première annonce</button>
+                  <p className="text-[#5b6b7a]">Vous n'avez pas encore d'annonce.</p>
+                  <button onClick={() => onNavigate?.({ name: 'publish' })} className="mt-4 bg-[#00c9a7] text-white px-6 py-2 rounded-full hover:bg-[#00b396] transition">Créer ma première annonce</button>
                 </div>
               ) : (
                 properties.map((property: any) => (
                   <div key={property.id} className="rounded-3xl border border-[#e2f5f2] p-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between hover:shadow-lg transition-shadow">
                     <div className="flex-1">
                       <h3 className="text-xl font-semibold text-[#0f2940]">{property.title}</h3>
-                      <p className="text-sm text-[#6b7280] mt-1">
+                      <p className="text-sm text-[#5b6b7a] mt-1">
                         Statut :{' '}
                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs ${
                           property.status === 'active' ? 'bg-green-100 text-green-700' :
-                          property.status === 'pending' ? 'bg-orange-100 text-orange-700' :
-                          property.status === 'draft' ? 'bg-gray-100 text-gray-600' :
+                          property.status === 'pending' ? 'bg-[#fff3cd] text-[#6b4e06]' :
+                          property.status === 'draft' ? 'bg-[#e8faf6] text-[#5b6b7a]' :
                           'bg-red-100 text-red-700'
                         }`}>
                           {property.status_label || property.status}
                         </span>
                       </p>
-                      <div className="flex flex-wrap gap-4 mt-2 text-sm text-gray-500">
+                      <div className="flex flex-wrap gap-4 mt-2 text-sm text-[#5b6b7a]">
                         <span className="flex items-center gap-1"><Eye className="w-4 h-4" />{property.stats?.views_this_month || property.views_count || 0} vues</span>
-                        <span className="flex items-center gap-1"><Star className="w-4 h-4 text-yellow-400" />{property.average_rating || 0} / 5</span>
+                        <span className="flex items-center gap-1"><Star className="w-4 h-4 text-[#ffc93c]" />{property.average_rating || 0} / 5</span>
                         <span className="flex items-center gap-1"><CalendarDays className="w-4 h-4" />{property.stats?.bookings_count || property.bookings_count || 0} réservations</span>
                         <span className="flex items-center gap-1"><DollarSign className="w-4 h-4 text-[#00c9a7]" />{formatPrice(property.price_per_night)} FCFA / nuit</span>
                       </div>
-                      <div className="text-xs text-gray-400 mt-2">📍 {property.city}, {property.district}</div>
+                      <div className="text-xs text-[#5b6b7a] mt-2">📍 {property.city}, {property.district}</div>
                     </div>
                     <div className="flex flex-wrap items-center gap-3">
                       <button onClick={() => onNavigate?.({ name: 'listing', id: property.id.toString() })} className="border border-[#e2f5f2] rounded-full px-5 py-2.5 text-sm hover:bg-[#f4fffe] transition-colors">Voir</button>
@@ -12780,8 +12512,8 @@ export function HostListingsPage({ onNavigate }: HostListingsPageProps) {
                         title={getEditButtonTooltip(property)}
                         className={`border rounded-full px-5 py-2.5 text-sm transition-colors ${
                           !canEdit(property) 
-                            ? 'border-gray-200 text-gray-400 cursor-not-allowed' 
-                            : 'border-blue-200 text-blue-600 hover:bg-blue-50'
+                            ? 'border-[#e2f5f2] text-[#5b6b7a] cursor-not-allowed' 
+                            : 'border-[#c9f0e8] text-[#00806b] hover:bg-[#f4fffe]'
                         }`}
                       >
                         <Edit2 className="w-4 h-4 inline mr-1" />Modifier
@@ -12805,7 +12537,7 @@ export function HostListingsPage({ onNavigate }: HostListingsPageProps) {
           <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-fadeInUp">
             <div className="sticky top-0 z-10 bg-white border-b px-6 py-4 flex justify-between items-center">
               <h3 className="text-xl font-semibold text-[#0F2940]">Modifier l'annonce</h3>
-              <button onClick={() => setShowEditModal(false)} className="p-2 rounded-full hover:bg-gray-100 transition"><X className="w-5 h-5 text-gray-500" /></button>
+              <button onClick={() => setShowEditModal(false)} className="p-2 rounded-full hover:bg-[#e8faf6] transition"><X className="w-5 h-5 text-[#5b6b7a]" /></button>
             </div>
 
             <div className="p-6 space-y-6">
@@ -12819,8 +12551,8 @@ export function HostListingsPage({ onNavigate }: HostListingsPageProps) {
                 {editingProperty.photos && editingProperty.photos.length > 0 && (
                   <div className="mb-4">
                     <div className="flex justify-between items-center mb-2">
-                      <label className="block text-sm text-gray-600">Photos actuelles</label>
-                      <p className="text-xs text-gray-400">Cliquez sur la poubelle pour supprimer</p>
+                      <label className="block text-sm text-[#5b6b7a]">Photos actuelles</label>
+                      <p className="text-xs text-[#5b6b7a]">Cliquez sur la poubelle pour supprimer</p>
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                       {editingProperty.photos.map((photo: any) => {
@@ -12828,7 +12560,7 @@ export function HostListingsPage({ onNavigate }: HostListingsPageProps) {
                         const isDeleting = deletingPhotoId === photo.id;
                         
                         return (
-                          <div key={photo.id} className="relative group rounded-xl overflow-hidden border border-gray-200 bg-gray-50 aspect-square">
+                          <div key={photo.id} className="relative group rounded-xl overflow-hidden border border-[#e2f5f2] bg-[#f4fffe] aspect-square">
                             <img src={imageUrl} alt="Photo" className="w-full h-full object-cover" />
                             <button
                               onClick={() => confirmDeletePhoto(editingProperty.id, photo.id, imageUrl)}
@@ -12846,21 +12578,21 @@ export function HostListingsPage({ onNavigate }: HostListingsPageProps) {
 
                 {/* Ajout de nouvelles photos */}
                 <div>
-                  <label className="block text-sm text-gray-600 mb-2">Ajouter des photos</label>
+                  <label className="block text-sm text-[#5b6b7a] mb-2">Ajouter des photos</label>
                   <input
                     type="file"
                     accept="image/*"
                     multiple
                     onChange={handlePhotoChange}
-                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#00c9a7] file:text-white hover:file:bg-[#00b892] transition"
+                    className="block w-full text-sm text-[#5b6b7a] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#00c9a7] file:text-white hover:file:bg-[#00b396] transition"
                   />
                   
                   {newPhotoPreviews.length > 0 && (
                     <div className="mt-3">
-                      <p className="text-xs font-medium text-gray-500 mb-2">Nouvelles photos ({newPhotoPreviews.length})</p>
+                      <p className="text-xs font-medium text-[#5b6b7a] mb-2">Nouvelles photos ({newPhotoPreviews.length})</p>
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                         {newPhotoPreviews.map((preview, index) => (
-                          <div key={index} className="relative group rounded-xl overflow-hidden border border-gray-200 bg-gray-50 aspect-square">
+                          <div key={index} className="relative group rounded-xl overflow-hidden border border-[#e2f5f2] bg-[#f4fffe] aspect-square">
                             <img src={preview} alt={`Nouvelle photo ${index + 1}`} className="w-full h-full object-cover" />
                             <button
                               onClick={() => handleRemoveNewPhoto(index)}
@@ -12874,7 +12606,7 @@ export function HostListingsPage({ onNavigate }: HostListingsPageProps) {
                       </div>
                     </div>
                   )}
-                  <p className="text-xs text-gray-400 mt-2">Formats : JPG, PNG. Max : 5MB par photo.</p>
+                  <p className="text-xs text-[#5b6b7a] mt-2">Formats : JPG, PNG. Max : 5MB par photo.</p>
                 </div>
               </div>
 
@@ -12885,20 +12617,20 @@ export function HostListingsPage({ onNavigate }: HostListingsPageProps) {
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Titre *</label>
+                    <label className="block text-sm font-medium text-[#1c3b56] mb-1">Titre *</label>
                     <input 
                       type="text" 
                       value={editFormData.title} 
                       onChange={(e) => setEditFormData(prev => ({ ...prev, title: e.target.value }))} 
-                      className="w-full rounded-xl border border-gray-200 px-4 py-3 focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent" 
+                      className="w-full rounded-xl border border-[#e2f5f2] px-4 py-3 focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent" 
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Type de propriété *</label>
+                    <label className="block text-sm font-medium text-[#1c3b56] mb-1">Type de propriété *</label>
                     <select 
                       value={editFormData.property_type} 
                       onChange={(e) => setEditFormData(prev => ({ ...prev, property_type: e.target.value }))} 
-                      className="w-full rounded-xl border border-gray-200 px-4 py-3 focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent"
+                      className="w-full rounded-xl border border-[#e2f5f2] px-4 py-3 focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent"
                     >
                       <option value="appartement">Appartement</option>
                       <option value="chambre_habitant">Chambre chez l'habitant</option>
@@ -12915,41 +12647,41 @@ export function HostListingsPage({ onNavigate }: HostListingsPageProps) {
                 </div>
 
                 <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+                  <label className="block text-sm font-medium text-[#1c3b56] mb-1">Description *</label>
                   <textarea 
                     value={editFormData.description} 
                     onChange={(e) => setEditFormData(prev => ({ ...prev, description: e.target.value }))} 
                     rows={4} 
-                    className="w-full rounded-xl border border-gray-200 px-4 py-3 focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent" 
+                    className="w-full rounded-xl border border-[#e2f5f2] px-4 py-3 focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent" 
                   />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Ville *</label>
+                    <label className="block text-sm font-medium text-[#1c3b56] mb-1">Ville *</label>
                     <input 
                       type="text" 
                       value={editFormData.city} 
                       onChange={(e) => setEditFormData(prev => ({ ...prev, city: e.target.value }))} 
-                      className="w-full rounded-xl border border-gray-200 px-4 py-3 focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent" 
+                      className="w-full rounded-xl border border-[#e2f5f2] px-4 py-3 focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent" 
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Quartier *</label>
+                    <label className="block text-sm font-medium text-[#1c3b56] mb-1">Quartier *</label>
                     <input 
                       type="text" 
                       value={editFormData.district} 
                       onChange={(e) => setEditFormData(prev => ({ ...prev, district: e.target.value }))} 
-                      className="w-full rounded-xl border border-gray-200 px-4 py-3 focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent" 
+                      className="w-full rounded-xl border border-[#e2f5f2] px-4 py-3 focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent" 
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Adresse</label>
+                    <label className="block text-sm font-medium text-[#1c3b56] mb-1">Adresse</label>
                     <input 
                       type="text" 
                       value={editFormData.address} 
                       onChange={(e) => setEditFormData(prev => ({ ...prev, address: e.target.value }))} 
-                      className="w-full rounded-xl border border-gray-200 px-4 py-3 focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent" 
+                      className="w-full rounded-xl border border-[#e2f5f2] px-4 py-3 focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent" 
                     />
                   </div>
                 </div>
@@ -12966,67 +12698,67 @@ export function HostListingsPage({ onNavigate }: HostListingsPageProps) {
                 </h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Chambres</label>
+                    <label className="block text-sm font-medium text-[#1c3b56] mb-1">Chambres</label>
                     <input 
                       type="number" 
                       min={0} 
                       value={editFormData.bedrooms} 
                       onChange={(e) => setEditFormData(prev => ({ ...prev, bedrooms: parseInt(e.target.value) || 0 }))} 
-                      className="w-full rounded-xl border border-gray-200 px-4 py-3 focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent" 
+                      className="w-full rounded-xl border border-[#e2f5f2] px-4 py-3 focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent" 
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Lits</label>
+                    <label className="block text-sm font-medium text-[#1c3b56] mb-1">Lits</label>
                     <input 
                       type="number" 
                       min={1} 
                       value={editFormData.beds} 
                       onChange={(e) => setEditFormData(prev => ({ ...prev, beds: parseInt(e.target.value) || 1 }))} 
-                      className="w-full rounded-xl border border-gray-200 px-4 py-3 focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent" 
+                      className="w-full rounded-xl border border-[#e2f5f2] px-4 py-3 focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent" 
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Salles de bain</label>
+                    <label className="block text-sm font-medium text-[#1c3b56] mb-1">Salles de bain</label>
                     <input 
                       type="number" 
                       min={1} 
                       value={editFormData.bathrooms} 
                       onChange={(e) => setEditFormData(prev => ({ ...prev, bathrooms: parseInt(e.target.value) || 1 }))} 
-                      className="w-full rounded-xl border border-gray-200 px-4 py-3 focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent" 
+                      className="w-full rounded-xl border border-[#e2f5f2] px-4 py-3 focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent" 
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Capacité max</label>
+                    <label className="block text-sm font-medium text-[#1c3b56] mb-1">Capacité max</label>
                     <input 
                       type="number" 
                       min={1} 
                       value={editFormData.max_guests} 
                       onChange={(e) => setEditFormData(prev => ({ ...prev, max_guests: parseInt(e.target.value) || 1 }))} 
-                      className="w-full rounded-xl border border-gray-200 px-4 py-3 focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent" 
+                      className="w-full rounded-xl border border-[#e2f5f2] px-4 py-3 focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent" 
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Prix par nuit (FCFA)</label>
+                    <label className="block text-sm font-medium text-[#1c3b56] mb-1">Prix par nuit (FCFA)</label>
                     <input 
                       type="number" 
                       min={0} 
                       value={editFormData.price_per_night} 
                       onChange={(e) => setEditFormData(prev => ({ ...prev, price_per_night: parseInt(e.target.value) || 0 }))} 
-                      className="w-full rounded-xl border border-gray-200 px-4 py-3 focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent" 
+                      className="w-full rounded-xl border border-[#e2f5f2] px-4 py-3 focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent" 
                     />
-                    <p className="text-xs text-gray-500 mt-1">≈ {convertToEuro(editFormData.price_per_night).toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €</p>
+                    <p className="text-xs text-[#5b6b7a] mt-1">≈ {convertToEuro(editFormData.price_per_night).toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Séjour minimum (nuits)</label>
+                    <label className="block text-sm font-medium text-[#1c3b56] mb-1">Séjour minimum (nuits)</label>
                     <input 
                       type="number" 
                       min={1} 
                       value={editFormData.min_stay} 
                       onChange={(e) => setEditFormData(prev => ({ ...prev, min_stay: parseInt(e.target.value) || 1 }))} 
-                      className="w-full rounded-xl border border-gray-200 px-4 py-3 focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent" 
+                      className="w-full rounded-xl border border-[#e2f5f2] px-4 py-3 focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent" 
                     />
                   </div>
                 </div>
@@ -13314,8 +13046,8 @@ export function HostListingsPage({ onNavigate }: HostListingsPageProps) {
             </div>
 
             <div className="sticky bottom-0 bg-white border-t px-6 py-4 flex justify-end gap-3">
-              <button onClick={() => setShowEditModal(false)} className="px-6 py-2 rounded-xl border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition">Annuler</button>
-              <button onClick={handleSaveEdit} disabled={updateMutation.isPending || uploadingPhotos} className="px-6 py-2 rounded-xl bg-[#00c9a7] text-white font-medium hover:bg-[#00b892] transition disabled:opacity-50">
+              <button onClick={() => setShowEditModal(false)} className="px-6 py-2 rounded-xl border border-[#c9f0e8] text-[#1c3b56] font-medium hover:bg-[#f4fffe] transition">Annuler</button>
+              <button onClick={handleSaveEdit} disabled={updateMutation.isPending || uploadingPhotos} className="px-6 py-2 rounded-xl bg-[#00c9a7] text-white font-medium hover:bg-[#00b396] transition disabled:opacity-50">
                 {uploadingPhotos || updateMutation.isPending ? 'Enregistrement...' : 'Enregistrer'}
               </button>
             </div>
@@ -13330,14 +13062,14 @@ export function HostListingsPage({ onNavigate }: HostListingsPageProps) {
             <div className="p-6 text-center">
               <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4"><AlertCircle className="w-8 h-8 text-red-600" /></div>
               <h3 className="text-xl font-semibold text-[#0F2940] mb-2">Supprimer cette photo ?</h3>
-              <p className="text-gray-500 text-sm">Cette action est irréversible.</p>
-              <div className="mt-3 rounded-lg overflow-hidden border border-gray-200">
+              <p className="text-[#5b6b7a] text-sm">Cette action est irréversible.</p>
+              <div className="mt-3 rounded-lg overflow-hidden border border-[#e2f5f2]">
                 <img src={photoDeleteConfirmation.photoUrl} alt="Photo à supprimer" className="w-full h-32 object-cover" />
               </div>
             </div>
-            <div className="flex border-t border-gray-100">
-              <button onClick={() => setPhotoDeleteConfirmation({ show: false, propertyId: null, photoId: null, photoUrl: '' })} className="flex-1 py-3 text-gray-600 font-medium hover:bg-gray-50 transition-colors">Annuler</button>
-              <button onClick={handleDeletePhoto} className="flex-1 py-3 text-red-600 font-medium border-l border-gray-100 hover:bg-red-50 transition-colors">Supprimer</button>
+            <div className="flex border-t border-[#e2f5f2]">
+              <button onClick={() => setPhotoDeleteConfirmation({ show: false, propertyId: null, photoId: null, photoUrl: '' })} className="flex-1 py-3 text-[#5b6b7a] font-medium hover:bg-[#f4fffe] transition-colors">Annuler</button>
+              <button onClick={handleDeletePhoto} className="flex-1 py-3 text-red-600 font-medium border-l border-[#e2f5f2] hover:bg-red-50 transition-colors">Supprimer</button>
             </div>
           </div>
         </div>
@@ -13350,12 +13082,12 @@ export function HostListingsPage({ onNavigate }: HostListingsPageProps) {
             <div className="p-6 text-center">
               <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4"><AlertCircle className="w-8 h-8 text-red-600" /></div>
               <h3 className="text-xl font-semibold text-[#0F2940] mb-2">Confirmer la suppression</h3>
-              <p className="text-gray-500 text-sm">Êtes-vous sûr de vouloir supprimer le logement <br /><span className="font-semibold text-[#0F2940]">"{deleteConfirmation.propertyTitle}"</span> ?</p>
+              <p className="text-[#5b6b7a] text-sm">Êtes-vous sûr de vouloir supprimer le logement <br /><span className="font-semibold text-[#0F2940]">"{deleteConfirmation.propertyTitle}"</span> ?</p>
               <p className="text-xs text-red-500 mt-2">Cette action est irréversible.</p>
             </div>
-            <div className="flex border-t border-gray-100">
-              <button onClick={() => setDeleteConfirmation({ show: false, propertyId: null, propertyTitle: '' })} className="flex-1 py-3 text-gray-600 font-medium hover:bg-gray-50 transition-colors">Annuler</button>
-              <button onClick={handleDelete} className="flex-1 py-3 text-red-600 font-medium border-l border-gray-100 hover:bg-red-50 transition-colors">Supprimer</button>
+            <div className="flex border-t border-[#e2f5f2]">
+              <button onClick={() => setDeleteConfirmation({ show: false, propertyId: null, propertyTitle: '' })} className="flex-1 py-3 text-[#5b6b7a] font-medium hover:bg-[#f4fffe] transition-colors">Annuler</button>
+              <button onClick={handleDelete} className="flex-1 py-3 text-red-600 font-medium border-l border-[#e2f5f2] hover:bg-red-50 transition-colors">Supprimer</button>
             </div>
           </div>
         </div>
@@ -13366,14 +13098,14 @@ export function HostListingsPage({ onNavigate }: HostListingsPageProps) {
         <div className="fixed inset-0 z-[9999] bg-black/50 backdrop-blur-sm overflow-y-auto">
           <div className="min-h-screen flex items-center justify-center p-4">
             <div className="w-full max-w-[500px] rounded-2xl bg-white shadow-xl overflow-hidden border border-[#e2f5f2]">
-              <div className="relative bg-gradient-to-br from-[#f3fffc] to-white px-5 py-5 text-center">
-                <button onClick={handleSuccessClose} className="absolute top-3 right-3 rounded-full p-1.5 text-gray-400 hover:text-gray-600 transition"><X className="w-4 h-4" /></button>
-                <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#e6f9f3] border border-[#c7f1ea]"><CheckCircle className="w-7 h-7 text-[#00c9a7]" /></div>
+              <div className="relative bg-gradient-to-br from-[#f4fffe] to-white px-5 py-5 text-center">
+                <button onClick={handleSuccessClose} className="absolute top-3 right-3 rounded-full p-1.5 text-[#5b6b7a] hover:text-[#5b6b7a] transition"><X className="w-4 h-4" /></button>
+                <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#e8faf6] border border-[#c9f0e8]"><CheckCircle className="w-7 h-7 text-[#00c9a7]" /></div>
                 <h2 className="text-lg font-semibold text-[#0F2940]">Votre bien est entre de bonnes mains.</h2>
-                <p className="mx-auto mt-2 max-w-md text-xs text-gray-500">Merci pour votre confiance. Nous avons bien reçu votre demande.</p>
+                <p className="mx-auto mt-2 max-w-md text-xs text-[#5b6b7a]">Merci pour votre confiance. Nous avons bien reçu votre demande.</p>
               </div>
               <div className="px-5 pb-5">
-                <div className="mb-4 flex items-center justify-center gap-2 rounded-xl border border-[#c7f1ea] bg-[#f4fffe] px-3 py-2"><Clock className="w-3.5 h-3.5 text-[#00c9a7]" /><span className="text-xs font-medium text-[#0F2940]">Notre équipe vous contacte sous 24h</span></div>
+                <div className="mb-4 flex items-center justify-center gap-2 rounded-xl border border-[#c9f0e8] bg-[#f4fffe] px-3 py-2"><Clock className="w-3.5 h-3.5 text-[#00c9a7]" /><span className="text-xs font-medium text-[#0F2940]">Notre équipe vous contacte sous 24h</span></div>
                 <button onClick={handleSuccessClose} className="w-full bg-[#0F2940] text-white py-3 rounded-xl font-medium hover:bg-[#1a3a5c] transition">OK, j'ai compris</button>
               </div>
             </div>
@@ -13597,7 +13329,7 @@ export function HostCalendarPage({ onNavigate, id }: { onNavigate?: (route: Rout
   if (!propertyId) {
     return (
       <div className="min-h-screen bg-[#f4fffe] py-10 text-center">
-        <p className="text-gray-500">Sélectionnez d'abord une propriété.</p>
+        <p className="text-[#5b6b7a]">Sélectionnez d'abord une propriété.</p>
         <button onClick={() => onNavigate?.({ name: 'host-annonces' })} className="mt-4 bg-[#00c9a7] px-4 py-2 rounded-full">
           Voir mes annonces
         </button>
@@ -13609,7 +13341,7 @@ export function HostCalendarPage({ onNavigate, id }: { onNavigate?: (route: Rout
     return (
       <div className="min-h-screen bg-[#f4fffe] py-10 text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00c9a7] mx-auto"></div>
-        <p className="mt-4 text-gray-500">Chargement du calendrier...</p>
+        <p className="mt-4 text-[#5b6b7a]">Chargement du calendrier...</p>
       </div>
     );
   }
@@ -13623,7 +13355,7 @@ export function HostCalendarPage({ onNavigate, id }: { onNavigate?: (route: Rout
         {toastMessage && (
           <div className={`fixed top-20 right-4 z-50 p-4 rounded-xl shadow-lg max-w-md ${
             toastMessage.type === 'success' ? 'bg-green-500 text-white' : 
-            toastMessage.type === 'error' ? 'bg-red-500 text-white' : 'bg-blue-500 text-white'
+            toastMessage.type === 'error' ? 'bg-red-500 text-white' : 'bg-[#00c9a7] text-white'
           }`}>
             {toastMessage.message}
           </div>
@@ -13642,7 +13374,7 @@ export function HostCalendarPage({ onNavigate, id }: { onNavigate?: (route: Rout
             ) : (
               <button
                 onClick={() => setShowBlockModal(true)}
-                className="px-4 py-2 bg-orange-500 text-white rounded-lg text-sm font-medium hover:bg-orange-600 transition"
+                className="px-4 py-2 bg-[#ffc93c] text-white rounded-lg text-sm font-medium hover:bg-[#e0ac1f] transition"
               >
                 🚫 Bloquer une plage de dates
               </button>
@@ -13652,15 +13384,15 @@ export function HostCalendarPage({ onNavigate, id }: { onNavigate?: (route: Rout
                 refetch();
                 showToast('info', '🔄 Calendrier actualisé');
               }}
-              className="px-4 py-2 bg-gray-500 text-white rounded-lg text-sm font-medium hover:bg-gray-600 transition"
+              className="px-4 py-2 bg-[#5b6b7a] text-white rounded-lg text-sm font-medium hover:bg-[#5b6b7a] transition"
             >
               🔄 Rafraîchir
             </button>
           </div>
 
           {selectedRange.start !== null && selectedRange.end === null && (
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-4 text-center">
-              <p className="text-sm text-blue-700">
+            <div className="bg-[#f4fffe] border border-[#c9f0e8] rounded-xl p-3 mb-4 text-center">
+              <p className="text-sm text-[#0f2940]">
                 📌 Date de début sélectionnée: <strong>{selectedRange.start}</strong>
                 <br />
                 Cliquez sur une date de fin pour bloquer la plage.
@@ -13672,7 +13404,7 @@ export function HostCalendarPage({ onNavigate, id }: { onNavigate?: (route: Rout
             <div className="flex justify-between items-center mb-6">
               <button 
                 onClick={() => setCurrentDate(new Date(year, month - 2, 1))} 
-                className="p-2 rounded-full hover:bg-gray-100 transition"
+                className="p-2 rounded-full hover:bg-[#e8faf6] transition"
                 disabled={isUpdating}
               >
                 <ChevronLeft className="w-5 h-5" />
@@ -13680,14 +13412,14 @@ export function HostCalendarPage({ onNavigate, id }: { onNavigate?: (route: Rout
               <h2 className="text-xl font-semibold">{currentDate.toLocaleString('fr', { month: 'long', year: 'numeric' })}</h2>
               <button 
                 onClick={() => setCurrentDate(new Date(year, month, 1))} 
-                className="p-2 rounded-full hover:bg-gray-100 transition"
+                className="p-2 rounded-full hover:bg-[#e8faf6] transition"
                 disabled={isUpdating}
               >
                 <ChevronRight className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="grid grid-cols-7 gap-1 text-center font-semibold text-gray-500 mb-2">
+            <div className="grid grid-cols-7 gap-1 text-center font-semibold text-[#5b6b7a] mb-2">
               {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map(d => <div key={d} className="py-2">{d}</div>)}
             </div>
 
@@ -13707,8 +13439,8 @@ export function HostCalendarPage({ onNavigate, id }: { onNavigate?: (route: Rout
                   cursor = 'cursor-not-allowed';
                   hoverEffect = '';
                 } else if (dayStatus === 'blocked') {
-                  bgColor = 'bg-orange-100 text-orange-700';
-                  hoverEffect = 'hover:bg-orange-200 hover:scale-105';
+                  bgColor = 'bg-[#fff3cd] text-[#6b4e06]';
+                  hoverEffect = 'hover:bg-[#ffe9a8] hover:scale-105';
                 } else {
                   bgColor = 'bg-green-50 text-green-700';
                   hoverEffect = 'hover:bg-green-100 hover:scale-105';
@@ -13718,7 +13450,7 @@ export function HostCalendarPage({ onNavigate, id }: { onNavigate?: (route: Rout
                   bgColor = 'ring-2 ring-[#00c9a7] shadow-lg bg-[#00c9a7]/10';
                 }
                 if (isInRange) {
-                  bgColor = 'bg-blue-100';
+                  bgColor = 'bg-[#e8faf6]';
                 }
                 
                 // ✅ Afficher les dates passées comme réservées
@@ -13749,9 +13481,9 @@ export function HostCalendarPage({ onNavigate, id }: { onNavigate?: (route: Rout
 
 
             {(updateAvailabilityMutation.isPending || specialPriceMutation.isPending || isUpdating) && (
-              <div className="mt-4 text-center text-sm text-gray-500">
+              <div className="mt-4 text-center text-sm text-[#5b6b7a]">
                 <div className="inline-flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-[#5b6b7a] border-t-transparent rounded-full animate-spin" />
                   Mise à jour en cours...
                 </div>
               </div>
@@ -13767,46 +13499,46 @@ export function HostCalendarPage({ onNavigate, id }: { onNavigate?: (route: Rout
             <h3 className="text-xl font-semibold text-[#0F2940] mb-4">🚫 Bloquer une plage de dates</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Date de début</label>
+                <label className="block text-sm font-medium text-[#1c3b56] mb-1">Date de début</label>
                 <input
                   type="date"
                   value={blockRange.start}
                   onChange={(e) => setBlockRange({ ...blockRange, start: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent"
+                  className="w-full px-4 py-2 border border-[#e2f5f2] rounded-xl focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent"
                   min={new Date().toISOString().split('T')[0]}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Date de fin</label>
+                <label className="block text-sm font-medium text-[#1c3b56] mb-1">Date de fin</label>
                 <input
                   type="date"
                   value={blockRange.end}
                   onChange={(e) => setBlockRange({ ...blockRange, end: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent"
+                  className="w-full px-4 py-2 border border-[#e2f5f2] rounded-xl focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent"
                   min={blockRange.start || new Date().toISOString().split('T')[0]}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Raison (optionnel)</label>
+                <label className="block text-sm font-medium text-[#1c3b56] mb-1">Raison (optionnel)</label>
                 <input
                   type="text"
                   value={blockRange.reason}
                   onChange={(e) => setBlockRange({ ...blockRange, reason: e.target.value })}
                   placeholder="Travaux, indisponibilité, etc."
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent"
+                  className="w-full px-4 py-2 border border-[#e2f5f2] rounded-xl focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent"
                 />
               </div>
               <div className="flex gap-3 pt-4">
                 <button
                   onClick={() => setShowBlockModal(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition"
+                  className="flex-1 px-4 py-2 border border-[#c9f0e8] rounded-xl text-[#1c3b56] hover:bg-[#f4fffe] transition"
                 >
                   Annuler
                 </button>
                 <button
                   onClick={handleBlockRangeSubmit}
                   disabled={updateAvailabilityMutation.isPending}
-                  className="flex-1 px-4 py-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition disabled:opacity-50"
+                  className="flex-1 px-4 py-2 bg-[#ffc93c] text-white rounded-xl hover:bg-[#e0ac1f] transition disabled:opacity-50"
                 >
                   {updateAvailabilityMutation.isPending ? 'Blocage...' : 'Bloquer'}
                 </button>
@@ -13827,21 +13559,21 @@ export function HostCalendarPage({ onNavigate, id }: { onNavigate?: (route: Rout
               <h3 className="text-xl font-semibold text-[#0F2940]">Débloquer la date</h3>
             </div>
             
-            <p className="text-gray-600 mb-4">
+            <p className="text-[#5b6b7a] mb-4">
               Êtes-vous sûr de vouloir débloquer le <strong className="text-[#0F2940]">{unblockDate}</strong> ?
               <br />
-              <span className="text-sm text-gray-400">Cette date redeviendra disponible pour les réservations.</span>
+              <span className="text-sm text-[#5b6b7a]">Cette date redeviendra disponible pour les réservations.</span>
             </p>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Raison du déblocage (optionnel)</label>
+                <label className="block text-sm font-medium text-[#1c3b56] mb-1">Raison du déblocage (optionnel)</label>
                 <input
                   type="text"
                   value={unblockReason}
                   onChange={(e) => setUnblockReason(e.target.value)}
                   placeholder="Indisponibilité terminée, etc."
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent"
+                  className="w-full px-4 py-2 border border-[#e2f5f2] rounded-xl focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent"
                 />
               </div>
               
@@ -13852,7 +13584,7 @@ export function HostCalendarPage({ onNavigate, id }: { onNavigate?: (route: Rout
                     setUnblockDate(null);
                     setUnblockReason('');
                   }}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition"
+                  className="flex-1 px-4 py-2 border border-[#c9f0e8] rounded-xl text-[#1c3b56] hover:bg-[#f4fffe] transition"
                 >
                   Annuler
                 </button>
@@ -13954,12 +13686,12 @@ export function HostReservationsPage({ onNavigate }: HostReservationsPageProps) 
     // ✅ Fonction pour obtenir la couleur du statut
     const getStatusColor = (status: string): string => {
         const colorMap: Record<string, string> = {
-            'pending': 'bg-yellow-100 text-yellow-800',
+            'pending': 'bg-[#fff3cd] text-[#4a3400]',
             'confirmed': 'bg-green-100 text-green-800',
             'cancelled': 'bg-red-100 text-red-800',
-            'completed': 'bg-blue-100 text-blue-800',
+            'completed': 'bg-[#e8faf6] text-[#0f2940]',
         };
-        return colorMap[status] || 'bg-gray-100 text-gray-800';
+        return colorMap[status] || 'bg-[#e8faf6] text-[#0f2940]';
     };
 
     if (isLoading) {
@@ -13968,7 +13700,7 @@ export function HostReservationsPage({ onNavigate }: HostReservationsPageProps) 
                 <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center py-20">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00c9a7] mx-auto"></div>
-                        <p className="mt-4 text-gray-500">Chargement des réservations...</p>
+                        <p className="mt-4 text-[#5b6b7a]">Chargement des réservations...</p>
                     </div>
                 </div>
             </div>
@@ -14005,7 +13737,7 @@ export function HostReservationsPage({ onNavigate }: HostReservationsPageProps) 
                             <h3 className="text-xl font-semibold text-[#0f2940] mb-2">
                                 Aucune réservation
                             </h3>
-                            <p className="text-gray-500">
+                            <p className="text-[#5b6b7a]">
                                 Vous n'avez pas encore reçu de réservation.
                             </p>
                         </div>
@@ -14020,7 +13752,7 @@ export function HostReservationsPage({ onNavigate }: HostReservationsPageProps) 
                                         {/* Informations réservation */}
                                         <div className="flex-1">
                                             <div className="flex items-center gap-2 mb-2 flex-wrap">
-                                                <span className="text-xs font-mono bg-gray-200 px-2 py-1 rounded">
+                                                <span className="text-xs font-mono bg-[#e2f5f2] px-2 py-1 rounded">
                                                     #{booking.reference || booking.id}
                                                 </span>
                                                 <span className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(booking.status)}`}>
@@ -14030,7 +13762,7 @@ export function HostReservationsPage({ onNavigate }: HostReservationsPageProps) 
                                                     <span className={`text-xs px-2 py-1 rounded-full font-medium ${
                                                         booking.payment_status === 'paid' 
                                                             ? 'bg-green-100 text-green-800' 
-                                                            : 'bg-yellow-100 text-yellow-800'
+                                                            : 'bg-[#fff3cd] text-[#4a3400]'
                                                     }`}>
                                                         {booking.payment_status === 'paid' ? 'Payé' : 'En attente de paiement'}
                                                     </span>
@@ -14041,7 +13773,7 @@ export function HostReservationsPage({ onNavigate }: HostReservationsPageProps) 
                                                 {booking.property?.title || 'Propriété'}
                                             </h3>
                                             
-                                            <p className="text-sm text-[#6b7280] mt-1">
+                                            <p className="text-sm text-[#5b6b7a] mt-1">
                                                 {booking.property?.district}, {booking.property?.city}
                                             </p>
                                             
@@ -14056,30 +13788,30 @@ export function HostReservationsPage({ onNavigate }: HostReservationsPageProps) 
                                                         />
                                                     )}
                                                     <p className="text-sm">
-                                                        <span className="text-gray-500">👤 Voyageur:</span>{' '}
+                                                        <span className="text-[#5b6b7a]">👤 Voyageur:</span>{' '}
                                                         <span className="font-medium">{booking.guest?.name || 'Non renseigné'}</span>
                                                     </p>
                                                 </div>
                                                 
                                                 {booking.guest?.phone && (
                                                     <p className="text-sm">
-                                                        <span className="text-gray-500">📞 Téléphone:</span>{' '}
+                                                        <span className="text-[#5b6b7a]">📞 Téléphone:</span>{' '}
                                                         <span className="font-medium">{booking.guest.phone}</span>
                                                     </p>
                                                 )}
                                                 
                                                 <p className="text-sm">
-                                                    <span className="text-gray-500">👥 Nombre de voyageurs:</span>{' '}
+                                                    <span className="text-[#5b6b7a]">👥 Nombre de voyageurs:</span>{' '}
                                                     <span className="font-medium">{booking.guests_count || 1}</span>
                                                 </p>
                                                 
                                                 <p className="text-sm">
-                                                    <span className="text-gray-500">🌙 Nuits:</span>{' '}
+                                                    <span className="text-[#5b6b7a]">🌙 Nuits:</span>{' '}
                                                     <span className="font-medium">{booking.dates?.nights || 0}</span>
                                                 </p>
                                                 
                                                 <p className="text-sm">
-                                                    <span className="text-gray-500">📅 Dates:</span>{' '}
+                                                    <span className="text-[#5b6b7a]">📅 Dates:</span>{' '}
                                                     <span className="font-medium">
                                                         {booking.dates?.check_in || '--'} → {booking.dates?.check_out || '--'}
                                                     </span>
@@ -14090,17 +13822,17 @@ export function HostReservationsPage({ onNavigate }: HostReservationsPageProps) 
                                         {/* Montant et actions */}
                                         <div className="text-left lg:text-right">
                                             <div className="mb-3">
-                                                <div className="text-sm text-gray-500">Sous-total</div>
+                                                <div className="text-sm text-[#5b6b7a]">Sous-total</div>
                                                 <div className="font-medium">{formatAmount(booking.amount?.subtotal)}</div>
-                                                <div className="text-sm text-gray-500 mt-1">Frais de service</div>
+                                                <div className="text-sm text-[#5b6b7a] mt-1">Frais de service</div>
                                                 <div className="font-medium">{formatAmount(booking.amount?.service_fee)}</div>
                                                 {booking.amount?.cleaning_fee && parseFloat(booking.amount.cleaning_fee.replace(/\s/g, '')) > 0 && (
                                                     <>
-                                                        <div className="text-sm text-gray-500 mt-1">Frais de ménage</div>
+                                                        <div className="text-sm text-[#5b6b7a] mt-1">Frais de ménage</div>
                                                         <div className="font-medium">{formatAmount(booking.amount?.cleaning_fee)}</div>
                                                     </>
                                                 )}
-                                                <div className="border-t border-gray-200 mt-2 pt-2">
+                                                <div className="border-t border-[#e2f5f2] mt-2 pt-2">
                                                     <div className="text-lg font-bold text-[#00c9a7]">
                                                         {formatAmount(booking.amount?.total)}
                                                     </div>
@@ -14213,7 +13945,7 @@ const HostChatView = ({
 
   if (!conversation) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center text-gray-400 p-4">
+      <div className="flex-1 flex flex-col items-center justify-center text-[#5b6b7a] p-4">
         <MessageCircle className="w-16 h-16 mb-4 opacity-50" />
         <p className="text-lg font-medium text-center">Sélectionnez une conversation</p>
         <p className="text-sm text-center">Les messages des voyageurs apparaissent ici</p>
@@ -14261,17 +13993,17 @@ const HostChatView = ({
           {onBack && (
             <button 
               onClick={onBack}
-              className="lg:hidden p-2 -ml-2 rounded-full hover:bg-gray-100 transition"
+              className="lg:hidden p-2 -ml-2 rounded-full hover:bg-[#e8faf6] transition"
             >
-              <ArrowLeft className="w-5 h-5 text-gray-600" />
+              <ArrowLeft className="w-5 h-5 text-[#5b6b7a]" />
             </button>
           )}
           <div className="w-10 h-10 rounded-full bg-[#00c9a7] flex items-center justify-center text-white font-bold flex-shrink-0 text-sm">
             {displayName.charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-gray-900 truncate">{displayName}</p>
-            <div className="flex items-center gap-1 text-xs text-gray-500 truncate">
+            <p className="font-semibold text-[#0f2940] truncate">{displayName}</p>
+            <div className="flex items-center gap-1 text-xs text-[#5b6b7a] truncate">
               {isInquiry ? (
                 <>
                   <Sparkles className="w-3 h-3 flex-shrink-0 text-[#00c9a7]" />
@@ -14284,16 +14016,16 @@ const HostChatView = ({
             </div>
           </div>
           {conversation?.guest?.phone && (
-            <a href={`tel:${conversation.guest.phone}`} className="p-2 rounded-full hover:bg-gray-100 transition flex-shrink-0">
-              <Phone className="w-4 h-4 text-gray-500" />
+            <a href={`tel:${conversation.guest.phone}`} className="p-2 rounded-full hover:bg-[#e8faf6] transition flex-shrink-0">
+              <Phone className="w-4 h-4 text-[#5b6b7a]" />
             </a>
           )}
         </div>
         
         {/* ✅ Détails de la réservation */}
         {(checkIn || checkOut || guests || totalPrice) && (
-          <div className="mt-2 p-2 bg-gray-50 rounded-lg border border-gray-100">
-            <div className="flex flex-wrap items-center gap-3 text-xs text-gray-600">
+          <div className="mt-2 p-2 bg-[#f4fffe] rounded-lg border border-[#e2f5f2]">
+            <div className="flex flex-wrap items-center gap-3 text-xs text-[#5b6b7a]">
               {checkIn && checkOut && (
                 <span className="flex items-center gap-1">
                   <Calendar className="w-3 h-3 text-[#00c9a7]" />
@@ -14318,14 +14050,14 @@ const HostChatView = ({
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 bg-gray-50">
+      <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 bg-[#f4fffe]">
         {messagesLoading ? (
           <div className="text-center py-10">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00c9a7] mx-auto"></div>
-            <p className="text-gray-500 mt-2 text-sm">Chargement des messages...</p>
+            <p className="text-[#5b6b7a] mt-2 text-sm">Chargement des messages...</p>
           </div>
         ) : messages.length === 0 ? (
-          <div className="text-center py-10 text-gray-400">
+          <div className="text-center py-10 text-[#5b6b7a]">
             <MessageCircle className="w-12 h-12 mx-auto mb-2 opacity-50" />
             <p className="text-sm">Aucun message</p>
             <p className="text-xs mt-1">Soyez le premier à répondre !</p>
@@ -14345,13 +14077,13 @@ const HostChatView = ({
             return (
               <div key={msg.id || index} className={`flex ${isFromMe ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[85%] sm:max-w-[70%] rounded-2xl p-3 ${
-                  isFromMe ? 'bg-[#00c9a7] text-white' : 'bg-white text-gray-800 shadow-sm'
+                  isFromMe ? 'bg-[#00c9a7] text-white' : 'bg-white text-[#0f2940] shadow-sm'
                 }`}>
                   {!isFromMe && (
                     <p className="text-xs font-semibold text-[#00c9a7] mb-1">{senderName}</p>
                   )}
                   <p className="text-sm sm:text-base whitespace-pre-wrap break-words">{msg.message}</p>
-                  <p className={`text-xs mt-1 ${isFromMe ? 'text-white/70' : 'text-gray-400'}`}>
+                  <p className={`text-xs mt-1 ${isFromMe ? 'text-white/70' : 'text-[#5b6b7a]'}`}>
                     {messageTime(msg.created_at)}
                   </p>
                 </div>
@@ -14383,7 +14115,7 @@ const HostChatView = ({
           <button
             onClick={handleSend}
             disabled={!messageInput.trim() || isSending}
-            className="bg-[#00c9a7] text-white rounded-full p-2.5 sm:p-3 disabled:opacity-50 hover:bg-[#00b89a] transition flex-shrink-0"
+            className="bg-[#00c9a7] text-white rounded-full p-2.5 sm:p-3 disabled:opacity-50 hover:bg-[#00b396] transition flex-shrink-0"
           >
             {isSending ? (
               <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white" />
@@ -14524,7 +14256,7 @@ export function HostMessagesPage({ onNavigate, id }: HostMessagesPageProps) {
             <span className="hidden sm:inline">Messagerie Hôte</span>
             <span className="sm:hidden">Messages</span>
           </h1>
-          <button onClick={() => onNavigate?.({ name: 'host-dashboard' })} className="text-sm text-gray-500 hover:text-[#00c9a7] transition">
+          <button onClick={() => onNavigate?.({ name: 'host-dashboard' })} className="text-sm text-[#5b6b7a] hover:text-[#00c9a7] transition">
             ← Retour
           </button>
         </div>
@@ -14542,9 +14274,9 @@ export function HostMessagesPage({ onNavigate, id }: HostMessagesPageProps) {
             {mobileMenuOpen && (
               <button 
                 onClick={() => setMobileMenuOpen(false)}
-                className="lg:hidden absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100"
+                className="lg:hidden absolute top-4 right-4 p-2 rounded-full hover:bg-[#e8faf6]"
               >
-                <X className="w-5 h-5 text-gray-600" />
+                <X className="w-5 h-5 text-[#5b6b7a]" />
               </button>
             )}
             
@@ -14561,7 +14293,7 @@ export function HostMessagesPage({ onNavigate, id }: HostMessagesPageProps) {
             
             <div className="divide-y max-h-[calc(100vh-200px)] overflow-y-auto">
               {conversations.length === 0 ? (
-                <div className="p-8 text-center text-gray-400">
+                <div className="p-8 text-center text-[#5b6b7a]">
                   <MessageCircle className="w-12 h-12 mx-auto mb-2 opacity-50" />
                   <p>Aucune conversation</p>
                 </div>
@@ -14587,7 +14319,7 @@ export function HostMessagesPage({ onNavigate, id }: HostMessagesPageProps) {
                       <div className="flex justify-between items-start">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <p className="font-medium text-gray-900 text-sm sm:text-base truncate">
+                            <p className="font-medium text-[#0f2940] text-sm sm:text-base truncate">
                               {guestName}
                             </p>
                             {conv.unread_count > 0 && (
@@ -14596,24 +14328,24 @@ export function HostMessagesPage({ onNavigate, id }: HostMessagesPageProps) {
                               </span>
                             )}
                           </div>
-                          <p className="text-xs sm:text-sm text-gray-500 truncate">{propertyTitle}</p>
+                          <p className="text-xs sm:text-sm text-[#5b6b7a] truncate">{propertyTitle}</p>
                           {isInquiry && (
                             <span className="text-[10px] text-[#00c9a7] mt-0.5 inline-block">✉️ Demande d'information</span>
                           )}
                           {conv.booking.check_in && conv.booking.check_out && (
-                            <p className="text-xs text-gray-400 mt-0.5">
+                            <p className="text-xs text-[#5b6b7a] mt-0.5">
                               📅 {conv.booking.check_in} → {conv.booking.check_out}
                             </p>
                           )}
                         </div>
                         {conv.last_message && (
-                          <span className="text-[10px] sm:text-xs text-gray-400 flex-shrink-0 ml-2">
+                          <span className="text-[10px] sm:text-xs text-[#5b6b7a] flex-shrink-0 ml-2">
                             {conv.last_message.sent_at}
                           </span>
                         )}
                       </div>
                       {conv.last_message && (
-                        <p className="text-xs text-gray-400 mt-2 truncate">
+                        <p className="text-xs text-[#5b6b7a] mt-2 truncate">
                           {conv.last_message.message}
                         </p>
                       )}
@@ -14628,9 +14360,9 @@ export function HostMessagesPage({ onNavigate, id }: HostMessagesPageProps) {
           <div className={`${selectedConversation ? 'flex' : 'hidden lg:flex'} lg:w-2/3 flex-col h-[calc(100dvh-13rem)] min-h-[420px] lg:h-[600px] relative`}>
             <button 
               onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden absolute top-3 left-3 z-10 p-2 rounded-full bg-white shadow-md hover:bg-gray-50"
+              className="lg:hidden absolute top-3 left-3 z-10 p-2 rounded-full bg-white shadow-md hover:bg-[#f4fffe]"
             >
-              <Menu className="w-5 h-5 text-gray-600" />
+              <Menu className="w-5 h-5 text-[#5b6b7a]" />
             </button>
 
             {selectedConversation && chatData ? (
@@ -14648,7 +14380,7 @@ export function HostMessagesPage({ onNavigate, id }: HostMessagesPageProps) {
                 bookingDetails={chatData.bookingDetails}
               />
             ) : (
-              <div className="flex-1 flex flex-col items-center justify-center text-gray-400 bg-[#f4fffe] rounded-b-2xl">
+              <div className="flex-1 flex flex-col items-center justify-center text-[#5b6b7a] bg-[#f4fffe] rounded-b-2xl">
                 <MessageCircle className="w-16 h-16 mb-4 opacity-50" />
                 <p className="text-lg font-medium">Sélectionnez une conversation</p>
                 <p className="text-sm">Pour commencer à discuter avec un voyageur</p>
@@ -14785,7 +14517,7 @@ export function HostFavoritesPage({ onNavigate }: HostFavoritesPageProps) {
                 <div className="max-w-[1200px] mx-auto px-4">
                     <div className="text-center py-20">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00c9a7] mx-auto"></div>
-                        <p className="text-gray-500 mt-4">Chargement des favoris...</p>
+                        <p className="text-[#5b6b7a] mt-4">Chargement des favoris...</p>
                     </div>
                 </div>
             </div>
@@ -14799,7 +14531,7 @@ export function HostFavoritesPage({ onNavigate }: HostFavoritesPageProps) {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                     <div>
                         <h1 className="text-3xl font-bold text-[#0f2940]">Favoris reçus</h1>
-                        <p className="text-gray-500 mt-1">
+                        <p className="text-[#5b6b7a] mt-1">
                             Voyageurs qui ont aimé vos propriétés
                         </p>
                     </div>
@@ -14819,28 +14551,28 @@ export function HostFavoritesPage({ onNavigate }: HostFavoritesPageProps) {
                             <Heart className="w-5 h-5 text-[#00c9a7]" />
                             <span className="text-2xl font-bold text-[#0f2940]">{stats.total_favorites || 0}</span>
                         </div>
-                        <p className="text-sm text-gray-500 mt-1">Total favoris</p>
+                        <p className="text-sm text-[#5b6b7a] mt-1">Total favoris</p>
                     </div>
                     <div className="bg-white rounded-2xl p-4 border border-[#e2f5f2] shadow-sm">
                         <div className="flex items-center justify-between">
                             <Users className="w-5 h-5 text-[#00c9a7]" />
                             <span className="text-2xl font-bold text-[#0f2940]">{stats.unique_travelers || 0}</span>
                         </div>
-                        <p className="text-sm text-gray-500 mt-1">Voyageurs uniques</p>
+                        <p className="text-sm text-[#5b6b7a] mt-1">Voyageurs uniques</p>
                     </div>
                     <div className="bg-white rounded-2xl p-4 border border-[#e2f5f2] shadow-sm">
                         <div className="flex items-center justify-between">
                             <Home className="w-5 h-5 text-[#00c9a7]" />
                             <span className="text-2xl font-bold text-[#0f2940]">{stats.total_properties_with_favorites || 0}</span>
                         </div>
-                        <p className="text-sm text-gray-500 mt-1">Propriétés avec favoris</p>
+                        <p className="text-sm text-[#5b6b7a] mt-1">Propriétés avec favoris</p>
                     </div>
                     <div className="bg-white rounded-2xl p-4 border border-[#e2f5f2] shadow-sm">
                         <div className="flex items-center justify-between">
                             <TrendingUp className="w-5 h-5 text-[#00c9a7]" />
                             <span className="text-2xl font-bold text-[#0f2940]">{stats.favorites_last_30_days || 0}</span>
                         </div>
-                        <p className="text-sm text-gray-500 mt-1">Derniers 30 jours</p>
+                        <p className="text-sm text-[#5b6b7a] mt-1">Derniers 30 jours</p>
                     </div>
                 </div>
 
@@ -14869,7 +14601,7 @@ export function HostFavoritesPage({ onNavigate }: HostFavoritesPageProps) {
                                                 )}
                                             </div>
                                         </div>
-                                        <span className="text-xs text-gray-500 mt-2">{day.day}</span>
+                                        <span className="text-xs text-[#5b6b7a] mt-2">{day.day}</span>
                                     </div>
                                 );
                             })}
@@ -14881,11 +14613,11 @@ export function HostFavoritesPage({ onNavigate }: HostFavoritesPageProps) {
                 <div className="space-y-6">
                     {properties.length === 0 ? (
                         <div className="bg-white rounded-3xl border border-[#e2f5f2] p-12 text-center shadow-sm">
-                            <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                            <Heart className="w-16 h-16 text-[#9fb3c4] mx-auto mb-4" />
                             <h3 className="text-xl font-semibold text-[#0f2940] mb-2">
                                 Aucun favori pour le moment
                             </h3>
-                            <p className="text-gray-500">
+                            <p className="text-[#5b6b7a]">
                                 Les voyageurs n'ont pas encore ajouté vos propriétés en favoris.
                             </p>
                         </div>
@@ -14903,7 +14635,7 @@ export function HostFavoritesPage({ onNavigate }: HostFavoritesPageProps) {
                                     >
                                         <div className="flex items-center gap-4">
                                             {/* Image de la propriété */}
-                                            <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                                            <div className="w-16 h-16 rounded-lg overflow-hidden bg-[#e8faf6] flex-shrink-0">
                                                 {imageUrl && imageUrl !== '/placeholder.jpg' ? (
                                                     <img 
                                                         src={imageUrl} 
@@ -14915,14 +14647,14 @@ export function HostFavoritesPage({ onNavigate }: HostFavoritesPageProps) {
                                                     />
                                                 ) : (
                                                     <div className="w-full h-full flex items-center justify-center">
-                                                        <Home className="w-8 h-8 text-gray-400" />
+                                                        <Home className="w-8 h-8 text-[#5b6b7a]" />
                                                     </div>
                                                 )}
                                             </div>
                                             
                                             <div className="flex-1">
                                                 <h3 className="font-semibold text-[#0f2940]">{property.title}</h3>
-                                                <p className="text-sm text-gray-500">
+                                                <p className="text-sm text-[#5b6b7a]">
                                                     📍 {property.district}, {property.city}
                                                 </p>
                                                 <div className="flex items-center gap-3 mt-1">
@@ -14937,14 +14669,14 @@ export function HostFavoritesPage({ onNavigate }: HostFavoritesPageProps) {
                                                             e.stopPropagation();
                                                             onNavigate?.({ name: 'listing', id: property.id.toString() });
                                                         }}
-                                                        className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1"
+                                                        className="text-xs text-[#00806b] hover:text-[#0f2940] flex items-center gap-1"
                                                     >
                                                         <Eye className="w-3 h-3" />
                                                         Voir l'annonce
                                                     </button>
                                                 </div>
                                             </div>
-                                            <div className="text-gray-400 text-lg">
+                                            <div className="text-[#5b6b7a] text-lg">
                                                 {isExpanded ? '▲' : '▼'}
                                             </div>
                                         </div>
@@ -14968,8 +14700,8 @@ export function HostFavoritesPage({ onNavigate }: HostFavoritesPageProps) {
                                                                     }}
                                                                 />
                                                             ) : (
-                                                                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                                                    <User className="w-5 h-5 text-gray-400" />
+                                                                <div className="w-10 h-10 rounded-full bg-[#e2f5f2] flex items-center justify-center">
+                                                                    <User className="w-5 h-5 text-[#5b6b7a]" />
                                                                 </div>
                                                             )}
                                                         </div>
@@ -14979,25 +14711,25 @@ export function HostFavoritesPage({ onNavigate }: HostFavoritesPageProps) {
                                                                 <h4 className="font-medium text-[#0f2940]">
                                                                     {favorite.user_name || favorite.user?.name || 'Voyageur'}
                                                                 </h4>
-                                                                <span className="text-xs text-gray-400">
+                                                                <span className="text-xs text-[#5b6b7a]">
                                                                     Ajouté le {formatDate(favorite.created_at)}
                                                                 </span>
                                                             </div>
                                                             
                                                             {favorite.user_email && (
-                                                                <p className="text-sm text-gray-500 mt-1">
+                                                                <p className="text-sm text-[#5b6b7a] mt-1">
                                                                     ✉️ {favorite.user_email}
                                                                 </p>
                                                             )}
                                                             
                                                             {favorite.user_phone && (
-                                                                <p className="text-sm text-gray-500">
+                                                                <p className="text-sm text-[#5b6b7a]">
                                                                     📞 {favorite.user_phone}
                                                                 </p>
                                                             )}
                                                             
                                                             {favorite.notes && (
-                                                                <p className="text-sm text-gray-600 mt-2 italic bg-gray-50 p-2 rounded-lg">
+                                                                <p className="text-sm text-[#5b6b7a] mt-2 italic bg-[#f4fffe] p-2 rounded-lg">
                                                                     "📝 {favorite.notes}"
                                                                 </p>
                                                             )}
@@ -15014,7 +14746,7 @@ export function HostFavoritesPage({ onNavigate }: HostFavoritesPageProps) {
                                                                 {favorite.user_id && (
                                                                     <button
                                                                         onClick={() => onNavigate?.({ name: 'host-messages', id: favorite.user_id.toString() })}
-                                                                        className="text-xs border border-gray-300 text-gray-600 px-3 py-1 rounded-full hover:bg-gray-100 transition flex items-center gap-1"
+                                                                        className="text-xs border border-[#c9f0e8] text-[#5b6b7a] px-3 py-1 rounded-full hover:bg-[#e8faf6] transition flex items-center gap-1"
                                                                     >
                                                                         <MessageCircle className="w-3 h-3" />
                                                                         Envoyer message
@@ -15030,8 +14762,8 @@ export function HostFavoritesPage({ onNavigate }: HostFavoritesPageProps) {
                                     
                                     {/* Message si aucun favori pour cette propriété */}
                                     {isExpanded && (!property.favorites || property.favorites.length === 0) && (
-                                        <div className="p-8 text-center text-gray-500">
-                                            <Heart className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+                                        <div className="p-8 text-center text-[#5b6b7a]">
+                                            <Heart className="w-12 h-12 text-[#9fb3c4] mx-auto mb-2" />
                                             <p>Aucun voyageur n'a encore ajouté cette propriété en favoris.</p>
                                         </div>
                                     )}
@@ -15094,7 +14826,7 @@ const MessagesChatView = ({
 
   if (!conversation) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center text-gray-400 p-4">
+      <div className="flex-1 flex flex-col items-center justify-center text-[#5b6b7a] p-4">
         <MessageCircle className="w-16 h-16 mb-4 opacity-50" />
         <p className="text-lg font-medium text-center">Sélectionnez une conversation</p>
         <p className="text-sm text-center">Les messages apparaissent ici</p>
@@ -15137,24 +14869,24 @@ const MessagesChatView = ({
     {onBack && (
       <button 
         onClick={onBack}
-        className="lg:hidden p-2 -ml-2 rounded-full hover:bg-gray-100 transition"
+        className="lg:hidden p-2 -ml-2 rounded-full hover:bg-[#e8faf6] transition"
       >
-        <ArrowLeft className="w-5 h-5 text-gray-600" />
+        <ArrowLeft className="w-5 h-5 text-[#5b6b7a]" />
       </button>
     )}
     <div className="w-10 h-10 rounded-full bg-[#00c9a7] flex items-center justify-center text-white font-bold flex-shrink-0 text-sm">
       {displayName.charAt(0).toUpperCase()}
     </div>
     <div className="flex-1 min-w-0">
-      <p className="font-semibold text-gray-900 truncate">{displayName}</p>
-      <div className="flex items-center gap-1 text-xs text-gray-500 truncate">
+      <p className="font-semibold text-[#0f2940] truncate">{displayName}</p>
+      <div className="flex items-center gap-1 text-xs text-[#5b6b7a] truncate">
         {isInquiry ? (
           <>
             <Sparkles className="w-3 h-3 flex-shrink-0 text-[#00c9a7]" />
             <span className="truncate">{displayTitle}</span>
             <span className="flex-shrink-0 text-[#00c9a7]">· Demande</span>
             {conversation.booking?.date && (
-              <span className="flex-shrink-0 text-gray-400">· {new Date(conversation.booking.date).toLocaleDateString('fr-FR')}</span>
+              <span className="flex-shrink-0 text-[#5b6b7a]">· {new Date(conversation.booking.date).toLocaleDateString('fr-FR')}</span>
             )}
           </>
         ) : (
@@ -15163,28 +14895,28 @@ const MessagesChatView = ({
       </div>
     </div>
     {conversation.booking?.host?.phone && (
-      <a href={`tel:${conversation.booking.host.phone}`} className="p-2 rounded-full hover:bg-gray-100 transition flex-shrink-0">
-        <Phone className="w-4 h-4 text-gray-500" />
+      <a href={`tel:${conversation.booking.host.phone}`} className="p-2 rounded-full hover:bg-[#e8faf6] transition flex-shrink-0">
+        <Phone className="w-4 h-4 text-[#5b6b7a]" />
       </a>
     )}
   </div>
   {/* ✅ Afficher les détails du service si présent */}
   {conversation.booking?.service_id && (
-    <div className="mt-2 p-2 bg-gray-50 rounded-lg border border-gray-100">
-      <div className="flex items-center gap-2 text-xs text-gray-600">
+    <div className="mt-2 p-2 bg-[#f4fffe] rounded-lg border border-[#e2f5f2]">
+      <div className="flex items-center gap-2 text-xs text-[#5b6b7a]">
         <Briefcase className="w-3 h-3 text-[#00c9a7]" />
         <span className="font-medium">Service:</span>
         <span>{conversation.booking.service_name || 'Service'}</span>
         {conversation.booking.location && (
           <>
-            <span className="text-gray-300">|</span>
+            <span className="text-[#9fb3c4]">|</span>
             <MapPin className="w-3 h-3" />
             <span>{conversation.booking.location}</span>
           </>
         )}
         {conversation.booking.price && (
           <>
-            <span className="text-gray-300">|</span>
+            <span className="text-[#9fb3c4]">|</span>
             <span className="font-medium text-[#00c9a7]">{conversation.booking.price} FCFA</span>
           </>
         )}
@@ -15194,14 +14926,14 @@ const MessagesChatView = ({
 </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 bg-gray-50">
+      <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 bg-[#f4fffe]">
         {messagesLoading ? (
           <div className="text-center py-10">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00c9a7] mx-auto"></div>
-            <p className="text-gray-500 mt-2 text-sm">Chargement des messages...</p>
+            <p className="text-[#5b6b7a] mt-2 text-sm">Chargement des messages...</p>
           </div>
         ) : messages.length === 0 ? (
-          <div className="text-center py-10 text-gray-400">
+          <div className="text-center py-10 text-[#5b6b7a]">
             <MessageCircle className="w-12 h-12 mx-auto mb-2 opacity-50" />
             <p className="text-sm">Aucun message</p>
             <p className="text-xs mt-1">Soyez le premier à envoyer un message !</p>
@@ -15213,10 +14945,10 @@ const MessagesChatView = ({
             return (
               <div key={msg.id || index} className={`flex ${isFromMe ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[85%] sm:max-w-[70%] rounded-2xl p-3 ${
-                  isFromMe ? 'bg-[#00c9a7] text-white' : 'bg-white text-gray-800 shadow-sm'
+                  isFromMe ? 'bg-[#00c9a7] text-white' : 'bg-white text-[#0f2940] shadow-sm'
                 }`}>
                   <p className="text-sm sm:text-base whitespace-pre-wrap break-words">{msg.message}</p>
-                  <p className={`text-xs mt-1 ${isFromMe ? 'text-white/70' : 'text-gray-400'}`}>
+                  <p className={`text-xs mt-1 ${isFromMe ? 'text-white/70' : 'text-[#5b6b7a]'}`}>
                     {messageTime(msg.created_at)}
                   </p>
                 </div>
@@ -15248,7 +14980,7 @@ const MessagesChatView = ({
           <button
             onClick={handleSend}
             disabled={!messageInput.trim() || isSending}
-            className="bg-[#00c9a7] text-white rounded-full p-2.5 sm:p-3 disabled:opacity-50 hover:bg-[#00b89a] transition flex-shrink-0"
+            className="bg-[#00c9a7] text-white rounded-full p-2.5 sm:p-3 disabled:opacity-50 hover:bg-[#00b396] transition flex-shrink-0"
           >
             {isSending ? (
               <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white" />
@@ -15743,7 +15475,7 @@ useEffect(() => {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#00c9a7] border-t-transparent mx-auto mb-4"></div>
-          <p className="text-gray-500">Redirection vers la connexion...</p>
+          <p className="text-[#5b6b7a]">Redirection vers la connexion...</p>
         </div>
       </div>
     );
@@ -15754,7 +15486,7 @@ useEffect(() => {
       <div className="bg-[#f4fffe] min-h-screen py-10">
         <div className="max-w-[1200px] mx-auto px-4 text-center py-20">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00c9a7] mx-auto mb-4"></div>
-          <p className="text-gray-600">Envoi de votre message à l'hôte...</p>
+          <p className="text-[#5b6b7a]">Envoi de votre message à l'hôte...</p>
         </div>
       </div>
     );
@@ -15765,7 +15497,7 @@ useEffect(() => {
       <div className="bg-[#f4fffe] min-h-screen py-10">
         <div className="max-w-[1200px] mx-auto px-4 text-center py-20">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00c9a7] mx-auto"></div>
-          <p className="text-gray-600 mt-4">Chargement des conversations...</p>
+          <p className="text-[#5b6b7a] mt-4">Chargement des conversations...</p>
         </div>
       </div>
     );
@@ -15780,7 +15512,7 @@ useEffect(() => {
             <span className="hidden sm:inline">Messagerie</span>
             <span className="sm:hidden">Messages</span>
           </h1>
-          <button onClick={() => onNavigate?.({ name: 'home' })} className="text-sm text-gray-500 hover:text-[#00c9a7] transition">← Retour</button>
+          <button onClick={() => onNavigate?.({ name: 'home' })} className="text-sm text-[#5b6b7a] hover:text-[#00c9a7] transition">← Retour</button>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 bg-white rounded-2xl sm:rounded-3xl shadow-md overflow-hidden border border-[#e2f5f2]">
@@ -15797,9 +15529,9 @@ useEffect(() => {
             {mobileMenuOpen && (
               <button 
                 onClick={() => setMobileMenuOpen(false)}
-                className="lg:hidden absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100"
+                className="lg:hidden absolute top-4 right-4 p-2 rounded-full hover:bg-[#e8faf6]"
               >
-                <X className="w-5 h-5 text-gray-600" />
+                <X className="w-5 h-5 text-[#5b6b7a]" />
               </button>
             )}
             
@@ -15816,7 +15548,7 @@ useEffect(() => {
             
             <div className="divide-y max-h-[calc(100vh-200px)] overflow-y-auto">
               {conversations.length === 0 ? (
-                <div className="p-8 text-center text-gray-400">
+                <div className="p-8 text-center text-[#5b6b7a]">
                   <MessageCircle className="w-12 h-12 mx-auto mb-2 opacity-50" />
                   <p>Aucune conversation</p>
                   <p className="text-sm mt-1">Contactez un hôte pour commencer</p>
@@ -15834,14 +15566,14 @@ useEffect(() => {
                     <button
                       key={index}
                       onClick={() => handleSelectConversation(conv)}
-                      className={`w-full text-left p-3 sm:p-4 hover:bg-gray-50 transition ${
-                        isSelected ? 'bg-gray-100' : ''
+                      className={`w-full text-left p-3 sm:p-4 hover:bg-[#f4fffe] transition ${
+                        isSelected ? 'bg-[#e8faf6]' : ''
                       }`}
                     >
                       <div className="flex justify-between items-start">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <p className="font-medium text-gray-900 text-sm sm:text-base truncate">
+                            <p className="font-medium text-[#0f2940] text-sm sm:text-base truncate">
                               {guestName}
                             </p>
                             {conv.unread_count > 0 && (
@@ -15850,24 +15582,24 @@ useEffect(() => {
                               </span>
                             )}
                           </div>
-                          <p className="text-xs sm:text-sm text-gray-500 truncate">{propertyTitle}</p>
+                          <p className="text-xs sm:text-sm text-[#5b6b7a] truncate">{propertyTitle}</p>
                           {isInquiry && (
                             <span className="text-[10px] text-[#00c9a7] mt-0.5 inline-block">✉️ Demande d'information</span>
                           )}
                           {conv.booking.dates?.check_in && conv.booking.dates?.check_out && (
-                            <p className="text-xs text-gray-400 mt-0.5">
+                            <p className="text-xs text-[#5b6b7a] mt-0.5">
                               📅 {conv.booking.dates.check_in} → {conv.booking.dates.check_out}
                             </p>
                           )}
                         </div>
                         {conv.last_message && (
-                          <span className="text-[10px] sm:text-xs text-gray-400 flex-shrink-0 ml-2">
+                          <span className="text-[10px] sm:text-xs text-[#5b6b7a] flex-shrink-0 ml-2">
                             {conv.last_message.sent_at}
                           </span>
                         )}
                       </div>
                       {conv.last_message && (
-                        <p className="text-xs text-gray-400 mt-2 truncate">
+                        <p className="text-xs text-[#5b6b7a] mt-2 truncate">
                           {conv.last_message.message}
                         </p>
                       )}
@@ -15882,9 +15614,9 @@ useEffect(() => {
           <div className={`${selectedConversation ? 'flex' : 'hidden lg:flex'} lg:w-2/3 flex-col h-[calc(100dvh-13rem)] min-h-[420px] lg:h-[600px] relative`}>
             <button 
               onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden absolute top-3 left-3 z-10 p-2 rounded-full bg-white shadow-md hover:bg-gray-50"
+              className="lg:hidden absolute top-3 left-3 z-10 p-2 rounded-full bg-white shadow-md hover:bg-[#f4fffe]"
             >
-              <Menu className="w-5 h-5 text-gray-600" />
+              <Menu className="w-5 h-5 text-[#5b6b7a]" />
             </button>
 
             {selectedConversation ? (
@@ -15903,7 +15635,7 @@ useEffect(() => {
                 isInquiry={selectedConversation.type === 'inquiry' || selectedConversation.type === 'experience'}
               />
             ) : (
-              <div className="flex-1 flex flex-col items-center justify-center text-gray-400">
+              <div className="flex-1 flex flex-col items-center justify-center text-[#5b6b7a]">
                 <MessageCircle className="w-16 h-16 mb-4 opacity-50" />
                 <p className="text-lg font-medium">Sélectionnez une conversation</p>
                 <p className="text-sm">Ou contactez un hôte depuis une expérience</p>
@@ -16038,11 +15770,11 @@ export function FavoritesPage({ onNavigate }: PageProps) {
       
       return (
         <div 
-          className="group rounded-2xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer bg-white"
+          className="group rounded-2xl overflow-hidden border border-[#e2f5f2] shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer bg-white"
           onClick={() => onNavigate?.({ name: 'listing', id: propertyId.toString() })}
         >
           {/* Image - hauteur réduite sur mobile */}
-          <div className="relative h-48 sm:h-52 md:h-56 overflow-hidden bg-gray-100">
+          <div className="relative h-48 sm:h-52 md:h-56 overflow-hidden bg-[#e8faf6]">
             <img
               src={imageUrl}
               alt={title}
@@ -16067,11 +15799,7 @@ export function FavoritesPage({ onNavigate }: PageProps) {
             
             {/* Badges */}
             <div className="absolute top-3 left-3 flex flex-col gap-1 z-10">
-              {propertyData.bluefin_certified && (
-                <div className="px-2 py-1 bg-blue-600 text-white text-xs rounded-full font-medium shadow-sm">
-                  ✓ Bluefin Immo Certifié
-                </div>
-              )}
+              {propertyData.bluefin_certified && <CertifiedBadge size="md" />}
             </div>
             
             {propertyData.instant_booking && (
@@ -16089,42 +15817,42 @@ export function FavoritesPage({ onNavigate }: PageProps) {
               </h3>
               {rating > 0 && (
                 <div className="flex items-center gap-1 text-xs sm:text-sm flex-shrink-0">
-                  <Star className="w-3 h-3 sm:w-4 sm:h-4 fill-yellow-500 text-yellow-500" />
+                  <Star className="w-3 h-3 sm:w-4 sm:h-4 fill-[#ffc93c] text-[#e0ac1f]" />
                   <span className="font-medium">{rating.toFixed(1)}</span>
                   {reviews > 0 && (
-                    <span className="text-gray-500 text-xs hidden sm:inline">({reviews})</span>
+                    <span className="text-[#5b6b7a] text-xs hidden sm:inline">({reviews})</span>
                   )}
                 </div>
               )}
             </div>
             
-            <p className="text-xs sm:text-sm text-gray-500 mt-1 line-clamp-1">{location}</p>
+            <p className="text-xs sm:text-sm text-[#5b6b7a] mt-1 line-clamp-1">{location}</p>
             
             {/* Équipements - cachés sur très petit mobile */}
             <div className="hidden sm:flex flex-wrap gap-2 mt-3">
               {propertyData.has_wifi && (
-                <span className="inline-flex items-center gap-1 text-xs bg-gray-100 px-2 py-1 rounded-full">
+                <span className="inline-flex items-center gap-1 text-xs bg-[#e8faf6] px-2 py-1 rounded-full">
                   📶 Wi-Fi
                 </span>
               )}
               {propertyData.has_air_conditioning && (
-                <span className="inline-flex items-center gap-1 text-xs bg-gray-100 px-2 py-1 rounded-full">
+                <span className="inline-flex items-center gap-1 text-xs bg-[#e8faf6] px-2 py-1 rounded-full">
                   ❄️ Clim
                 </span>
               )}
               {propertyData.has_generator && (
-                <span className="inline-flex items-center gap-1 text-xs bg-gray-100 px-2 py-1 rounded-full">
+                <span className="inline-flex items-center gap-1 text-xs bg-[#e8faf6] px-2 py-1 rounded-full">
                   ⚡ Groupe
                 </span>
               )}
             </div>
             
             {/* Prix */}
-            <div className="mt-3 pt-2 border-t border-gray-100">
+            <div className="mt-3 pt-2 border-t border-[#e2f5f2]">
               <div className="flex items-center justify-between">
                 <div>
                   <span className="font-bold text-base sm:text-lg text-[#00c9a7]">{priceDisplay}</span>
-                  <span className="text-xs sm:text-sm text-gray-400"> / nuit</span>
+                  <span className="text-xs sm:text-sm text-[#5b6b7a]"> / nuit</span>
                 </div>
                 <button 
                   className="text-xs sm:text-sm text-[#00c9a7] hover:text-[#0F2940] font-medium transition-colors"
@@ -16149,16 +15877,16 @@ export function FavoritesPage({ onNavigate }: PageProps) {
       <div className="min-h-screen bg-white py-10">
         <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-9 h-9 bg-gray-200 rounded-full animate-pulse"></div>
-            <div className="h-8 w-32 bg-gray-200 rounded animate-pulse"></div>
-            <div className="h-5 w-20 bg-gray-200 rounded animate-pulse"></div>
+            <div className="w-9 h-9 bg-[#e2f5f2] rounded-full animate-pulse"></div>
+            <div className="h-8 w-32 bg-[#e2f5f2] rounded animate-pulse"></div>
+            <div className="h-5 w-20 bg-[#e2f5f2] rounded animate-pulse"></div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
               <div key={i} className="animate-pulse">
-                <div className="bg-gray-200 rounded-2xl h-48 mb-3"></div>
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                <div className="bg-[#e2f5f2] rounded-2xl h-48 mb-3"></div>
+                <div className="h-4 bg-[#e2f5f2] rounded w-3/4 mb-2"></div>
+                <div className="h-3 bg-[#e2f5f2] rounded w-1/2"></div>
               </div>
             ))}
           </div>
@@ -16175,20 +15903,20 @@ export function FavoritesPage({ onNavigate }: PageProps) {
           <div className="flex items-center gap-4 mb-6">
             <button
               onClick={() => onNavigate?.({ name: 'home' })}
-              className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+              className="p-2 rounded-full hover:bg-[#e8faf6] transition-colors"
             >
               <ArrowLeft className="w-5 h-5 text-[#0F2940]" />
             </button>
             <h1 className="text-2xl font-bold text-[#0F2940]">Mes favoris</h1>
-            <span className="text-sm text-gray-500">(0 logement)</span>
+            <span className="text-sm text-[#5b6b7a]">(0 logement)</span>
           </div>
           <div className="text-center py-16">
-            <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <Heart className="w-16 h-16 text-[#9fb3c4] mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-[#0F2940] mb-2">Aucun favori</h2>
-            <p className="text-gray-500 mb-6">Les logements que vous ajoutez aux favoris apparaissent ici.</p>
+            <p className="text-[#5b6b7a] mb-6">Les logements que vous ajoutez aux favoris apparaissent ici.</p>
             <button
               onClick={() => onNavigate?.({ name: 'home' })}
-              className="px-6 py-3 bg-[#00c9a7] text-white rounded-full font-semibold hover:bg-[#00b892] transition-colors"
+              className="px-6 py-3 bg-[#00c9a7] text-white rounded-full font-semibold hover:bg-[#00b396] transition-colors"
             >
               Découvrir des logements
             </button>
@@ -16207,12 +15935,12 @@ export function FavoritesPage({ onNavigate }: PageProps) {
           <div className="flex items-center gap-3 sm:gap-4">
             <button
               onClick={() => onNavigate?.({ name: 'home' })}
-              className="p-2 rounded-full hover:bg-gray-100 transition-colors active:bg-gray-200"
+              className="p-2 rounded-full hover:bg-[#e8faf6] transition-colors active:bg-[#e2f5f2]"
             >
               <ArrowLeft className="w-5 h-5 text-[#0F2940]" />
             </button>
             <h1 className="text-xl sm:text-2xl font-bold text-[#0F2940]">Mes favoris</h1>
-            <span className="text-xs sm:text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+            <span className="text-xs sm:text-sm text-[#5b6b7a] bg-[#e8faf6] px-2 py-1 rounded-full">
               {displayedFavorites.length}
             </span>
           </div>
@@ -16228,7 +15956,7 @@ export function FavoritesPage({ onNavigate }: PageProps) {
                 className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm transition-all duration-200 whitespace-nowrap ${
                   selectedFilter === filter 
                     ? 'bg-[#00c9a7] text-white shadow-md scale-105' 
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-[#e8faf6] text-[#1c3b56] hover:bg-[#e2f5f2]'
                 }`}
               >
                 {filter}
@@ -16246,7 +15974,7 @@ export function FavoritesPage({ onNavigate }: PageProps) {
 
         {/* Message de fin */}
         {displayedFavorites.length >= 4 && (
-          <div className="text-center mt-8 sm:mt-12 text-gray-400 text-xs sm:text-sm">
+          <div className="text-center mt-8 sm:mt-12 text-[#5b6b7a] text-xs sm:text-sm">
             — Fin de la liste —
           </div>
         )}
@@ -16742,7 +16470,7 @@ export function PublishListingPage({ onNavigate }: PublishListingPageProps) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00c9a7]" />
-        <p className="ml-3 text-gray-600">Vérification de votre compte...</p>
+        <p className="ml-3 text-[#5b6b7a]">Vérification de votre compte...</p>
       </div>
     );
   }
@@ -16751,16 +16479,16 @@ export function PublishListingPage({ onNavigate }: PublishListingPageProps) {
     return (
       <div className="min-h-screen bg-[#f4fffe] flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
-          <div className="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <AlertCircle className="w-10 h-10 text-yellow-500" />
+          <div className="w-20 h-20 bg-[#fff3cd] rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="w-10 h-10 text-[#e0ac1f]" />
           </div>
           <h2 className="text-2xl font-bold text-[#0F2940] mb-2">Accès restreint</h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-[#5b6b7a] mb-6">
             Vous devez être connecté en tant qu'hôte pour publier une annonce.
           </p>
           <button
             onClick={() => onNavigate?.({ name: 'become-host' })}
-            className="bg-[#00c9a7] text-white px-6 py-3 rounded-full font-semibold hover:bg-[#00b892] transition"
+            className="bg-[#00c9a7] text-white px-6 py-3 rounded-full font-semibold hover:bg-[#00b396] transition"
           >
             Devenir hôte
           </button>
@@ -16893,7 +16621,7 @@ export function PublishListingPage({ onNavigate }: PublishListingPageProps) {
                       className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${
                         currency === 'XAF' 
                           ? 'bg-[#00c9a7] text-white' 
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          : 'bg-[#e8faf6] text-[#5b6b7a] hover:bg-[#e2f5f2]'
                       }`}
                     >
                       FCFA (XAF)
@@ -16904,7 +16632,7 @@ export function PublishListingPage({ onNavigate }: PublishListingPageProps) {
                       className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${
                         currency === 'EUR' 
                           ? 'bg-[#00c9a7] text-white' 
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          : 'bg-[#e8faf6] text-[#5b6b7a] hover:bg-[#e2f5f2]'
                       }`}
                     >
                       Euro (€)
@@ -16925,7 +16653,7 @@ export function PublishListingPage({ onNavigate }: PublishListingPageProps) {
                     />
                     {/* ✅ AFFICHAGE de l'équivalent Euro */}
                     <div className="flex justify-between items-center mt-2">
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-[#5b6b7a]">
                         ≈ {convertXAFtoEUR(parseInt(formData.price_per_night) || 0)} €
                       </span>
                       <span className="text-xs text-[#00c9a7] font-medium">
@@ -16934,7 +16662,7 @@ export function PublishListingPage({ onNavigate }: PublishListingPageProps) {
                     </div>
                   </div>
                   
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-[#5b6b7a] mt-1">
                     Une commission de service sera appliquée sur chaque réservation
                   </p>
                 </div>
@@ -16958,7 +16686,7 @@ export function PublishListingPage({ onNavigate }: PublishListingPageProps) {
                   <Home className="w-5 h-5 text-[#00c9a7]" />
                   Ce que propose ce logement
                 </h3>
-                <p className="text-sm text-gray-500 mb-6">Cochez tous les équipements disponibles dans votre logement</p>
+                <p className="text-sm text-[#5b6b7a] mb-6">Cochez tous les équipements disponibles dans votre logement</p>
 
                 {/* Salle de bain */}
                 <AmenitySection title="🛁 Salle de bain">
@@ -17328,7 +17056,7 @@ export function PublishListingPage({ onNavigate }: PublishListingPageProps) {
                   accept="image/*"
                   multiple
                   onChange={handlePhotoChange}
-                  className="mt-2 block w-full text-sm text-[#0F2940] file:mr-4 file:rounded-full file:border-0 file:bg-[#00c9a7] file:px-4 file:py-2 file:text-white hover:file:bg-[#00b892] transition"
+                  className="mt-2 block w-full text-sm text-[#0F2940] file:mr-4 file:rounded-full file:border-0 file:bg-[#00c9a7] file:px-4 file:py-2 file:text-white hover:file:bg-[#00b396] transition"
                 />
                 
                 {photoPreviews.length > 0 && (
@@ -17369,12 +17097,12 @@ export function PublishListingPage({ onNavigate }: PublishListingPageProps) {
               </div>
 
               {/* Informations */}
-              <div className="rounded-[1.75rem] border border-[#e2f5f2] bg-[#f4fffe] p-5 text-sm text-[#6b7280]">
+              <div className="rounded-[1.75rem] border border-[#e2f5f2] bg-[#f4fffe] p-5 text-sm text-[#5b6b7a]">
                 <p className="font-semibold text-[#0F2940] mb-2">💰 Frais de service</p>
                 <p>Une commission de service sera automatiquement appliquée sur chaque réservation. Aucun frais de ménage n'est facturé.</p>
               </div>
 
-              <div className="rounded-[1.75rem] border border-[#e2f5f2] bg-[#f4fffe] p-5 text-sm text-[#6b7280]">
+              <div className="rounded-[1.75rem] border border-[#e2f5f2] bg-[#f4fffe] p-5 text-sm text-[#5b6b7a]">
                 <p className="font-semibold text-[#0F2940] mb-2">⚠️ Attention</p>
                 <p>Après soumission, une équipe admin examinera votre annonce. Si tout est conforme, elle sera publiée sur la page d'accueil.</p>
               </div>
@@ -17384,7 +17112,7 @@ export function PublishListingPage({ onNavigate }: PublishListingPageProps) {
                 <button
                   type="submit"
                   disabled={submitting || photos.length < 3}
-                  className="inline-flex items-center justify-center rounded-full bg-[#00c9a7] px-6 py-3 text-white font-semibold hover:bg-[#00b892] transition disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex items-center justify-center rounded-full bg-[#00c9a7] px-6 py-3 text-white font-semibold hover:bg-[#00b396] transition disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {submitting ? 'Envoi en cours...' : 'Soumettre l\'annonce'}
                 </button>
@@ -17405,20 +17133,20 @@ export function PublishListingPage({ onNavigate }: PublishListingPageProps) {
       {showSuccessModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm overflow-y-auto">
           <div className="w-full max-w-[500px] rounded-2xl bg-white shadow-xl overflow-hidden border border-[#e2f5f2] my-8">
-            <div className="relative bg-gradient-to-br from-[#f3fffc] to-white px-5 py-5 text-center">
-              <button onClick={handleSuccessClose} className="absolute top-3 right-3 rounded-full p-1.5 text-gray-400 hover:text-gray-600 transition">
+            <div className="relative bg-gradient-to-br from-[#f4fffe] to-white px-5 py-5 text-center">
+              <button onClick={handleSuccessClose} className="absolute top-3 right-3 rounded-full p-1.5 text-[#5b6b7a] hover:text-[#5b6b7a] transition">
                 <X className="w-4 h-4" />
               </button>
-              <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#e6f9f3] border border-[#c7f1ea]">
+              <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#e8faf6] border border-[#c9f0e8]">
                 <CheckCircle className="w-7 h-7 text-[#00c9a7]" />
               </div>
               <h2 className="text-lg font-semibold text-[#0F2940]">Votre bien est entre de bonnes mains.</h2>
-              <p className="mx-auto mt-2 max-w-md text-xs text-gray-500">
+              <p className="mx-auto mt-2 max-w-md text-xs text-[#5b6b7a]">
                 Merci pour votre confiance. Nous avons bien reçu votre demande et notre équipe va l'étudier avec la plus grande attention.
               </p>
             </div>
             <div className="px-5 pb-5">
-              <div className="mb-4 flex flex-col items-center gap-2 rounded-xl border border-[#c7f1ea] bg-[#f4fffe] px-3 py-2 text-xs font-medium text-[#0F2940] sm:flex-row sm:justify-center">
+              <div className="mb-4 flex flex-col items-center gap-2 rounded-xl border border-[#c9f0e8] bg-[#f4fffe] px-3 py-2 text-xs font-medium text-[#0F2940] sm:flex-row sm:justify-center">
                 <Clock className="w-3.5 h-3.5 text-[#00c9a7]" />
                 <span>Notre équipe vous contacte sous 24h</span>
               </div>
@@ -17518,7 +17246,7 @@ export function HelpPage({ onNavigate }: { onNavigate?: (route: any) => void }) 
       <div class=" rounded-xl p-4 text-center">
         <button 
           onclick="window.location.href='/become-host'" 
-          class="bg-[#00c9a7] text-white px-6 py-2 rounded-full font-medium hover:bg-[#00b892] transition cursor-pointer"
+          class="bg-[#00c9a7] text-white px-6 py-2 rounded-full font-medium hover:bg-[#00b396] transition cursor-pointer"
         >
           Commencer mon inscription
         </button>
@@ -17536,9 +17264,9 @@ export function HelpPage({ onNavigate }: { onNavigate?: (route: any) => void }) 
             <div class="bg-[#f4fffe] rounded-xl p-4">
               <p class="font-semibold text-[#0F2940]">Frais de service :</p>
               <p class="text-2xl font-bold text-[#00c9a7] mt-2">15%</p>
-              <p class="text-sm text-gray-600">Pour chaque expérience réservée, Bluefin-Immo déduit automatiquement 15% des frais de service du versement.</p>
+              <p class="text-sm text-[#5b6b7a]">Pour chaque expérience réservée, Bluefin Immo déduit automatiquement 15% des frais de service du versement.</p>
             </div>
-            <p class="text-sm text-gray-500">Exemple : Pour une expérience à 100 000 FCFA, vous recevrez 85 000 FCFA.</p>
+            <p class="text-sm text-[#5b6b7a]">Exemple : Pour une expérience à 100 000 FCFA, vous recevrez 85 000 FCFA.</p>
           </div>
         `
       },
@@ -17621,8 +17349,8 @@ export function HelpPage({ onNavigate }: { onNavigate?: (route: any) => void }) 
             <h3 class="font-semibold text-lg mt-4">Dois-je avoir ma propre assurance ?</h3>
             <p><strong>Oui</strong>. Bluefin Immo exige que vous souscriviez une <strong>assurance responsabilité civile</strong> adaptée à votre activité. Il est possible que nous vous demandions de nous fournir une preuve de cette assurance.</p>
             
-            <h3 class="font-semibold text-lg mt-4">Est-ce que Bluefin-Immo fournit une assurance ?</h3>
-            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+            <h3 class="font-semibold text-lg mt-4">Est-ce que Bluefin Immo fournit une assurance ?</h3>
+            <div class="bg-[#fffaeb] border border-[#ffe9a8] rounded-xl p-4">
               <p>Bluefin Immo <strong>ne propose pas de couverture d'assurance directe</strong>. Dans les rares cas où votre responsabilité serait engagée (préjudice corporel, dommage matériel ou vol), vous seriez personnellement exposé en l'absence d'assurance.</p>
               <p class="mt-2">Nous vous conseillons de vous couvrir en amont, et notre équipe reste à votre disposition pour vous orienter vers les solutions les plus adaptées.</p>
             </div>
@@ -17650,7 +17378,7 @@ const getServiceContent = () => ({
       description: "Découvrez les types de services acceptés sur Bluefin Immo.",
       content: `
         <div class="space-y-4">
-          <p>Les services Bluefin-Immo sont des prestations d'excellente qualité qui agrémentent le séjour des voyageurs.</p>
+          <p>Les services Bluefin Immo sont des prestations d'excellente qualité qui agrémentent le séjour des voyageurs.</p>
           <p><strong>Catégories de services acceptés :</strong></p>
           <div class="grid grid-cols-2 gap-3">
             <div class="bg-[#f4fffe] rounded-xl p-3 text-center">Traiteur</div>
@@ -17695,7 +17423,7 @@ const getServiceContent = () => ({
           <div class=" rounded-xl p-4 text-center">
         <button 
           onclick="window.location.href='/become-host'" 
-          class="bg-[#00c9a7] text-white px-6 py-2 rounded-full font-medium hover:bg-[#00b892] transition cursor-pointer"
+          class="bg-[#00c9a7] text-white px-6 py-2 rounded-full font-medium hover:bg-[#00b396] transition cursor-pointer"
         >
           Commencer mon inscription
         </button>
@@ -17713,7 +17441,7 @@ const getServiceContent = () => ({
           <div class="bg-[#f4fffe] rounded-xl p-4">
             <p class="font-semibold text-[#0F2940]">Frais de service :</p>
             <p class="text-2xl font-bold text-[#00c9a7] mt-2">15%</p>
-            <p>Pour chaque service réservé, Bluefin-Immo déduit automatiquement 15% des frais de service du versement.</p>
+            <p>Pour chaque service réservé, Bluefin Immo déduit automatiquement 15% des frais de service du versement.</p>
           </div>
         </div>
       `
@@ -17792,8 +17520,8 @@ const getServiceContent = () => ({
       <h3 class="font-semibold text-lg mt-4">Dois-je avoir ma propre assurance ?</h3>
       <p><strong>Oui</strong>. Bluefin Immo exige que vous souscriviez une <strong>assurance responsabilité civile</strong> adaptée à votre activité. Il est possible que nous vous demandions de nous fournir une preuve de cette assurance.</p>
       
-      <h3 class="font-semibold text-lg mt-4">Est-ce que Bluefin-Immo fournit une assurance ?</h3>
-      <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+      <h3 class="font-semibold text-lg mt-4">Est-ce que Bluefin Immo fournit une assurance ?</h3>
+      <div class="bg-[#fffaeb] border border-[#ffe9a8] rounded-xl p-4">
         <p>Bluefin Immo <strong>ne propose pas de couverture d'assurance directe</strong>. Dans les rares cas où votre responsabilité serait engagée (préjudice corporel, dommage matériel ou vol), vous seriez personnellement exposé en l'absence d'assurance.</p>
         <p class="mt-2">Nous vous conseillons de vous couvrir en amont, et notre équipe reste à votre disposition pour vous orienter vers les solutions les plus adaptées.</p>
       </div>
@@ -17828,7 +17556,7 @@ const getTravelerContent = () => ({
               <div class="bg-[#f4fffe] rounded-xl p-3 text-center border border-[#e2f5f2]"> Carte bancaire (Visa, Mastercard)</div>
               <div class="bg-[#f4fffe] rounded-xl p-3 text-center border border-[#e2f5f2]"> Virement bancaire</div>
             </div>
-            <p class="mt-3 text-sm text-gray-600">Une fois votre paiement confirmé, vous recevez automatiquement un e-mail de confirmation.</p>
+            <p class="mt-3 text-sm text-[#5b6b7a]">Une fois votre paiement confirmé, vous recevez automatiquement un e-mail de confirmation.</p>
           </div>
 
           <div>
@@ -17854,9 +17582,9 @@ const getTravelerContent = () => ({
           <div>
             <h3 class="font-semibold text-lg mb-3">Comment annuler ma réservation ?</h3>
             <p>Toute annulation doit être effectuée directement depuis votre compte sur la plateforme, dans la rubrique <strong>"Mes réservations"</strong>.</p>
-            <div class="bg-blue-50 rounded-xl p-3 mt-3 flex items-center gap-2">
-              <Info className="w-4 h-4 text-blue-500" />
-              <p class="text-sm text-blue-700">Connectez-vous à votre espace personnel, accédez à vos réservations et cliquez sur "Annuler".</p>
+            <div class="bg-[#f4fffe] rounded-xl p-3 mt-3 flex items-center gap-2">
+              <Info className="w-4 h-4 text-[#00806b]" />
+              <p class="text-sm text-[#0f2940]">Connectez-vous à votre espace personnel, accédez à vos réservations et cliquez sur "Annuler".</p>
             </div>
           </div>
 
@@ -17868,22 +17596,22 @@ const getTravelerContent = () => ({
                 <p class="font-semibold text-green-800">✓ Annulation dans les 24 heures suivant la réservation</p>
                 <p class="text-sm text-green-700">→ remboursement intégral</p>
               </div>
-              <div class="bg-yellow-50 rounded-xl p-3 border-l-4 border-yellow-500">
-                <p class="font-semibold text-yellow-800"> Annulation jusqu'à 7 jours avant le check-in</p>
-                <p class="text-sm text-yellow-700">→ remboursement de 50% des nuits. Les frais de service ne sont pas remboursés.</p>
+              <div class="bg-[#fffaeb] rounded-xl p-3 border-l-4 border-[#ffc93c]">
+                <p class="font-semibold text-[#4a3400]"> Annulation jusqu'à 7 jours avant le check-in</p>
+                <p class="text-sm text-[#6b4e06]">→ remboursement de 50% des nuits. Les frais de service ne sont pas remboursés.</p>
               </div>
               <div class="bg-red-50 rounded-xl p-3 border-l-4 border-red-500">
                 <p class="font-semibold text-red-800"> Annulation moins de 7 jours avant le check-in</p>
                 <p class="text-sm text-red-700">→ aucun remboursement, sans exception.</p>
               </div>
             </div>
-            <p class="text-sm text-gray-500 mt-2">Les logements en politique flexible ou stricte ont des délais différents (voir l'annonce concernée).</p>
+            <p class="text-sm text-[#5b6b7a] mt-2">Les logements en politique flexible ou stricte ont des délais différents (voir l'annonce concernée).</p>
           </div>
 
           <div>
             <h3 class="font-semibold text-lg mb-3">Les frais de service sont-ils remboursables ?</h3>
-            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
-              <p class="text-amber-800"><strong>Non.</strong> Quelle que soit la situation, les frais de service Bluefin Immo ne sont pas remboursés en cas d'annulation.</p>
+            <div class="bg-[#fffaeb] border border-[#ffe9a8] rounded-xl p-4">
+              <p class="text-[#4a3400]"><strong>Non.</strong> Quelle que soit la situation, les frais de service Bluefin Immo ne sont pas remboursés en cas d'annulation.</p>
             </div>
           </div>
         </div>
@@ -17898,9 +17626,9 @@ const getTravelerContent = () => ({
           <div>
             <h3 class="font-semibold text-lg mb-3">Que faire si mon logement ne correspond pas à l'annonce ?</h3>
             <p>Si vous constatez une non-conformité à votre arrivée, vous disposez d'un délai de <strong>48 heures après le check-in</strong> pour soumettre une réclamation via votre espace personnel sur la plateforme. Passé ce délai, aucune réclamation ne pourra être prise en compte.</p>
-            <div class="bg-blue-50 rounded-xl p-3 mt-3 flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-blue-500 mt-0.5" />
-              <p class="text-sm text-blue-700">Nous vous recommandons de documenter le problème avec des <strong>photos dès votre arrivée</strong>.</p>
+            <div class="bg-[#f4fffe] rounded-xl p-3 mt-3 flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-[#00806b] mt-0.5" />
+              <p class="text-sm text-[#0f2940]">Nous vous recommandons de documenter le problème avec des <strong>photos dès votre arrivée</strong>.</p>
             </div>
           </div>
 
@@ -17912,7 +17640,7 @@ const getTravelerContent = () => ({
 
           <div>
             <h3 class="font-semibold text-lg mb-3">Comment signaler un problème avec mon logement ?</h3>
-            <div class="bg-gray-50 rounded-xl p-4">
+            <div class="bg-[#f4fffe] rounded-xl p-4">
               <p>Connectez-vous à votre espace personnel, accédez à votre réservation et utilisez le formulaire de réclamation. Notre équipe s'engage à traiter votre demande avec sérieux et à trouver une résolution amiable dans les meilleurs délais.</p>
             </div>
           </div>
@@ -17928,7 +17656,7 @@ const getTravelerContent = () => ({
           <div>
             <h3 class="font-semibold text-lg mb-3">Que faire en cas de litige avec un propriétaire ?</h3>
             <p>En cas de différend, Bluefin Immo propose un service de médiation accessible depuis votre espace personnel.</p>
-            <div class="bg-gray-50 rounded-xl p-4 mt-3">
+            <div class="bg-[#f4fffe] rounded-xl p-4 mt-3">
               <p class="font-medium mb-2">Pour soumettre votre demande :</p>
               <ul class="list-disc pl-5 space-y-1 text-sm">
                 <li>Délai : dans les <strong>48 heures suivant le check-in</strong></li>
@@ -17948,8 +17676,8 @@ const getTravelerContent = () => ({
               <li>Maintenir le versement à l'hôte si sa bonne foi est établie</li>
               <li>Suspendre voire bannir un utilisateur en cas de manquement avéré</li>
             </ul>
-            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mt-3">
-              <p class="text-sm text-amber-800"> La décision rendue est définitive. Vous restez libre de saisir les juridictions compétentes si vous le souhaitez.</p>
+            <div class="bg-[#fffaeb] border border-[#ffe9a8] rounded-xl p-4 mt-3">
+              <p class="text-sm text-[#4a3400]"> La décision rendue est définitive. Vous restez libre de saisir les juridictions compétentes si vous le souhaitez.</p>
             </div>
           </div>
         </div>
@@ -17988,7 +17716,7 @@ const getHostContent = () => ({
   articles: [
     { 
       id: "devenir-hote", 
-      title: " Devenir hôte sur Bluefin-Immo", 
+      title: " Devenir hôte sur Bluefin Immo", 
       description: "Comment lancer votre activité d'hôte en quelques étapes.",
       content: `
         <div class="space-y-6">
@@ -17999,7 +17727,7 @@ const getHostContent = () => ({
               <div class="w-8 h-8 rounded-full bg-[#00c9a7] text-white flex items-center justify-center text-sm font-bold flex-shrink-0">1</div>
               <div>
                 <h3 class="font-semibold text-[#0F2940]">Décrivez votre logement</h3>
-                <p class="text-sm text-gray-600">Présentez-vous et parlez-nous de votre bien : type de logement, superficie, équipements disponibles, localisation et tout ce qui le rend unique et attractif pour les voyageurs.</p>
+                <p class="text-sm text-[#5b6b7a]">Présentez-vous et parlez-nous de votre bien : type de logement, superficie, équipements disponibles, localisation et tout ce qui le rend unique et attractif pour les voyageurs.</p>
               </div>
             </div>
             
@@ -18007,7 +17735,7 @@ const getHostContent = () => ({
               <div class="w-8 h-8 rounded-full bg-[#00c9a7] text-white flex items-center justify-center text-sm font-bold flex-shrink-0">2</div>
               <div>
                 <h3 class="font-semibold text-[#0F2940]">Ajoutez vos photos</h3>
-                <p class="text-sm text-gray-600">Des visuels de qualité font toute la différence. Prenez le temps de photographier chaque pièce sous son meilleur jour pour donner envie aux voyageurs de réserver.</p>
+                <p class="text-sm text-[#5b6b7a]">Des visuels de qualité font toute la différence. Prenez le temps de photographier chaque pièce sous son meilleur jour pour donner envie aux voyageurs de réserver.</p>
               </div>
             </div>
             
@@ -18015,7 +17743,7 @@ const getHostContent = () => ({
               <div class="w-8 h-8 rounded-full bg-[#00c9a7] text-white flex items-center justify-center text-sm font-bold flex-shrink-0">3</div>
               <div>
                 <h3 class="font-semibold text-[#0F2940]">Fixez vos tarifs</h3>
-                <p class="text-sm text-gray-600">Définissez vos prix à votre rythme, en fonction de vos disponibilités et de vos objectifs. Vous restez libre d'ajuster vos tarifs à tout moment.</p>
+                <p class="text-sm text-[#5b6b7a]">Définissez vos prix à votre rythme, en fonction de vos disponibilités et de vos objectifs. Vous restez libre d'ajuster vos tarifs à tout moment.</p>
               </div>
             </div>
             
@@ -18023,7 +17751,7 @@ const getHostContent = () => ({
               <div class="w-8 h-8 rounded-full bg-[#00c9a7] text-white flex items-center justify-center text-sm font-bold flex-shrink-0">4</div>
               <div>
                 <h3 class="font-semibold text-[#0F2940]">Soumettez votre annonce</h3>
-                <p class="text-sm text-gray-600">Une fois votre annonce complète, envoyez-la à notre équipe pour vérification. Nous pourrions vous contacter pour vous suggérer quelques ajustements ou vous demander certains documents, comme un agrément ou une preuve d'assurance.</p>
+                <p class="text-sm text-[#5b6b7a]">Une fois votre annonce complète, envoyez-la à notre équipe pour vérification. Nous pourrions vous contacter pour vous suggérer quelques ajustements ou vous demander certains documents, comme un agrément ou une preuve d'assurance.</p>
               </div>
             </div>
             
@@ -18031,12 +17759,12 @@ const getHostContent = () => ({
               <div class="w-8 h-8 rounded-full bg-[#00c9a7] text-white flex items-center justify-center text-sm font-bold flex-shrink-0">5</div>
               <div>
                 <h3 class="font-semibold text-[#0F2940]">Publiez et accueillez</h3>
-                <p class="text-sm text-gray-600">Dès que votre annonce est validée, publiez-la en un clic et commencez à recevoir vos premières demandes de réservation. Bienvenue dans la communauté des hôtes Bluefin Immo.</p>
+                <p class="text-sm text-[#5b6b7a]">Dès que votre annonce est validée, publiez-la en un clic et commencez à recevoir vos premières demandes de réservation. Bienvenue dans la communauté des hôtes Bluefin Immo.</p>
               </div>
             </div>
           </div>
           
-          <div class="bg-gradient-to-r from-[#00c9a7]/10 to-[#0F2940]/10 rounded-xl p-4 mt-4">
+          <div class="bg-[#f4fffe] rounded-xl p-4 mt-4">
             <p class="text-sm text-[#0F2940]"> <strong>Prêt à commencer ?</strong> Créez votre annonce dès maintenant et rejoignez notre communauté d'hôtes.</p>
           </div>
         </div>
@@ -18049,15 +17777,15 @@ const getHostContent = () => ({
       content: `
         <div class="space-y-4">
           <p>Avant l'arrivée de vos voyageurs, veillez à ce que votre logement soit :</p>
-          <ul class="list-disc pl-5 space-y-2 text-gray-600">
+          <ul class="list-disc pl-5 space-y-2 text-[#5b6b7a]">
             <li>Propre, bien rangé et en parfait état de fonctionnement</li>
             <li>Prévoyez du <strong>linge de lit frais</strong> en quantité suffisante</li>
             <li>Des <strong>articles de toilette</strong> (savon, shampoing, papier toilette)</li>
             <li>Les équipements de base (cafetière, bouilloire, ustensiles de cuisine)</li>
             <li>Une connexion Wi-Fi fonctionnelle</li>
           </ul>
-          <div class="bg-blue-50 rounded-xl p-4">
-            <p class="text-sm text-blue-700"> <strong>Conseil :</strong> Pensez à laisser un petit mot de bienvenue ou des recommandations locales pour rendre le séjour de vos voyageurs encore plus agréable.</p>
+          <div class="bg-[#f4fffe] rounded-xl p-4">
+            <p class="text-sm text-[#0f2940]"> <strong>Conseil :</strong> Pensez à laisser un petit mot de bienvenue ou des recommandations locales pour rendre le séjour de vos voyageurs encore plus agréable.</p>
           </div>
         </div>
       `
@@ -18074,25 +17802,25 @@ const getHostContent = () => ({
             <div class="bg-[#f4fffe] rounded-xl p-4 border border-[#e2f5f2]">
               <h3 class="font-semibold text-[#0F2940] flex items-center gap-2"> Pour l'hôte</h3>
               <p class="text-2xl font-bold text-[#00c9a7] mt-2">6%</p>
-              <p class="text-sm text-gray-600">Des frais de 6% sont déduits de votre sous-total pour calculer votre versement.</p>
-              <p class="text-sm text-gray-500 mt-2">Exemple : nuit à 50 000 FCFA → vous percevez <strong>47 000 FCFA</strong></p>
+              <p class="text-sm text-[#5b6b7a]">Des frais de 6% sont déduits de votre sous-total pour calculer votre versement.</p>
+              <p class="text-sm text-[#5b6b7a] mt-2">Exemple : nuit à 50 000 FCFA → vous percevez <strong>47 000 FCFA</strong></p>
             </div>
             
             <div class="bg-[#f4fffe] rounded-xl p-4 border border-[#e2f5f2]">
               <h3 class="font-semibold text-[#0F2940] flex items-center gap-2">✈️ Pour le voyageur</h3>
              
-              <p class="text-sm text-gray-600">Des frais de service sont ajoutés au prix affiché lors de la réservation.</p>
-              <p class="text-sm text-gray-500 mt-2">Exemple : nuit à 50 000 FCFA → voyageur paie <strong>55 000 FCFA</strong></p>
+              <p class="text-sm text-[#5b6b7a]">Des frais de service sont ajoutés au prix affiché lors de la réservation.</p>
+              <p class="text-sm text-[#5b6b7a] mt-2">Exemple : nuit à 50 000 FCFA → voyageur paie <strong>55 000 FCFA</strong></p>
             </div>
           </div>
           
           <div>
             <h3 class="font-semibold text-lg mb-3">À quoi servent ces frais ?</h3>
             <div class="grid grid-cols-2 gap-3">
-              <div class="flex items-center gap-2 text-sm text-gray-600"><Shield className="w-4 h-4 text-[#00c9a7]" /> Paiements sécurisés</div>
-              <div class="flex items-center gap-2 text-sm text-gray-600"><TrendingUp className="w-4 h-4 text-[#00c9a7]" /> Promotion des annonces</div>
-              <div class="flex items-center gap-2 text-sm text-gray-600"><MessageCircle className="w-4 h-4 text-[#00c9a7]" /> Assistance hôtes et voyageurs</div>
-              <div class="flex items-center gap-2 text-sm text-gray-600"><Settings className="w-4 h-4 text-[#00c9a7]" /> Maintenance et développement</div>
+              <div class="flex items-center gap-2 text-sm text-[#5b6b7a]"><Shield className="w-4 h-4 text-[#00c9a7]" /> Paiements sécurisés</div>
+              <div class="flex items-center gap-2 text-sm text-[#5b6b7a]"><TrendingUp className="w-4 h-4 text-[#00c9a7]" /> Promotion des annonces</div>
+              <div class="flex items-center gap-2 text-sm text-[#5b6b7a]"><MessageCircle className="w-4 h-4 text-[#00c9a7]" /> Assistance hôtes et voyageurs</div>
+              <div class="flex items-center gap-2 text-sm text-[#5b6b7a]"><Settings className="w-4 h-4 text-[#00c9a7]" /> Maintenance et développement</div>
             </div>
           </div>
         </div>
@@ -18107,19 +17835,19 @@ const getHostContent = () => ({
           <p>Votre calendrier est votre outil de disponibilité en temps réel. Mettez-le à jour régulièrement pour éviter les réservations indésirables ou les conflits de dates.</p>
           
           <div class="space-y-4">
-            <div class="bg-gray-50 rounded-xl p-4">
+            <div class="bg-[#f4fffe] rounded-xl p-4">
               <h3 class="font-semibold text-[#0F2940] flex items-center gap-2"><Calendar className="w-5 h-5 text-[#00c9a7]" /> Puis-je bloquer des dates ?</h3>
-              <p class="text-sm text-gray-600 mt-1">Oui, à tout moment et sans justification. Rendez-vous dans votre espace hôte, sélectionnez les dates concernées et marquez-les comme indisponibles.</p>
+              <p class="text-sm text-[#5b6b7a] mt-1">Oui, à tout moment et sans justification. Rendez-vous dans votre espace hôte, sélectionnez les dates concernées et marquez-les comme indisponibles.</p>
             </div>
             
-            <div class="bg-gray-50 rounded-xl p-4">
+            <div class="bg-[#f4fffe] rounded-xl p-4">
               <h3 class="font-semibold text-[#0F2940] flex items-center gap-2"><Clock className="w-5 h-5 text-[#00c9a7]" /> Puis-je définir une durée minimale de séjour ?</h3>
-              <p class="text-sm text-gray-600 mt-1">Oui. Vous pouvez fixer une durée minimale (exemple : 2 nuits minimum) pour optimiser votre taux d'occupation.</p>
+              <p class="text-sm text-[#5b6b7a] mt-1">Oui. Vous pouvez fixer une durée minimale (exemple : 2 nuits minimum) pour optimiser votre taux d'occupation.</p>
             </div>
             
-            <div class="bg-gray-50 rounded-xl p-4">
+            <div class="bg-[#f4fffe] rounded-xl p-4">
               <h3 class="font-semibold text-[#0F2940] flex items-center gap-2"><Bell className="w-5 h-5 text-[#00c9a7]" /> Comment éviter les réservations de dernière minute ?</h3>
-              <p class="text-sm text-gray-600 mt-1">Dans vos paramètres de calendrier, vous pouvez définir un délai de préavis minimum (ex: interdire les réservations moins de 24h avant l'arrivée).</p>
+              <p class="text-sm text-[#5b6b7a] mt-1">Dans vos paramètres de calendrier, vous pouvez définir un délai de préavis minimum (ex: interdire les réservations moins de 24h avant l'arrivée).</p>
             </div>
           </div>
         </div>
@@ -18133,14 +17861,14 @@ const getHostContent = () => ({
         <div class="space-y-6">
           <div class="bg-[#f4fffe] rounded-xl p-4">
             <h3 class="font-semibold text-[#0F2940]">Comment sont traités les paiements ?</h3>
-            <p class="text-sm text-gray-600 mt-1">Bluefin Immo centralise tous les paiements pour sécuriser les transactions. Le voyageur règle intégralement sa réservation au moment de la confirmation.</p>
+            <p class="text-sm text-[#5b6b7a] mt-1">Bluefin Immo centralise tous les paiements pour sécuriser les transactions. Le voyageur règle intégralement sa réservation au moment de la confirmation.</p>
           </div>
           
           <div>
             <h3 class="font-semibold text-[#0F2940] mb-3">Quels modes de paiement sont acceptés ?</h3>
             <div class="flex flex-wrap gap-3">
-              <div class="bg-gray-100 rounded-lg px-4 py-2 text-sm">📱 Mobile Money </div>
-              <div class="bg-gray-100 rounded-lg px-4 py-2 text-sm">💳 Carte bancaire (Visa, Mastercard)</div>
+              <div class="bg-[#e8faf6] rounded-lg px-4 py-2 text-sm">📱 Mobile Money </div>
+              <div class="bg-[#e8faf6] rounded-lg px-4 py-2 text-sm">💳 Carte bancaire (Visa, Mastercard)</div>
             </div>
           </div>
           
@@ -18149,9 +17877,9 @@ const getHostContent = () => ({
             <p class="text-sm text-green-700 mt-1">Pour la plupart des séjours, votre versement est effectué dans un délai de <strong>72 heures</strong> suivant la date d'arrivée confirmée du voyageur, sous réserve qu'aucun litige ne soit en cours.</p>
           </div>
           
-          <div class="bg-amber-50 rounded-xl p-4">
-            <h3 class="font-semibold text-amber-800">Comment mettre à jour mes coordonnées de paiement ?</h3>
-            <p class="text-sm text-amber-700 mt-1">Rendez-vous dans votre profil, section Paiements et versements, et renseignez ou modifiez vos coordonnées bancaires ou mobile money.</p>
+          <div class="bg-[#fffaeb] rounded-xl p-4">
+            <h3 class="font-semibold text-[#4a3400]">Comment mettre à jour mes coordonnées de paiement ?</h3>
+            <p class="text-sm text-[#6b4e06] mt-1">Rendez-vous dans votre profil, section Paiements et versements, et renseignez ou modifiez vos coordonnées bancaires ou mobile money.</p>
           </div>
         </div>
       `
@@ -18162,19 +17890,19 @@ const getHostContent = () => ({
       description: "Demandes, réservations instantanées et annulations.",
       content: `
         <div class="space-y-6">
-          <div class="bg-gray-50 rounded-xl p-4">
+          <div class="bg-[#f4fffe] rounded-xl p-4">
             <h3 class="font-semibold text-[#0F2940]">Comment fonctionne le système de réservation ?</h3>
-            <p class="text-sm text-gray-600 mt-1">Lorsqu'un voyageur soumet une demande, vous recevez une notification par e-mail et sur l'application. Vous disposez d'un délai de <strong>24 heures</strong> pour accepter ou décliner la demande.</p>
+            <p class="text-sm text-[#5b6b7a] mt-1">Lorsqu'un voyageur soumet une demande, vous recevez une notification par e-mail et sur l'application. Vous disposez d'un délai de <strong>24 heures</strong> pour accepter ou décliner la demande.</p>
           </div>
           
           <div class="bg-[#f4fffe] rounded-xl p-4">
             <h3 class="font-semibold text-[#0F2940] flex items-center gap-2"><Zap className="w-5 h-5 text-[#00c9a7]" /> Puis-je activer la réservation instantanée ?</h3>
-            <p class="text-sm text-gray-600 mt-1">Oui. La réservation instantanée permet aux voyageurs de réserver directement sans attendre votre validation. C'est un excellent moyen d'augmenter votre taux de réservation.</p>
+            <p class="text-sm text-[#5b6b7a] mt-1">Oui. La réservation instantanée permet aux voyageurs de réserver directement sans attendre votre validation. C'est un excellent moyen d'augmenter votre taux de réservation.</p>
           </div>
           
-          <div class="bg-yellow-50 rounded-xl p-4">
-            <h3 class="font-semibold text-yellow-800">Puis-je refuser une réservation ?</h3>
-            <p class="text-sm text-yellow-700 mt-1">Oui, vous êtes libre d'accepter ou de refuser toute demande. Cependant, un taux de refus élevé peut affecter la visibilité de votre annonce.</p>
+          <div class="bg-[#fffaeb] rounded-xl p-4">
+            <h3 class="font-semibold text-[#4a3400]">Puis-je refuser une réservation ?</h3>
+            <p class="text-sm text-[#6b4e06] mt-1">Oui, vous êtes libre d'accepter ou de refuser toute demande. Cependant, un taux de refus élevé peut affecter la visibilité de votre annonce.</p>
           </div>
           
           <div class="bg-red-50 rounded-xl p-4">
@@ -18182,9 +17910,9 @@ const getHostContent = () => ({
             <p class="text-sm text-red-700 mt-1">En cas de force majeure, rendez-vous dans votre espace hôte, sélectionnez la réservation concernée et suivez la procédure d'annulation. Des pénalités peuvent s'appliquer.</p>
           </div>
           
-          <div class="bg-blue-50 rounded-xl p-4">
-            <h3 class="font-semibold text-blue-800">Comment communiquer avec mon voyageur ?</h3>
-            <p class="text-sm text-blue-700 mt-1">Bluefin Immo met à votre disposition une messagerie intégrée sécurisée. Privilégiez ce canal pour toutes vos communications.</p>
+          <div class="bg-[#f4fffe] rounded-xl p-4">
+            <h3 class="font-semibold text-[#0f2940]">Comment communiquer avec mon voyageur ?</h3>
+            <p class="text-sm text-[#0f2940] mt-1">Bluefin Immo met à votre disposition une messagerie intégrée sécurisée. Privilégiez ce canal pour toutes vos communications.</p>
           </div>
           
           <div class="bg-[#0f2940] text-white rounded-xl p-4">
@@ -18241,31 +17969,31 @@ const getHostContent = () => ({
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="sticky top-0 z-40 bg-white border-b border-gray-100 px-5 py-4">
-        <button onClick={() => handleNavigate({ name: 'home' })} className="text-sm text-gray-500 mb-4 flex items-center gap-2">
+      <div className="sticky top-0 z-40 bg-white border-b border-[#e2f5f2] px-5 py-4">
+        <button onClick={() => handleNavigate({ name: 'home' })} className="text-sm text-[#5b6b7a] mb-4 flex items-center gap-2">
           <ArrowRight className="w-4 h-4 rotate-180" /> Retour
         </button>
         <h1 className="text-2xl text-[#0F2940]">Centre d'aide</h1>
       </div>
 
-      <section className="bg-gradient-to-r from-[#0F2940] to-[#1a3f5c] py-12 text-white">
+      <section className="bg-[#0f2940] py-12 text-white">
         <div className="max-w-4xl mx-auto px-5 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Bonjour, comment pouvons-nous vous aider ?</h2>
           <p className="text-white/80 mb-8">Rechercher des guides pratiques et plus</p>
           <div className="relative max-w-2xl mx-auto">
-            <Search className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
+            <Search className="absolute left-4 top-3.5 w-5 h-5 text-[#5b6b7a]" />
             <input
               type="text"
               placeholder="Recherche"
               value={searchQuery}
               onChange={(e) => { setSearchQuery(e.target.value); setShowSuggestions(true); }}
               onFocus={() => setShowSuggestions(true)}
-              className="w-full pl-12 pr-4 py-3 rounded-full text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
+              className="w-full pl-12 pr-4 py-3 rounded-full text-[#0f2940] placeholder-[#5b6b7a] focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
             />
             {showSuggestions && searchQuery && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-200 z-50 max-h-64 overflow-y-auto">
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-[#e2f5f2] z-50 max-h-64 overflow-y-auto">
                 {suggestions.filter(s => s.toLowerCase().includes(searchQuery.toLowerCase())).map((suggestion, idx) => (
-                  <button key={idx} onClick={() => { setSearchQuery(suggestion); setShowSuggestions(false); }} className="w-full text-left px-4 py-3 hover:bg-gray-50 text-gray-700">
+                  <button key={idx} onClick={() => { setSearchQuery(suggestion); setShowSuggestions(false); }} className="w-full text-left px-4 py-3 hover:bg-[#f4fffe] text-[#1c3b56]">
                     {suggestion}
                   </button>
                 ))}
@@ -18285,7 +18013,7 @@ const getHostContent = () => ({
                 key={role.id}
                 onClick={() => setSelectedRole(role.id as any)}
                 className={`px-6 py-3 rounded-full flex items-center gap-2 transition-all ${
-                  selectedRole === role.id ? "bg-[#00c9a7] text-[#0F2940] shadow-md" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  selectedRole === role.id ? "bg-[#00c9a7] text-[#0F2940] shadow-md" : "bg-[#e8faf6] text-[#1c3b56] hover:bg-[#e2f5f2]"
                 }`}
               >
                 <Icon className="w-5 h-5" />
@@ -18306,7 +18034,7 @@ const getHostContent = () => ({
                     key={role.id}
                     onClick={() => setSelectedRole(role.id as any)}
                     className={`px-4 py-2 rounded-full flex items-center gap-2 transition-all whitespace-nowrap ${
-                      selectedRole === role.id ? "bg-[#00c9a7] text-[#0F2940] shadow-md" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      selectedRole === role.id ? "bg-[#00c9a7] text-[#0F2940] shadow-md" : "bg-[#e8faf6] text-[#1c3b56] hover:bg-[#e2f5f2]"
                     }`}
                   >
                     <Icon className="w-4 h-4" />
@@ -18323,7 +18051,7 @@ const getHostContent = () => ({
                   className={`px-4 py-2 rounded-full flex items-center gap-2 transition-all whitespace-nowrap ${
                     hiddenRoles.some(r => r.id === selectedRole) 
                       ? "bg-[#00c9a7] text-[#0F2940] shadow-md" 
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      : "bg-[#e8faf6] text-[#1c3b56] hover:bg-[#e2f5f2]"
                   }`}
                 >
                   <Menu className="w-4 h-4" />
@@ -18338,7 +18066,7 @@ const getHostContent = () => ({
                 {showRolesMenu && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setShowRolesMenu(false)} />
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 z-50 overflow-hidden">
+                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-[#e2f5f2] z-50 overflow-hidden">
                       {hiddenRoles.map((role) => {
                         const Icon = role.icon;
                         return (
@@ -18351,7 +18079,7 @@ const getHostContent = () => ({
                             className={`w-full px-4 py-3 flex items-center gap-3 transition-all text-left ${
                               selectedRole === role.id 
                                 ? "bg-[#00c9a7]/10 text-[#0F2940]" 
-                                : "hover:bg-gray-50 text-gray-700"
+                                : "hover:bg-[#f4fffe] text-[#1c3b56]"
                             }`}
                           >
                             <Icon className="w-5 h-5" />
@@ -18382,12 +18110,12 @@ const getHostContent = () => ({
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <h2 className="text-2xl font-semibold text-[#0F2940] mb-2">{content.title}</h2>
-            <p className="text-gray-600 mb-6">{content.description}</p>
+            <p className="text-[#5b6b7a] mb-6">{content.description}</p>
             <div className="grid md:grid-cols-2 gap-6">
               {content.articles.map((article, idx) => (
                 <div 
                   key={idx} 
-                  className="border border-gray-200 rounded-xl p-5 hover:shadow-lg transition-all cursor-pointer hover:border-[#00c9a7] group" 
+                  className="border border-[#e2f5f2] rounded-xl p-5 hover:shadow-lg transition-all cursor-pointer hover:border-[#00c9a7] group" 
                   onClick={() => {
                     if (article.content) {
                       setSelectedArticle({ 
@@ -18410,7 +18138,7 @@ const getHostContent = () => ({
                     </div>
                     <div>
                       <h3 className="font-semibold text-[#0F2940] mb-1 text-lg">{article.title}</h3>
-                      <p className="text-sm text-gray-600">{article.description}</p>
+                      <p className="text-sm text-[#5b6b7a]">{article.description}</p>
                       <div className="mt-3 text-[#00c9a7] text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
                         Lire l'article <ArrowRight className="w-4 h-4" />
                       </div>
@@ -18422,7 +18150,7 @@ const getHostContent = () => ({
           </div>
 
           <div className="space-y-6">
-            <div className="bg-gradient-to-br from-[#00c9a7] to-[#00b396] rounded-2xl p-6 text-white text-center">
+            <div className="bg-[#00c9a7] rounded-2xl p-6 text-white text-center">
               <h3 className="text-xl font-semibold mb-2">Nous sommes là pour vous aider</h3>
               <p className="text-white/90 text-sm mb-4">Connectez-vous pour obtenir de l'aide pour vos réservations, votre compte et plus encore.</p>
               <button onClick={() => handleNavigate({ name: 'auth' })} className="bg-white text-[#00c9a7] px-6 py-2 rounded-full font-medium hover:bg-white/90 transition">
@@ -18430,42 +18158,42 @@ const getHostContent = () => ({
               </button>
             </div>
             
-            <div className="border border-gray-200 rounded-2xl p-6">
+            <div className="border border-[#e2f5f2] rounded-2xl p-6">
               <h3 className="font-semibold text-[#0F2940] mb-4">Liens rapides</h3>
               {content.quickLinks.map((link, idx) => {
                 const Icon = link.icon;
                 return (
-                  <button key={idx} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors group">
+                  <button key={idx} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-[#f4fffe] transition-colors group">
                     <div className="w-10 h-10 rounded-full bg-[#00c9a7]/10 flex items-center justify-center group-hover:bg-[#00c9a7]/20 transition">
                       <Icon className="w-5 h-5 text-[#00c9a7]" />
                     </div>
-                    <span className="text-gray-700 group-hover:text-[#0F2940]">{link.label}</span>
-                    <ArrowRight className="w-4 h-4 text-gray-400 ml-auto" />
+                    <span className="text-[#1c3b56] group-hover:text-[#0F2940]">{link.label}</span>
+                    <ArrowRight className="w-4 h-4 text-[#5b6b7a] ml-auto" />
                   </button>
                 );
               })}
             </div>
             
-            <div className="border border-gray-200 rounded-2xl p-6">
+            <div className="border border-[#e2f5f2] rounded-2xl p-6">
               <h3 className="font-semibold text-[#0F2940] mb-3">Les politiques de la communauté</h3>
-              <p className="text-sm text-gray-600 mb-3">Nos actions pour établir un climat de confiance.</p>
+              <p className="text-sm text-[#5b6b7a] mb-3">Nos actions pour établir un climat de confiance.</p>
               <button className="text-[#00c9a7] text-sm font-medium">En savoir plus</button>
             </div>
             
-            <div className="border border-gray-200 rounded-2xl p-6">
+            <div className="border border-[#e2f5f2] rounded-2xl p-6">
               <h3 className="font-semibold text-[#0F2940] mb-3">Conseils et consignes de sécurité</h3>
-              <p className="text-sm text-gray-600 mb-3">Conseils de sécurité pour les voyageurs.</p>
+              <p className="text-sm text-[#5b6b7a] mb-3">Conseils de sécurité pour les voyageurs.</p>
               <button className="text-[#00c9a7] text-sm font-medium">En savoir plus</button>
             </div>
 
             <div className="rounded-[2rem] bg-[#f4fffe] border border-[#e2f5f2] p-6">
               <h3 className="text-xl font-semibold text-[#0F2940] mb-3">Contact support</h3>
-              <p className="text-sm text-[#6b7280] mb-4">Chat WhatsApp disponible 8h-20h GMT+1. Email support@bluefin-immo.com</p>
+              <p className="text-sm text-[#5b6b7a] mb-4">Chat WhatsApp disponible 8h-20h GMT+1. Email support@bluefin-immo.com</p>
               <div className="flex flex-wrap gap-3">
-                <button className="rounded-full bg-[#00c9a7] text-white px-6 py-3 hover:bg-[#00b892] transition">
+                <button className="rounded-full bg-[#00c9a7] text-white px-6 py-3 hover:bg-[#00b396] transition">
                   WhatsApp
                 </button>
-                <button className="rounded-full border border-[#e2f5f2] px-6 py-3 text-[#0f2940] hover:bg-gray-50 transition">
+                <button className="rounded-full border border-[#e2f5f2] px-6 py-3 text-[#0f2940] hover:bg-[#f4fffe] transition">
                   Email
                 </button>
               </div>
@@ -18479,12 +18207,12 @@ const getHostContent = () => ({
         <div className="fixed inset-0 z-50 bg-black/80 overflow-y-auto p-4">
           <div className="min-h-screen flex items-center justify-center">
             <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-              <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex justify-between items-center">
+              <div className="sticky top-0 bg-white border-b border-[#e2f5f2] p-4 flex justify-between items-center">
                 <div>
                   <span className="text-sm text-[#00c9a7] font-medium">Guide pratique • {selectedArticle.category}</span>
                   <h2 className="text-2xl font-semibold text-[#0F2940]">{selectedArticle.title}</h2>
                 </div>
-                <button onClick={() => setSelectedArticle(null)} className="p-2 rounded-full hover:bg-gray-100">
+                <button onClick={() => setSelectedArticle(null)} className="p-2 rounded-full hover:bg-[#e8faf6]">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -18499,12 +18227,12 @@ const getHostContent = () => ({
         <div className="fixed inset-0 z-50 bg-black/80 overflow-y-auto p-4">
           <div className="min-h-screen flex items-center justify-center">
             <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-              <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex justify-between items-center">
+              <div className="sticky top-0 bg-white border-b border-[#e2f5f2] p-4 flex justify-between items-center">
                 <div>
                   <span className="text-sm text-[#00c9a7] font-medium">Guide pratique • {selectedArticle.category}</span>
                   <h2 className="text-2xl font-semibold text-[#0F2940]">{selectedArticle.title}</h2>
                 </div>
-                <button onClick={() => setSelectedArticle(null)} className="p-2 rounded-full hover:bg-gray-100">
+                <button onClick={() => setSelectedArticle(null)} className="p-2 rounded-full hover:bg-[#e8faf6]">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -18540,7 +18268,7 @@ export function AboutPage({ onNavigate }: PageProps) {
           <span className="inline-block text-[11px] font-semibold tracking-[0.16em] uppercase text-[#00c9a7] mb-5 animate-pulse">
             À propos de Bluefin Immo
           </span>
-          <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl text-white leading-tight mb-4">
+          <h1 className="font-display text-3xl md:text-4xl lg:text-5xl text-white leading-tight mb-4">
             Confort, Praticité<br />et <em className="text-[#00c9a7] not-italic">Sérénité</em> —<br />à chaque séjour.
           </h1>
           <p className="text-base text-white/50 max-w-md mx-auto">
@@ -18550,17 +18278,17 @@ export function AboutPage({ onNavigate }: PageProps) {
 
         {/* ACCROCHE */}
         <div className="py-6 mb-2">
-          <p className="font-serif text-xl md:text-2xl lg:text-[26px] text-[#1a2733] leading-tight">
+          <p className="font-display text-xl md:text-2xl lg:text-[26px] text-[#0f2940] leading-tight">
             Notre mission : rendre la location immobilière <em className="text-[#00c9a7] not-italic">simple, agréable et sans compromis.</em>
           </p>
         </div>
 
         {/* CORPS */}
         <div className="mb-6 space-y-3">
-          <p className="text-[#5a6a78] leading-relaxed">
+          <p className="text-[#5b6b7a] leading-relaxed">
             Chez Bluefin Immo, nous mettons à votre disposition des appartements meublés modernes, entièrement équipés et pensés dans les moindres détails pour vous offrir un cadre de vie chaleureux, fonctionnel et agréable.
           </p>
-          <p className="text-[#5a6a78] leading-relaxed">
+          <p className="text-[#5b6b7a] leading-relaxed">
             Nous accordons une attention particulière à la qualité de chaque bien, à la fluidité de votre expérience locative et à la réactivité de notre équipe — pour que vous puissiez vous concentrer sur l'essentiel : profiter pleinement de votre séjour.
           </p>
         </div>
@@ -18573,7 +18301,7 @@ export function AboutPage({ onNavigate }: PageProps) {
             { icon: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z", label: "Expatrié" },
             { icon: "M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5zM9 21V12h6v9", label: "Logement prêt à vivre" }
           ].map((item, idx) => (
-            <span key={idx} className="inline-flex items-center gap-2 bg-[rgba(0,201,167,0.09)] border border-[rgba(0,201,167,0.22)] rounded-full py-2 px-4 text-sm font-medium text-[#1a2733] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#00c9a7] hover:shadow-[0_4px_12px_rgba(0,201,167,0.15)]">
+            <span key={idx} className="inline-flex items-center gap-2 bg-[rgba(0,201,167,0.09)] border border-[rgba(0,201,167,0.22)] rounded-full py-2 px-4 text-sm font-medium text-[#0f2940] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#00c9a7] hover:shadow-[0_4px_12px_rgba(0,201,167,0.15)]">
               <svg className="w-3.5 h-3.5 text-[#00c9a7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 {item.rect ? <><rect x="2" y="7" width="20" height="14" rx="2"/><path d={item.icon}/></> : <path d={item.icon}/>}
               </svg>
@@ -18594,14 +18322,14 @@ export function AboutPage({ onNavigate }: PageProps) {
               { icon: "M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z", title: "Un accompagnement réactif", desc: "Une équipe disponible et à l'écoute, à chaque étape de votre séjour." },
               { icon: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z", title: "Transparence et confiance", desc: "Des conditions claires, des prix affichés, une relation de confiance durable." }
             ].map((item, idx) => (
-              <div key={idx} className="bg-white border border-[#eef0f3] rounded-2xl p-5 shadow-[0_2px_16px_rgba(15,41,64,0.07)] transition-all duration-300 hover:-translate-y-1.5 hover:border-[rgba(0,201,167,0.22)] hover:shadow-[0_12px_24px_rgba(0,201,167,0.12)]">
+              <div key={idx} className="bg-white border border-[#e2f5f2] rounded-2xl p-5 shadow-[0_2px_16px_rgba(15,41,64,0.07)] transition-all duration-300 hover:-translate-y-1.5 hover:border-[rgba(0,201,167,0.22)] hover:shadow-[0_12px_24px_rgba(0,201,167,0.12)]">
                 <div className="w-10 h-10 bg-[rgba(0,201,167,0.09)] rounded-lg flex items-center justify-center mb-3">
                   <svg className="w-5 h-5 text-[#00c9a7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d={item.icon} />
                   </svg>
                 </div>
-                <h3 className="text-sm font-semibold text-[#1a2733] mb-1.5">{item.title}</h3>
-                <p className="text-xs text-[#5a6a78] leading-relaxed">{item.desc}</p>
+                <h3 className="text-sm font-semibold text-[#0f2940] mb-1.5">{item.title}</h3>
+                <p className="text-xs text-[#5b6b7a] leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -18610,29 +18338,29 @@ export function AboutPage({ onNavigate }: PageProps) {
         {/* STATS */}
         <div className="bg-[#0F2940] rounded-2xl grid grid-cols-1 md:grid-cols-3 text-center p-6 md:p-8 mb-6 shadow-[0_8px_40px_rgba(15,41,64,0.12)]">
           <div className="px-4 py-3 md:border-r border-white/10">
-            <div className="font-serif text-3xl text-[#00c9a7]">100%</div>
+            <div className="font-display text-3xl text-[#00c9a7]">100%</div>
             <div className="text-xs text-white/40 mt-1.5">Des biens visités et sélectionnés par notre équipe</div>
           </div>
           <div className="px-4 py-3 md:border-r border-white/10">
-            <div className="font-serif text-3xl text-[#00c9a7]">&lt; 30 min</div>
+            <div className="font-display text-3xl text-[#00c9a7]">&lt; 30 min</div>
             <div className="text-xs text-white/40 mt-1.5">De réponse de notre équipe, toujours</div>
           </div>
           <div className="px-4 py-3">
-            <div className="font-serif text-3xl text-[#00c9a7]">0 FCFA</div>
+            <div className="font-display text-3xl text-[#00c9a7]">0 FCFA</div>
             <div className="text-xs text-white/40 mt-1.5">De frais cachés sur vos réservations</div>
           </div>
         </div>
 
         {/* SIGNATURE */}
         <div className="bg-[rgba(0,201,167,0.09)] border-l-[3px] border-[#00c9a7] rounded-r-2xl p-5 md:p-6 mb-6 transition-all duration-300 hover:translate-x-1">
-          <p className="font-serif text-lg md:text-xl text-[#1a2733] leading-relaxed">
+          <p className="font-display text-lg md:text-xl text-[#0f2940] leading-relaxed">
             <strong className="font-sans font-semibold text-[#0F2940]">Bluefin Immo</strong>, votre partenaire de confiance pour la location de biens meublés — parce qu'un beau séjour commence par un beau logement.
           </p>
         </div>
 
         {/* CTA */}
         <div className="bg-[#0F2940] rounded-2xl p-8 md:p-10 text-center shadow-[0_8px_40px_rgba(15,41,64,0.12)] transition-all duration-300 hover:-translate-y-1">
-          <h2 className="font-serif text-2xl md:text-3xl text-white leading-tight mb-2">
+          <h2 className="font-display text-2xl md:text-3xl text-white leading-tight mb-2">
             Votre logement idéal<br /><em className="text-[#00c9a7] not-italic">vous attend.</em>
           </h2>
           <p className="text-sm text-white/40 mb-6 max-w-sm mx-auto">
@@ -18667,7 +18395,7 @@ export function SiteFunctioningPage({ onNavigate }: PageProps) {
       title: "Recherchez votre logement",
       description: "Utilisez notre moteur de recherche pour trouver le logement idéal selon votre destination, vos dates et votre budget.",
       icon: Search,
-      color: "bg-blue-50"
+      color: "bg-[#f4fffe]"
     },
     {
       number: "02",
@@ -18681,14 +18409,14 @@ export function SiteFunctioningPage({ onNavigate }: PageProps) {
       title: "Communiquez avec l'hôte",
       description: "Échangez avec votre hôte pour organiser votre arrivée, poser vos questions et préparer votre séjour.",
       icon: MessageCircle,
-      color: "bg-purple-50"
+      color: "bg-[#f4fffe]"
     },
     {
       number: "04",
       title: "Profitez de votre séjour",
       description: "Une fois sur place, profitez de votre logement et n'hésitez pas à laisser un avis après votre départ.",
       icon: Star,
-      color: "bg-yellow-50"
+      color: "bg-[#fffaeb]"
     }
   ];
 
@@ -18720,22 +18448,22 @@ export function SiteFunctioningPage({ onNavigate }: PageProps) {
   ];
 
   const paymentMethods = [
-    { name: "Visa", icon: "💳", bg: "bg-blue-50" },
+    { name: "Visa", icon: "💳", bg: "bg-[#f4fffe]" },
     { name: "Mastercard", icon: "💳", bg: "bg-red-50" },
     { name: "Mobile Money", icon: "📱", bg: "bg-green-50" }
   ];
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="sticky top-0 z-40 bg-white border-b border-gray-100 px-5 py-4">
-        <button onClick={() => onNavigate?.({ name: 'home' })} className="text-sm text-gray-500 mb-4 flex items-center gap-2 hover:text-[#00c9a7] transition">
+      <div className="sticky top-0 z-40 bg-white border-b border-[#e2f5f2] px-5 py-4">
+        <button onClick={() => onNavigate?.({ name: 'home' })} className="text-sm text-[#5b6b7a] mb-4 flex items-center gap-2 hover:text-[#00c9a7] transition">
           <ArrowLeft className="w-4 h-4" /> Retour
         </button>
         <h1 className="text-2xl text-[#0F2940]">Fonctionnement du site</h1>
       </div>
 
       {/* Hero */}
-      <section className="bg-gradient-to-r from-[#0F2940] to-[#1a3f5c] py-12 text-white">
+      <section className="bg-[#0f2940] py-12 text-white">
         <div className="max-w-4xl mx-auto px-5 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Comment ça fonctionne ?</h2>
           <p className="text-white/80">Une plateforme simple et intuitive pour trouver votre logement idéal</p>
@@ -18743,14 +18471,14 @@ export function SiteFunctioningPage({ onNavigate }: PageProps) {
       </section>
 
       {/* Qu'est-ce que Bluefin Immo */}
-      <section className="py-12 bg-gray-50">
+      <section className="py-12 bg-[#f4fffe]">
         <div className="max-w-6xl mx-auto px-5">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-[#0F2940] mb-4">Qu'est-ce que Bluefin Immo ?</h2>
             <div className="w-20 h-1 bg-[#00c9a7] mx-auto"></div>
           </div>
           <div className="bg-white rounded-2xl p-8 shadow-sm">
-            <p className="text-gray-700 leading-relaxed mb-6">
+            <p className="text-[#1c3b56] leading-relaxed mb-6">
               Bluefin Immo est une plateforme en ligne spécialisée dans la location de logements meublés, 
               la découverte d'expériences locales et l'accès à des services à la demande. Elle met en relation 
               des Propriétaires qui proposent des biens et des prestations avec des Locataires en recherche 
@@ -18762,24 +18490,24 @@ export function SiteFunctioningPage({ onNavigate }: PageProps) {
                   <Home className="w-6 h-6 text-[#00c9a7]" />
                 </div>
                 <h3 className="font-semibold text-[#0F2940]">Hébergements</h3>
-                <p className="text-sm text-gray-500">Location de logements meublés pour séjours courts, moyens ou longs</p>
+                <p className="text-sm text-[#5b6b7a]">Location de logements meublés pour séjours courts, moyens ou longs</p>
               </div>
               <div className="bg-[#f4fffe] rounded-xl p-4 text-center border border-[#e2f5f2]">
                 <div className="w-12 h-12 bg-[#00c9a7]/10 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Star className="w-6 h-6 text-[#00c9a7]" />
                 </div>
                 <h3 className="font-semibold text-[#0F2940]">Expériences</h3>
-                <p className="text-sm text-gray-500">Activités animées par des locaux passionnés</p>
+                <p className="text-sm text-[#5b6b7a]">Activités animées par des locaux passionnés</p>
               </div>
               <div className="bg-[#f4fffe] rounded-xl p-4 text-center border border-[#e2f5f2]">
                 <div className="w-12 h-12 bg-[#00c9a7]/10 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Briefcase className="w-6 h-6 text-[#00c9a7]" />
                 </div>
                 <h3 className="font-semibold text-[#0F2940]">Services</h3>
-                <p className="text-sm text-gray-500">Services à la demande liés au logement ou au séjour</p>
+                <p className="text-sm text-[#5b6b7a]">Services à la demande liés au logement ou au séjour</p>
               </div>
             </div>
-            <p className="text-sm text-gray-500 mt-6 text-center italic">
+            <p className="text-sm text-[#5b6b7a] mt-6 text-center italic">
               La création d'un compte est nécessaire pour publier une Annonce ou effectuer une réservation.
             </p>
           </div>
@@ -18793,8 +18521,8 @@ export function SiteFunctioningPage({ onNavigate }: PageProps) {
             <h2 className="text-3xl font-bold text-[#0F2940] mb-4">Qui peut devenir Propriétaire sur Bluefin Immo ?</h2>
             <div className="w-20 h-1 bg-[#00c9a7] mx-auto"></div>
           </div>
-          <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-            <p className="text-gray-700 text-center mb-6">
+          <div className="bg-white rounded-2xl p-8 shadow-sm border border-[#e2f5f2]">
+            <p className="text-[#1c3b56] text-center mb-6">
               Tout particulier ou professionnel peut publier un logement meublé. L'inscription et la mise en ligne sont gratuites.
             </p>
             <div className="grid md:grid-cols-4 gap-4">
@@ -18806,7 +18534,7 @@ export function SiteFunctioningPage({ onNavigate }: PageProps) {
                       <Icon className="w-6 h-6 text-[#00c9a7]" />
                     </div>
                     <h3 className="font-semibold text-[#0F2940] text-sm">{item.title}</h3>
-                    <p className="text-xs text-gray-500 mt-1">{item.desc}</p>
+                    <p className="text-xs text-[#5b6b7a] mt-1">{item.desc}</p>
                   </div>
                 );
               })}
@@ -18816,14 +18544,14 @@ export function SiteFunctioningPage({ onNavigate }: PageProps) {
       </section>
 
       {/* Qui peut proposer une expérience */}
-      <section className="py-12 bg-gray-50">
+      <section className="py-12 bg-[#f4fffe]">
         <div className="max-w-6xl mx-auto px-5">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-[#0F2940] mb-4">Qui peut proposer une Expérience sur Bluefin Immo ?</h2>
             <div className="w-20 h-1 bg-[#00c9a7] mx-auto"></div>
           </div>
           <div className="bg-white rounded-2xl p-8 shadow-sm">
-            <p className="text-gray-700 text-center mb-6">
+            <p className="text-[#1c3b56] text-center mb-6">
               Les Expériences sont des activités animées par des passionnés du territoire. Il n'est pas nécessaire de louer un logement pour en proposer ou en réserver une.
             </p>
             <div className="grid md:grid-cols-3 gap-6">
@@ -18835,7 +18563,7 @@ export function SiteFunctioningPage({ onNavigate }: PageProps) {
                       <Icon className="w-7 h-7 text-[#00c9a7]" />
                     </div>
                     <h3 className="font-semibold text-[#0F2940] text-lg">{item.title}</h3>
-                    <p className="text-sm text-gray-500 mt-1">{item.desc}</p>
+                    <p className="text-sm text-[#5b6b7a] mt-1">{item.desc}</p>
                   </div>
                 );
               })}
@@ -18851,27 +18579,27 @@ export function SiteFunctioningPage({ onNavigate }: PageProps) {
             <h2 className="text-3xl font-bold text-[#0F2940] mb-4">Classement des annonces</h2>
             <div className="w-20 h-1 bg-[#00c9a7] mx-auto"></div>
           </div>
-          <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-            <p className="text-gray-700 text-center mb-6">
+          <div className="bg-white rounded-2xl p-8 shadow-sm border border-[#e2f5f2]">
+            <p className="text-[#1c3b56] text-center mb-6">
               L'algorithme prend en compte trois grandes catégories de facteurs :
             </p>
             <div className="grid md:grid-cols-3 gap-6">
               {rankingFactors.map((item, idx) => {
                 const Icon = item.icon;
                 return (
-                  <div key={idx} className="p-4 rounded-xl bg-gray-50">
+                  <div key={idx} className="p-4 rounded-xl bg-[#f4fffe]">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="w-10 h-10 bg-[#00c9a7]/10 rounded-full flex items-center justify-center">
                         <Icon className="w-5 h-5 text-[#00c9a7]" />
                       </div>
                       <h3 className="font-semibold text-[#0F2940]">{item.title}</h3>
                     </div>
-                    <p className="text-sm text-gray-500">{item.desc}</p>
+                    <p className="text-sm text-[#5b6b7a]">{item.desc}</p>
                   </div>
                 );
               })}
             </div>
-            <p className="text-sm text-gray-500 text-center mt-6 italic">
+            <p className="text-sm text-[#5b6b7a] text-center mt-6 italic">
               Il n'est pas possible de payer pour améliorer le classement de son annonce.
             </p>
           </div>
@@ -18879,14 +18607,14 @@ export function SiteFunctioningPage({ onNavigate }: PageProps) {
       </section>
 
       {/* Frais de service */}
-      <section className="py-12 bg-gray-50">
+      <section className="py-12 bg-[#f4fffe]">
         <div className="max-w-6xl mx-auto px-5">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-[#0F2940] mb-4">Frais de service</h2>
             <div className="w-20 h-1 bg-[#00c9a7] mx-auto"></div>
           </div>
           <div className="bg-white rounded-2xl p-8 shadow-sm">
-            <p className="text-gray-700 text-center mb-6">
+            <p className="text-[#1c3b56] text-center mb-6">
               L'inscription et la mise en ligne sont gratuites. Des frais de service sont prélevés à la confirmation d'une réservation :
             </p>
             <div className="grid md:grid-cols-2 gap-6">
@@ -18895,14 +18623,14 @@ export function SiteFunctioningPage({ onNavigate }: PageProps) {
                   <User className="w-6 h-6 text-[#00c9a7]" />
                 </div>
                 <h3 className="font-semibold text-[#0F2940">Côté Locataire</h3>
-                <p className="text-sm text-gray-500 mt-2">Commission affichée avant confirmation</p>
+                <p className="text-sm text-[#5b6b7a] mt-2">Commission affichée avant confirmation</p>
               </div>
               <div className="bg-[#f4fffe] rounded-xl p-6 text-center border border-[#e2f5f2]">
                 <div className="w-12 h-12 bg-[#00c9a7]/10 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Home className="w-6 h-6 text-[#00c9a7]" />
                 </div>
                 <h3 className="font-semibold text-[#0F2940]">Côté Propriétaire</h3>
-                <p className="text-sm text-gray-500 mt-2">Commission déduite du montant reversé</p>
+                <p className="text-sm text-[#5b6b7a] mt-2">Commission déduite du montant reversé</p>
               </div>
             </div>
           </div>
@@ -18916,16 +18644,16 @@ export function SiteFunctioningPage({ onNavigate }: PageProps) {
             <h2 className="text-3xl font-bold text-[#0F2940] mb-4">Modes de paiement</h2>
             <div className="w-20 h-1 bg-[#00c9a7] mx-auto"></div>
           </div>
-          <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+          <div className="bg-white rounded-2xl p-8 shadow-sm border border-[#e2f5f2]">
             <div className="flex flex-wrap justify-center gap-4 mb-6">
               {paymentMethods.map((method, idx) => (
                 <div key={idx} className={`${method.bg} rounded-xl px-6 py-3 text-center min-w-[120px]`}>
                   <span className="text-2xl mr-2">{method.icon}</span>
-                  <span className="font-medium text-gray-700">{method.name}</span>
+                  <span className="font-medium text-[#1c3b56]">{method.name}</span>
                 </div>
               ))}
             </div>
-            <p className="text-gray-600 text-center text-sm">
+            <p className="text-[#5b6b7a] text-center text-sm">
               Le débit intervient à l'acceptation par le Propriétaire, ou immédiatement en réservation instantanée. 
               Le paiement est retenu 24 heures après l'entrée dans les lieux avant d'être transféré au Propriétaire.
             </p>
@@ -18934,7 +18662,7 @@ export function SiteFunctioningPage({ onNavigate }: PageProps) {
       </section>
 
       {/* Protection des propriétaires */}
-      <section className="py-12 bg-gray-50">
+      <section className="py-12 bg-[#f4fffe]">
         <div className="max-w-6xl mx-auto px-5">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-[#0F2940] mb-4">Protection des Propriétaires</h2>
@@ -18948,7 +18676,7 @@ export function SiteFunctioningPage({ onNavigate }: PageProps) {
                 </div>
                 <h3 className="font-semibold text-[#0F2940] text-lg">Garantie Propriétaire</h3>
               </div>
-              <p className="text-gray-600 text-sm">Couvre les dommages matériels causés par les Locataires</p>
+              <p className="text-[#5b6b7a] text-sm">Couvre les dommages matériels causés par les Locataires</p>
             </div>
             <div className="bg-white rounded-2xl p-6 shadow-sm">
               <div className="flex items-center gap-3 mb-4">
@@ -18957,10 +18685,10 @@ export function SiteFunctioningPage({ onNavigate }: PageProps) {
                 </div>
                 <h3 className="font-semibold text-[#0F2940] text-lg">Assurance Responsabilité Civile</h3>
               </div>
-              <p className="text-gray-600 text-sm">Protège contre les réclamations de tiers</p>
+              <p className="text-[#5b6b7a] text-sm">Protège contre les réclamations de tiers</p>
             </div>
           </div>
-          <p className="text-sm text-gray-400 text-center mt-6 italic">
+          <p className="text-sm text-[#5b6b7a] text-center mt-6 italic">
             Ces protections ne remplacent pas votre assurance habitation personnelle.
           </p>
         </div>
@@ -18973,24 +18701,24 @@ export function SiteFunctioningPage({ onNavigate }: PageProps) {
             <h2 className="text-3xl font-bold text-[#0F2940] mb-4">Centre de résolution et assistance</h2>
             <div className="w-20 h-1 bg-[#00c9a7] mx-auto"></div>
           </div>
-          <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+          <div className="bg-white rounded-2xl p-8 shadow-sm border border-[#e2f5f2]">
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-[#f4fffe] rounded-xl p-5">
                 <h3 className="font-semibold text-[#0F2940] mb-2 flex items-center gap-2">
                   <User className="w-5 h-5 text-[#00c9a7]" />
                   Locataire
                 </h3>
-                <p className="text-gray-600 text-sm">2 jours après le départ pour ouvrir une demande</p>
+                <p className="text-[#5b6b7a] text-sm">2 jours après le départ pour ouvrir une demande</p>
               </div>
               <div className="bg-[#f4fffe] rounded-xl p-5">
                 <h3 className="font-semibold text-[#0F2940] mb-2 flex items-center gap-2">
                   <Home className="w-5 h-5 text-[#00c9a7]" />
                   Propriétaire
                 </h3>
-                <p className="text-gray-600 text-sm">2 jours après le départ pour demander une retenue</p>
+                <p className="text-[#5b6b7a] text-sm">2 jours après le départ pour demander une retenue</p>
               </div>
             </div>
-            <p className="text-gray-600 text-center mt-6 text-sm">
+            <p className="text-[#5b6b7a] text-center mt-6 text-sm">
               Si aucun accord n'est trouvé sous 72h, vous pouvez faire intervenir l'équipe Bluefin Immo via votre espace personnel.
             </p>
           </div>
@@ -18998,21 +18726,21 @@ export function SiteFunctioningPage({ onNavigate }: PageProps) {
       </section>
 
       {/* Désactivation d'une annonce ou d'un compte */}
-      <section className="py-12 bg-gray-50">
+      <section className="py-12 bg-[#f4fffe]">
         <div className="max-w-6xl mx-auto px-5">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-[#0F2940] mb-4">Désactivation d'une annonce ou d'un compte</h2>
             <div className="w-20 h-1 bg-[#00c9a7] mx-auto"></div>
           </div>
           <div className="bg-white rounded-2xl p-8 shadow-sm">
-            <p className="text-gray-700 text-center mb-4">Un compte peut être suspendu en cas de :</p>
+            <p className="text-[#1c3b56] text-center mb-4">Un compte peut être suspendu en cas de :</p>
             <ul className="space-y-3 max-w-md mx-auto">
-              <li className="flex items-center gap-3 text-gray-600"><XCircle className="w-5 h-5 text-red-500" /> Non-respect des valeurs de la communauté</li>
-              <li className="flex items-center gap-3 text-gray-600"><AlertCircle className="w-5 h-5 text-orange-500" /> Signalement d'un problème</li>
-              <li className="flex items-center gap-3 text-gray-600"><Clock className="w-5 h-5 text-yellow-500" /> Taux de réponse ou d'acceptation trop faible</li>
-              <li className="flex items-center gap-3 text-gray-600"><Calendar className="w-5 h-5 text-purple-500" /> Annulations répétées de réservations confirmées</li>
+              <li className="flex items-center gap-3 text-[#5b6b7a]"><XCircle className="w-5 h-5 text-red-500" /> Non-respect des valeurs de la communauté</li>
+              <li className="flex items-center gap-3 text-[#5b6b7a]"><AlertCircle className="w-5 h-5 text-[#e0ac1f]" /> Signalement d'un problème</li>
+              <li className="flex items-center gap-3 text-[#5b6b7a]"><Clock className="w-5 h-5 text-[#e0ac1f]" /> Taux de réponse ou d'acceptation trop faible</li>
+              <li className="flex items-center gap-3 text-[#5b6b7a]"><Calendar className="w-5 h-5 text-[#00806b]" /> Annulations répétées de réservations confirmées</li>
             </ul>
-            <p className="text-sm text-gray-500 text-center mt-6 italic">
+            <p className="text-sm text-[#5b6b7a] text-center mt-6 italic">
               En cas de suspension, toutes les réservations en cours ou futures peuvent être annulées.
             </p>
           </div>
@@ -19023,19 +18751,19 @@ export function SiteFunctioningPage({ onNavigate }: PageProps) {
       <section className="py-12">
         <div className="max-w-6xl mx-auto px-5">
           <h2 className="text-3xl font-bold text-[#0F2940] text-center mb-4">Pour les voyageurs</h2>
-          <p className="text-gray-600 text-center mb-10">Réservez votre prochain séjour en quelques clics</p>
+          <p className="text-[#5b6b7a] text-center mb-10">Réservez votre prochain séjour en quelques clics</p>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {steps.map((step, idx) => {
               const Icon = step.icon;
               return (
                 <div key={idx} className={`${step.color} rounded-2xl p-6 relative overflow-hidden hover:shadow-lg transition-shadow`}>
-                  <div className="text-6xl font-bold text-gray-300/30 absolute top-4 right-4">{step.number}</div>
+                  <div className="text-6xl font-bold text-[#9fb3c4]/30 absolute top-4 right-4">{step.number}</div>
                   <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm">
                     <Icon className="w-7 h-7 text-[#00c9a7]" />
                   </div>
                   <h3 className="text-xl font-semibold text-[#0F2940] mb-2">{step.title}</h3>
-                  <p className="text-gray-600 text-sm">{step.description}</p>
+                  <p className="text-[#5b6b7a] text-sm">{step.description}</p>
                 </div>
               );
             })}
@@ -19044,11 +18772,11 @@ export function SiteFunctioningPage({ onNavigate }: PageProps) {
       </section>
 
       {/* Comment devenir hôte */}
-      <section className="bg-gray-50 py-12">
+      <section className="bg-[#f4fffe] py-12">
         <div className="max-w-6xl mx-auto px-5">
           <div className="text-center mb-10">
             <h2 className="text-3xl font-bold text-[#0F2940] mb-4">Pour les hôtes</h2>
-            <p className="text-gray-600">Gagnez de l'argent en partageant votre logement</p>
+            <p className="text-[#5b6b7a]">Gagnez de l'argent en partageant votre logement</p>
           </div>
           
           <div className="grid md:grid-cols-3 gap-8">
@@ -19057,21 +18785,21 @@ export function SiteFunctioningPage({ onNavigate }: PageProps) {
                 <span className="text-2xl font-bold text-[#00c9a7]">1</span>
               </div>
               <h3 className="font-semibold text-[#0F2940] mb-2">Créez votre annonce</h3>
-              <p className="text-gray-500 text-sm">Décrivez votre logement, ajoutez des photos et fixez vos tarifs</p>
+              <p className="text-[#5b6b7a] text-sm">Décrivez votre logement, ajoutez des photos et fixez vos tarifs</p>
             </div>
             <div className="text-center group">
               <div className="w-20 h-20 bg-[#00c9a7]/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                 <span className="text-2xl font-bold text-[#00c9a7]">2</span>
               </div>
               <h3 className="font-semibold text-[#0F2940] mb-2">Recevez des réservations</h3>
-              <p className="text-gray-500 text-sm">Les voyageurs réservent votre logement directement</p>
+              <p className="text-[#5b6b7a] text-sm">Les voyageurs réservent votre logement directement</p>
             </div>
             <div className="text-center group">
               <div className="w-20 h-20 bg-[#00c9a7]/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                 <span className="text-2xl font-bold text-[#00c9a7]">3</span>
               </div>
               <h3 className="font-semibold text-[#0F2940] mb-2">Recevez vos paiements</h3>
-              <p className="text-gray-500 text-sm">Virements vers Mobile Money ou compte bancaire</p>
+              <p className="text-[#5b6b7a] text-sm">Virements vers Mobile Money ou compte bancaire</p>
             </div>
           </div>
         </div>
@@ -19080,7 +18808,7 @@ export function SiteFunctioningPage({ onNavigate }: PageProps) {
       {/* Fonctionnalités */}
       <section className="py-12">
         <div className="max-w-6xl mx-auto px-5">
-          <h2 className="text-3xl font-bold text-[#0F2940] text-center mb-10">Pourquoi choisir Bluefin-Immo ?</h2>
+          <h2 className="text-3xl font-bold text-[#0F2940] text-center mb-10">Pourquoi choisir Bluefin Immo ?</h2>
           <div className="grid md:grid-cols-4 gap-6">
             {features.map((feature, idx) => {
               const Icon = feature.icon;
@@ -19090,7 +18818,7 @@ export function SiteFunctioningPage({ onNavigate }: PageProps) {
                     <Icon className="w-7 h-7 text-[#00c9a7]" />
                   </div>
                   <h3 className="font-semibold text-[#0F2940] mb-1">{feature.title}</h3>
-                  <p className="text-gray-500 text-sm">{feature.desc}</p>
+                  <p className="text-[#5b6b7a] text-sm">{feature.desc}</p>
                 </div>
               );
             })}
@@ -19140,14 +18868,14 @@ export function CompanyInfoPage({ onNavigate }: PageProps) {
   return (
     <Layout onNavigate={onNavigate} currentPage="company-info">
       <div className="max-w-4xl mx-auto px-5 py-8 md:px-6 md:py-10">
-        <div className="sticky top-0 z-40 bg-white border-b border-gray-100 px-5 py-4 -mt-8 -mx-5 md:-mx-6 mb-8">
+        <div className="sticky top-0 z-40 bg-white border-b border-[#e2f5f2] px-5 py-4 -mt-8 -mx-5 md:-mx-6 mb-8">
           <h1 className="text-2xl text-[#0F2940]">Informations légales</h1>
-          <p className="text-sm text-gray-500 mt-1">Mentions légales — article 328 et 501 de la loi n° 2017-20 (Code du numérique, Bénin)</p>
+          <p className="text-sm text-[#5b6b7a] mt-1">Mentions légales — article 328 et 501 de la loi n° 2017-20 (Code du numérique, Bénin)</p>
         </div>
 
         {identite.some((item) => item.value === LEGAL_PLACEHOLDER) && (
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-8">
-            <p className="text-sm text-amber-800">
+          <div className="bg-[#fffaeb] border border-[#ffe9a8] rounded-2xl p-4 mb-8">
+            <p className="text-sm text-[#4a3400]">
               Certaines informations d'immatriculation sont en cours de finalisation et seront publiées dès leur
               délivrance. Nous ne publions jamais de numéro d'immatriculation fictif.
             </p>
@@ -19159,8 +18887,8 @@ export function CompanyInfoPage({ onNavigate }: PageProps) {
           <dl className="grid sm:grid-cols-2 gap-4">
             {identite.map((item, idx) => (
               <div key={idx} className="bg-[#f4fffe] rounded-xl p-4">
-                <dt className="text-sm text-gray-500 mb-1">{item.label}</dt>
-                <dd className={`font-semibold ${item.value === LEGAL_PLACEHOLDER ? 'text-amber-600' : 'text-[#0F2940]'}`}>{item.value}</dd>
+                <dt className="text-sm text-[#5b6b7a] mb-1">{item.label}</dt>
+                <dd className={`font-semibold ${item.value === LEGAL_PLACEHOLDER ? 'text-[#a87c10]' : 'text-[#0F2940]'}`}>{item.value}</dd>
               </div>
             ))}
           </dl>
@@ -19168,9 +18896,9 @@ export function CompanyInfoPage({ onNavigate }: PageProps) {
 
         <div className="space-y-8">
           {sections.map((section, idx) => (
-            <div key={idx} className="border-b border-gray-200 pb-6">
+            <div key={idx} className="border-b border-[#e2f5f2] pb-6">
               <h2 className="text-xl font-semibold text-[#0F2940] mb-3">{section.title}</h2>
-              <p className="text-gray-600 leading-relaxed whitespace-pre-line">{section.content}</p>
+              <p className="text-[#5b6b7a] leading-relaxed whitespace-pre-line">{section.content}</p>
             </div>
           ))}
         </div>
@@ -19195,8 +18923,8 @@ const blogArticlesData = [
     content: `
       <div class="space-y-8">
         <!-- Introduction -->
-        <div class="bg-gradient-to-r from-[#00c9a7]/10 to-[#0f2940]/10 rounded-2xl p-6">
-          <p class="text-lg text-gray-700 leading-relaxed">
+        <div class="bg-[#f4fffe] rounded-2xl p-6">
+          <p class="text-lg text-[#1c3b56] leading-relaxed">
             Un logement bien préparé, c'est la promesse d'une première impression mémorable. 
             Le souci du détail fait toute la différence entre un voyageur satisfait et un voyageur 
             qui revient et qui laisse une évaluation élogieuse.
@@ -19209,8 +18937,8 @@ const blogArticlesData = [
             <div class="w-12 h-12 rounded-full bg-[#00c9a7] flex items-center justify-center text-white font-bold text-xl">01</div>
             <h2 class="text-2xl font-semibold text-[#0f2940]">Un nettoyage irréprochable</h2>
           </div>
-          <p class="text-gray-600 mb-4">Les hôtes les plus performants partagent une discipline commune : une routine de nettoyage stricte, appliquée sans exception avant chaque arrivée.</p>
-          <ul class="space-y-3 text-gray-600 list-disc pl-5">
+          <p class="text-[#5b6b7a] mb-4">Les hôtes les plus performants partagent une discipline commune : une routine de nettoyage stricte, appliquée sans exception avant chaque arrivée.</p>
+          <ul class="space-y-3 text-[#5b6b7a] list-disc pl-5">
             <li>Nettoyez soigneusement les zones très passagères : plans de travail, drains de lavabo, flacons de savon. Vérifiez qu'aucun cheveu ne vous a échappé.</li>
             <li>Aérez chaque pièce. Ouvrez les fenêtres, dépoussiérez les surfaces et nettoyez tous les sols, y compris sous les meubles.</li>
             <li>Faites les lits avec des draps frais et fournissez des serviettes propres pour chaque voyageur.</li>
@@ -19224,8 +18952,8 @@ const blogArticlesData = [
             <div class="w-12 h-12 rounded-full bg-[#00c9a7] flex items-center justify-center text-white font-bold text-xl">02</div>
             <h2 class="text-2xl font-semibold text-[#0f2940]">Les produits de base indispensables</h2>
           </div>
-          <p class="text-gray-600 mb-4">Les voyageurs s'attendent à trouver certains équipements essentiels dès leur arrivée. Voici les incontournables à toujours avoir en stock :</p>
-          <ul class="space-y-2 text-gray-600 list-disc pl-5 mb-6">
+          <p class="text-[#5b6b7a] mb-4">Les voyageurs s'attendent à trouver certains équipements essentiels dès leur arrivée. Voici les incontournables à toujours avoir en stock :</p>
+          <ul class="space-y-2 text-[#5b6b7a] list-disc pl-5 mb-6">
             <li>Papier toilette en quantité suffisante</li>
             <li>Savon pour les mains et le corps</li>
             <li>Une serviette propre par voyageur</li>
@@ -19235,19 +18963,19 @@ const blogArticlesData = [
           <div class="grid md:grid-cols-2 gap-4 mt-4">
             <div class="bg-[#f4fffe] rounded-xl p-4">
               <h4 class="font-semibold text-[#0f2940] mb-2">🍳 Cuisine</h4>
-              <p class="text-sm text-gray-600">Table et chaises pour tous les voyageurs, cafetière, bouilloire, casseroles et ustensiles, sel, poivre, huile de cuisson, liquide vaisselle et torchons.</p>
+              <p class="text-sm text-[#5b6b7a]">Table et chaises pour tous les voyageurs, cafetière, bouilloire, casseroles et ustensiles, sel, poivre, huile de cuisson, liquide vaisselle et torchons.</p>
             </div>
             <div class="bg-[#f4fffe] rounded-xl p-4">
               <h4 class="font-semibold text-[#0f2940] mb-2">🛋️ Salon</h4>
-              <p class="text-sm text-gray-600">Places assises pour tous les voyageurs, téléviseur avec service de streaming, manuel de la maison.</p>
+              <p class="text-sm text-[#5b6b7a]">Places assises pour tous les voyageurs, téléviseur avec service de streaming, manuel de la maison.</p>
             </div>
             <div class="bg-[#f4fffe] rounded-xl p-4">
               <h4 class="font-semibold text-[#0f2940] mb-2">🛁 Salle de bain</h4>
-              <p class="text-sm text-gray-600">Serviettes et tapis de bain, brosse à WC et ventouse, shampoing, après-shampoing et sèche-cheveux.</p>
+              <p class="text-sm text-[#5b6b7a]">Serviettes et tapis de bain, brosse à WC et ventouse, shampoing, après-shampoing et sèche-cheveux.</p>
             </div>
             <div class="bg-[#f4fffe] rounded-xl p-4">
               <h4 class="font-semibold text-[#0f2940] mb-2">🛏️ Chambre</h4>
-              <p class="text-sm text-gray-600">Stores ou rideaux occultants, rangements pour vêtements et espace pour les bagages, couvertures supplémentaires.</p>
+              <p class="text-sm text-[#5b6b7a]">Stores ou rideaux occultants, rangements pour vêtements et espace pour les bagages, couvertures supplémentaires.</p>
             </div>
           </div>
         </div>
@@ -19258,7 +18986,7 @@ const blogArticlesData = [
             <div class="w-12 h-12 rounded-full bg-[#00c9a7] flex items-center justify-center text-white font-bold text-xl">03</div>
             <h2 class="text-2xl font-semibold text-[#0f2940]">Les petits plus qui font la différence</h2>
           </div>
-          <p class="text-gray-600 mb-4">Ce sont souvent les attentions inattendues qui transforment un séjour ordinaire en une expérience mémorable.</p>
+          <p class="text-[#5b6b7a] mb-4">Ce sont souvent les attentions inattendues qui transforment un séjour ordinaire en une expérience mémorable.</p>
           <div class="space-y-4">
             <div class="flex gap-3">
               <span class="text-2xl">🎁</span>
@@ -19294,8 +19022,8 @@ const blogArticlesData = [
     image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80",
     content: `
       <div class="space-y-8">
-        <div class="bg-gradient-to-r from-[#00c9a7]/10 to-[#0f2940]/10 rounded-2xl p-6">
-          <p class="text-lg text-gray-700 leading-relaxed">
+        <div class="bg-[#f4fffe] rounded-2xl p-6">
+          <p class="text-lg text-[#1c3b56] leading-relaxed">
             Une annonce bien construite, c'est votre meilleur commercial. Les détails font la différence 
             entre un logement qui passe inaperçu et un logement qui décroche des réservations dès les premières semaines.
           </p>
@@ -19307,13 +19035,13 @@ const blogArticlesData = [
             <div class="w-12 h-12 rounded-full bg-[#00c9a7] flex items-center justify-center text-white font-bold text-xl">01</div>
             <h2 class="text-2xl font-semibold text-[#0f2940]">Des photos qui donnent envie</h2>
           </div>
-          <p class="text-gray-600 mb-4">Les photos sont l'élément le plus décisif de votre annonce. Un voyageur prend sa décision en quelques secondes — vos visuels doivent capter l'attention immédiatement.</p>
-          <ul class="space-y-3 text-gray-600 list-disc pl-5">
+          <p class="text-[#5b6b7a] mb-4">Les photos sont l'élément le plus décisif de votre annonce. Un voyageur prend sa décision en quelques secondes — vos visuels doivent capter l'attention immédiatement.</p>
+          <ul class="space-y-3 text-[#5b6b7a] list-disc pl-5">
             <li><strong>Misez sur la lumière naturelle</strong> — Identifiez les moments de la journée où vos pièces sont les mieux éclairées.</li>
             <li><strong>Soignez votre cadrage</strong> — Alternez plans larges et plans rapprochés. Photographiez à hauteur des yeux.</li>
             <li><strong>Créez une visite complète</strong> — Photographiez tous les espaces auxquels les voyageurs auront accès.</li>
           </ul>
-          <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mt-4">
+          <div class="bg-[#fffaeb] border border-[#ffe9a8] rounded-xl p-4 mt-4">
             <p class="text-sm"><strong>💡 Conseil pro :</strong> Pour aller plus loin, faites appel à un photographe professionnel. Des photos de qualité augmentent significativement le taux de conversion de votre annonce.</p>
           </div>
         </div>
@@ -19324,16 +19052,16 @@ const blogArticlesData = [
             <div class="w-12 h-12 rounded-full bg-[#00c9a7] flex items-center justify-center text-white font-bold text-xl">02</div>
             <h2 class="text-2xl font-semibold text-[#0f2940]">Tous vos équipements bien renseignés</h2>
           </div>
-          <p class="text-gray-600 mb-4">De nombreux voyageurs filtrent leurs recherches par équipements. Une liste exhaustive augmente directement votre visibilité.</p>
+          <p class="text-[#5b6b7a] mb-4">De nombreux voyageurs filtrent leurs recherches par équipements. Une liste exhaustive augmente directement votre visibilité.</p>
           <div class="flex flex-wrap gap-2 mb-4">
-            <span class="px-3 py-1 bg-gray-100 rounded-full text-sm">Wifi</span>
-            <span class="px-3 py-1 bg-gray-100 rounded-full text-sm">Piscine</span>
-            <span class="px-3 py-1 bg-gray-100 rounded-full text-sm">Jacuzzi</span>
-            <span class="px-3 py-1 bg-gray-100 rounded-full text-sm">Cuisine équipée</span>
-            <span class="px-3 py-1 bg-gray-100 rounded-full text-sm">Télévision</span>
-            <span class="px-3 py-1 bg-gray-100 rounded-full text-sm">Climatisation</span>
-            <span class="px-3 py-1 bg-gray-100 rounded-full text-sm">Lave-linge</span>
-            <span class="px-3 py-1 bg-gray-100 rounded-full text-sm">Parking gratuit</span>
+            <span class="px-3 py-1 bg-[#e8faf6] rounded-full text-sm">Wifi</span>
+            <span class="px-3 py-1 bg-[#e8faf6] rounded-full text-sm">Piscine</span>
+            <span class="px-3 py-1 bg-[#e8faf6] rounded-full text-sm">Jacuzzi</span>
+            <span class="px-3 py-1 bg-[#e8faf6] rounded-full text-sm">Cuisine équipée</span>
+            <span class="px-3 py-1 bg-[#e8faf6] rounded-full text-sm">Télévision</span>
+            <span class="px-3 py-1 bg-[#e8faf6] rounded-full text-sm">Climatisation</span>
+            <span class="px-3 py-1 bg-[#e8faf6] rounded-full text-sm">Lave-linge</span>
+            <span class="px-3 py-1 bg-[#e8faf6] rounded-full text-sm">Parking gratuit</span>
           </div>
         </div>
 
@@ -19365,8 +19093,8 @@ const blogArticlesData = [
             <div class="w-12 h-12 rounded-full bg-[#00c9a7] flex items-center justify-center text-white font-bold text-xl">04</div>
             <h2 class="text-2xl font-semibold text-[#0f2940]">Un règlement intérieur clair</h2>
           </div>
-          <p class="text-gray-600 mb-4">Un règlement bien rédigé protège votre logement et évite les malentendus.</p>
-          <ul class="space-y-2 text-gray-600 list-disc pl-5">
+          <p class="text-[#5b6b7a] mb-4">Un règlement bien rédigé protège votre logement et évite les malentendus.</p>
+          <ul class="space-y-2 text-[#5b6b7a] list-disc pl-5">
             <li>Animaux de compagnie</li>
             <li>Événements et fêtes</li>
             <li>Tabac et vapotage</li>
@@ -19387,8 +19115,8 @@ const blogArticlesData = [
     image: "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=800&q=80",
     content: `
       <div class="space-y-8">
-        <div class="bg-gradient-to-r from-[#00c9a7]/10 to-[#0f2940]/10 rounded-2xl p-6">
-          <p class="text-lg text-gray-700 leading-relaxed">
+        <div class="bg-[#f4fffe] rounded-2xl p-6">
+          <p class="text-lg text-[#1c3b56] leading-relaxed">
             Tout comme votre logement, quelques ajustements apportés au bon moment peuvent transformer les performances de votre annonce.
             En affinant vos photos, vos équipements et votre tarification, vous attirez davantage de voyageurs.
           </p>
@@ -19400,7 +19128,7 @@ const blogArticlesData = [
             <div class="w-12 h-12 rounded-full bg-[#00c9a7] flex items-center justify-center text-white font-bold text-xl">01</div>
             <h2 class="text-2xl font-semibold text-[#0f2940]">Mettez à jour vos photos</h2>
           </div>
-          <ul class="space-y-3 text-gray-600 list-disc pl-5">
+          <ul class="space-y-3 text-[#5b6b7a] list-disc pl-5">
             <li>Ajoutez des légendes à vos photos</li>
             <li>Soignez la composition — activez la grille, vérifiez la résolution</li>
             <li>Faites appel à un professionnel si nécessaire</li>
@@ -19413,7 +19141,7 @@ const blogArticlesData = [
             <div class="w-12 h-12 rounded-full bg-[#00c9a7] flex items-center justify-center text-white font-bold text-xl">02</div>
             <h2 class="text-2xl font-semibold text-[#0f2940]">Enrichissez vos informations</h2>
           </div>
-          <ul class="space-y-3 text-gray-600 list-disc pl-5">
+          <ul class="space-y-3 text-[#5b6b7a] list-disc pl-5">
             <li>Mettez en avant les équipements recherchés</li>
             <li>Maintenez votre annonce à jour</li>
             <li>Restez simple et direct</li>
@@ -19427,7 +19155,7 @@ const blogArticlesData = [
             <div class="w-12 h-12 rounded-full bg-[#00c9a7] flex items-center justify-center text-white font-bold text-xl">03</div>
             <h2 class="text-2xl font-semibold text-[#0f2940]">Offrez le meilleur rapport qualité-prix</h2>
           </div>
-          <ul class="space-y-3 text-gray-600 list-disc pl-5">
+          <ul class="space-y-3 text-[#5b6b7a] list-disc pl-5">
             <li>Adoptez une tarification compétitive</li>
             <li>Justifiez votre prix par votre offre</li>
           </ul>
@@ -19447,8 +19175,8 @@ const blogArticlesData = [
     image: "https://images.unsplash.com/photo-1590759668628-05b3b8986301?w=800&q=80",
     content: `
       <div class="space-y-6">
-        <div class="bg-gradient-to-r from-[#00c9a7]/10 to-[#0f2940]/10 rounded-2xl p-6">
-          <p class="text-lg text-gray-700">Le Bénin regorge de trésors culturels et naturels. Voici notre sélection des 10 destinations à absolument découvrir.</p>
+        <div class="bg-[#f4fffe] rounded-2xl p-6">
+          <p class="text-lg text-[#1c3b56]">Le Bénin regorge de trésors culturels et naturels. Voici notre sélection des 10 destinations à absolument découvrir.</p>
         </div>
         
         <div class="space-y-4">
@@ -19505,26 +19233,26 @@ const blogArticlesData = [
     image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
     content: `
       <div class="space-y-6">
-        <div class="bg-gradient-to-r from-[#00c9a7]/10 to-[#0f2940]/10 rounded-2xl p-6">
-          <p class="text-lg text-gray-700">La cuisine béninoise est riche en saveurs. Voici un guide des plats incontournables à goûter absolument.</p>
+        <div class="bg-[#f4fffe] rounded-2xl p-6">
+          <p class="text-lg text-[#1c3b56]">La cuisine béninoise est riche en saveurs. Voici un guide des plats incontournables à goûter absolument.</p>
         </div>
         
         <div class="space-y-4">
           <div class="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#00c9a7]">
             <h3 class="font-semibold text-lg text-[#0f2940]">🍛 Le Riz au Gras</h3>
-            <p class="text-gray-600">Plat national du Bénin, ce riz cuit dans une sauce tomate épicée avec du poisson ou de la viande.</p>
+            <p class="text-[#5b6b7a]">Plat national du Bénin, ce riz cuit dans une sauce tomate épicée avec du poisson ou de la viande.</p>
           </div>
           <div class="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#00c9a7]">
             <h3 class="font-semibold text-lg text-[#0f2940]">🍲 La Pâte (Akassa)</h3>
-            <p class="text-gray-600">Préparée à base de maïs ou de manioc, accompagnée de sauces variées (graines, gombo, arachide).</p>
+            <p class="text-[#5b6b7a]">Préparée à base de maïs ou de manioc, accompagnée de sauces variées (graines, gombo, arachide).</p>
           </div>
           <div class="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#00c9a7]">
             <h3 class="font-semibold text-lg text-[#0f2940]">🐟 Le Poisson braisé</h3>
-            <p class="text-gray-600">Spécialité du bord de mer, mariné aux épices locales et grillé au feu de bois.</p>
+            <p class="text-[#5b6b7a]">Spécialité du bord de mer, mariné aux épices locales et grillé au feu de bois.</p>
           </div>
           <div class="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#00c9a7]">
             <h3 class="font-semibold text-lg text-[#0f2940]">🥘 L'Igname pilée (Foutou)</h3>
-            <p class="text-gray-600">Accompagnement traditionnel servi avec des sauces relevées.</p>
+            <p class="text-[#5b6b7a]">Accompagnement traditionnel servi avec des sauces relevées.</p>
           </div>
         </div>
       </div>
@@ -19579,13 +19307,13 @@ export function BlogPage({ onNavigate }: PageProps) {
           <div className="mb-8">
             <button 
               onClick={() => onNavigate?.({ name: 'home' })} 
-              className="flex items-center gap-2 text-gray-500 hover:text-[#00c9a7] transition-colors mb-4"
+              className="flex items-center gap-2 text-[#5b6b7a] hover:text-[#00c9a7] transition-colors mb-4"
             >
               <ArrowRight className="w-4 h-4 rotate-180" />
               <span>Retour à l'accueil</span>
             </button>
             <h1 className="text-3xl font-bold text-[#0F2940]">Blog & Actualités</h1>
-            <p className="text-gray-500 mt-2">Des conseils de voyage au Bénin et des idées d'itinéraires pour les hôtes et voyageurs</p>
+            <p className="text-[#5b6b7a] mt-2">Des conseils de voyage au Bénin et des idées d'itinéraires pour les hôtes et voyageurs</p>
           </div>
 
           {/* Catégories */}
@@ -19593,13 +19321,13 @@ export function BlogPage({ onNavigate }: PageProps) {
             <button className="px-4 py-2 rounded-full bg-[#00c9a7] text-white text-sm font-medium">
               Tous les articles
             </button>
-            <button className="px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition">
+            <button className="px-4 py-2 rounded-full bg-[#e8faf6] text-[#1c3b56] text-sm font-medium hover:bg-[#e2f5f2] transition">
               Guide Hôte
             </button>
-            <button className="px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition">
+            <button className="px-4 py-2 rounded-full bg-[#e8faf6] text-[#1c3b56] text-sm font-medium hover:bg-[#e2f5f2] transition">
               Guide Voyageur
             </button>
-            <button className="px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition">
+            <button className="px-4 py-2 rounded-full bg-[#e8faf6] text-[#1c3b56] text-sm font-medium hover:bg-[#e2f5f2] transition">
               Culture & Gastronomie
             </button>
           </div>
@@ -19610,7 +19338,7 @@ export function BlogPage({ onNavigate }: PageProps) {
               <div
                 key={article.id}
                 onClick={() => setSelectedArticle(article)}
-                className="group cursor-pointer bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                className="group cursor-pointer bg-white rounded-2xl overflow-hidden shadow-sm border border-[#e2f5f2] hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
               >
                 <div className="relative h-48 overflow-hidden">
                   <img 
@@ -19625,13 +19353,13 @@ export function BlogPage({ onNavigate }: PageProps) {
                   </div>
                 </div>
                 <div className="p-5">
-                  <div className="flex items-center gap-2 text-xs text-gray-400 mb-2">
+                  <div className="flex items-center gap-2 text-xs text-[#5b6b7a] mb-2">
                     <span>{article.readTime}</span>
                   </div>
                   <h3 className="text-xl font-semibold text-[#0F2940] mb-2 line-clamp-2 group-hover:text-[#00c9a7] transition-colors">
                     {article.title}
                   </h3>
-                  <p className="text-gray-500 text-sm line-clamp-3 mb-4">
+                  <p className="text-[#5b6b7a] text-sm line-clamp-3 mb-4">
                     {article.excerpt}
                   </p>
                   <div className="flex items-center justify-between">
@@ -19640,8 +19368,8 @@ export function BlogPage({ onNavigate }: PageProps) {
                         <span className="text-sm font-bold text-[#00c9a7]">B</span>
                       </div>
                       <div>
-                        <p className="text-xs font-medium text-[#0F2940]">Bluefin-Immo</p>
-                        <p className="text-xs text-gray-400">Guide officiel</p>
+                        <p className="text-xs font-medium text-[#0F2940]">Bluefin Immo</p>
+                        <p className="text-xs text-[#5b6b7a]">Guide officiel</p>
                       </div>
                     </div>
                     <button className="text-[#00c9a7] text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
@@ -19683,13 +19411,13 @@ export function TermsPage({ onNavigate }: PageProps) {
   return (
     <Layout onNavigate={onNavigate} currentPage="privacy">
       <div className="max-w-4xl mx-auto px-5 py-8 md:px-6 md:py-10">
-        <div className="sticky top-0 z-40 bg-white border-b border-gray-100 px-5 py-4 -mt-8 -mx-5 md:-mx-6 mb-8">
+        <div className="sticky top-0 z-40 bg-white border-b border-[#e2f5f2] px-5 py-4 -mt-8 -mx-5 md:-mx-6 mb-8">
           <h1 className="text-2xl text-[#0F2940]">Politique de confidentialité</h1>
-          <p className="text-sm text-gray-500 mt-1">Dernière mise à jour : 1er janvier 2026</p>
+          <p className="text-sm text-[#5b6b7a] mt-1">Dernière mise à jour : 1er janvier 2026</p>
         </div>
 
         <div className="bg-[#f4fffe] rounded-2xl p-6 mb-8">
-          <p className="text-gray-700">
+          <p className="text-[#1c3b56]">
             Chez Bluefin Immo, nous accordons une importance capitale à votre confiance. 
             Cette page détaille nos engagements et vos droits concernant vos données personnelles.
           </p>
@@ -19697,9 +19425,9 @@ export function TermsPage({ onNavigate }: PageProps) {
 
         <div className="space-y-8">
           {sections.map((section, idx) => (
-            <div key={idx} className="border-b border-gray-200 pb-6">
+            <div key={idx} className="border-b border-[#e2f5f2] pb-6">
               <h2 className="text-xl font-semibold text-[#0F2940] mb-3">{section.title}</h2>
-              <p className="text-gray-600 leading-relaxed">{section.content}</p>
+              <p className="text-[#5b6b7a] leading-relaxed">{section.content}</p>
             </div>
           ))}
         </div>
@@ -19778,17 +19506,17 @@ export function CguPage({ onNavigate }: PageProps) {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="sticky top-0 z-40 bg-white border-b border-gray-100 px-5 py-4">
-        <button onClick={() => onNavigate?.({ name: 'home' })} className="text-sm text-gray-500 mb-4 flex items-center gap-2">
+      <div className="sticky top-0 z-40 bg-white border-b border-[#e2f5f2] px-5 py-4">
+        <button onClick={() => onNavigate?.({ name: 'home' })} className="text-sm text-[#5b6b7a] mb-4 flex items-center gap-2">
           <ArrowLeft className="w-4 h-4" /> Retour
         </button>
         <h1 className="text-2xl text-[#0F2940]">{cguContent.title}</h1>
-        <p className="text-sm text-gray-500 mt-1">Dernière mise à jour : {cguContent.lastUpdated}</p>
+        <p className="text-sm text-[#5b6b7a] mt-1">Dernière mise à jour : {cguContent.lastUpdated}</p>
       </div>
 
       <div className="max-w-4xl mx-auto px-5 py-8">
         <div className="bg-[#f4fffe] rounded-2xl p-6 mb-8">
-          <p className="text-gray-700">
+          <p className="text-[#1c3b56]">
             Chez Bluefin Immo, nous accordons une importance capitale à votre confiance. 
             Cette page détaille nos engagements et vos droits concernant l'utilisation de notre plateforme.
           </p>
@@ -19796,9 +19524,9 @@ export function CguPage({ onNavigate }: PageProps) {
 
         <div className="space-y-8">
           {cguContent.sections.map((section, idx) => (
-            <div key={idx} className="border-b border-gray-200 pb-6">
+            <div key={idx} className="border-b border-[#e2f5f2] pb-6">
               <h2 className="text-xl font-semibold text-[#0F2940] mb-3">{section.title}</h2>
-              <p className="text-gray-600 leading-relaxed whitespace-pre-line">{section.content}</p>
+              <p className="text-[#5b6b7a] leading-relaxed whitespace-pre-line">{section.content}</p>
             </div>
           ))}
         </div>
@@ -19811,11 +19539,11 @@ export function CguPage({ onNavigate }: PageProps) {
 // ==================== NOT FOUND PAGE ====================
 export function NotFoundPage({ onNavigate }: PageProps) {
   return (
-    <div className="min-h-screen bg-[#e8fffb] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[#f4fffe] flex items-center justify-center px-4">
       <div className="max-w-lg text-center rounded-[2rem] bg-white p-10 shadow-[0_20px_80px_rgba(15,41,64,0.08)]">
         <XCircle className="mx-auto mb-6 w-16 h-16 text-[#00c9a7]" />
         <h1 className="text-3xl font-bold text-[#0f2940] mb-3">Page introuvable</h1>
-        <p className="text-sm text-[#6b7280] mb-6">La page que vous recherchez n'existe pas ou a été déplacée.</p>
+        <p className="text-sm text-[#5b6b7a] mb-6">La page que vous recherchez n'existe pas ou a été déplacée.</p>
         <button
           onClick={() => onNavigate?.({ name: 'home' })}
           className="bg-[#00c9a7] text-white px-6 py-3 rounded-full font-semibold hover:bg-[#00b396] transition-colors"
@@ -20082,10 +19810,10 @@ const ExperienceCard = ({ exp, onClick }: { exp: Experience; onClick: () => void
 
   return (
     <div 
-      className="group cursor-pointer bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+      className="group cursor-pointer bg-white rounded-2xl overflow-hidden shadow-sm border border-[#e2f5f2] hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
       onClick={onClick}
     >
-      <div className="relative h-56 overflow-hidden bg-gray-100">
+      <div className="relative h-56 overflow-hidden bg-[#e8faf6]">
         <img 
           src={firstImage}
           alt={exp.name} 
@@ -20117,25 +19845,25 @@ const ExperienceCard = ({ exp, onClick }: { exp: Experience; onClick: () => void
             {exp.name}
           </h3>
           <div className="flex items-center gap-1 flex-shrink-0">
-            <Star className="w-3 h-3 fill-current text-yellow-400" />
+            <Star className="w-3 h-3 fill-current text-[#ffc93c]" />
             <span className="text-xs font-medium">{rating > 0 ? rating.toFixed(1) : 'Nouveau'}</span>
-            {reviews > 0 && <span className="text-xs text-gray-400">({reviews})</span>}
+            {reviews > 0 && <span className="text-xs text-[#5b6b7a]">({reviews})</span>}
           </div>
         </div>
-        <p className="text-xs text-gray-500 mb-2 flex items-center gap-1">
+        <p className="text-xs text-[#5b6b7a] mb-2 flex items-center gap-1">
           <MapPin className="w-3 h-3" />
           {exp.location || 'Bénin'}
         </p>
-        <p className="text-sm text-gray-600 line-clamp-2 mb-3">
+        <p className="text-sm text-[#5b6b7a] line-clamp-2 mb-3">
           {exp.description || 'Aucune description disponible'}
         </p>
         <div className="flex items-center justify-between">
           <div>
             <span className="font-bold text-[#0F2940] text-lg">{formatFCFA(exp.price || 0)}</span>
-            <span className="text-xs text-gray-500 block">{formatEuro(exp.price || 0)}</span>
+            <span className="text-xs text-[#5b6b7a] block">{formatEuro(exp.price || 0)}</span>
           </div>
           {exp.duration && (
-            <div className="text-xs text-gray-400 flex items-center gap-1">
+            <div className="text-xs text-[#5b6b7a] flex items-center gap-1">
               <Clock className="w-3 h-3" />
               {exp.duration}
             </div>
@@ -20229,20 +19957,20 @@ const ExperienceCalendar = ({
   return (
     <div className="text-center">
       <div className="flex items-center justify-between mb-3">
-        <button onClick={handlePrevMonth} className="p-1 hover:bg-gray-100 rounded-full transition">
+        <button onClick={handlePrevMonth} className="p-1 hover:bg-[#e8faf6] rounded-full transition">
           <ChevronLeft className="w-4 h-4" />
         </button>
         <span className="font-medium text-sm">
           {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
         </span>
-        <button onClick={handleNextMonth} className="p-1 hover:bg-gray-100 rounded-full transition">
+        <button onClick={handleNextMonth} className="p-1 hover:bg-[#e8faf6] rounded-full transition">
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>
       
       <div className="grid grid-cols-7 gap-1 text-xs">
         {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((day, i) => (
-          <div key={i} className="font-medium text-gray-500 py-1">{day}</div>
+          <div key={i} className="font-medium text-[#5b6b7a] py-1">{day}</div>
         ))}
         {Array.from({ length: firstDay === 0 ? 6 : firstDay - 1 }).map((_, i) => (
           <div key={`empty-${i}`} className="py-1" />
@@ -20260,12 +19988,12 @@ const ExperienceCalendar = ({
           let hoverEffect = '';
           
           if (!isCurrentMonth) {
-            textColor = 'text-gray-300';
+            textColor = 'text-[#9fb3c4]';
             cursor = 'cursor-default';
           } else if (isPast) {
-            textColor = 'text-gray-300';
+            textColor = 'text-[#9fb3c4]';
             cursor = 'cursor-not-allowed';
-            bgColor = 'bg-gray-50';
+            bgColor = 'bg-[#f4fffe]';
           } else if (!isAvailable) {
             textColor = 'text-red-400';
             cursor = 'cursor-not-allowed';
@@ -20276,7 +20004,7 @@ const ExperienceCalendar = ({
             cursor = 'cursor-pointer';
             hoverEffect = 'hover:scale-105';
           } else {
-            textColor = 'text-gray-800';
+            textColor = 'text-[#0f2940]';
             cursor = 'cursor-pointer';
             hoverEffect = 'hover:bg-[#00c9a7]/20';
           }
@@ -20300,23 +20028,23 @@ const ExperienceCalendar = ({
       {/* <div className="mt-2 flex flex-wrap items-center justify-center gap-3 text-xs">
         <div className="flex items-center gap-1">
           <div className="w-3 h-3 rounded-full bg-[#00c9a7]"></div>
-          <span className="text-gray-600">Disponible</span>
+          <span className="text-[#5b6b7a]">Disponible</span>
         </div>
         <div className="flex items-center gap-1">
           <div className="w-3 h-3 rounded-full bg-red-200"></div>
-          <span className="text-gray-600">Non disponible</span>
+          <span className="text-[#5b6b7a]">Non disponible</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-3 h-3 rounded-full bg-gray-100 border border-gray-300"></div>
-          <span className="text-gray-600">Passé</span>
+          <div className="w-3 h-3 rounded-full bg-[#e8faf6] border border-[#c9f0e8]"></div>
+          <span className="text-[#5b6b7a]">Passé</span>
         </div>
         <div className="flex items-center gap-1">
           <div className="w-3 h-3 rounded-full bg-[#00c9a7] border-2 border-white shadow"></div>
-          <span className="text-gray-600">Sélectionné</span>
+          <span className="text-[#5b6b7a]">Sélectionné</span>
         </div>
       </div> */}
       
-      <div className="mt-2 text-xs text-gray-400">
+      <div className="mt-2 text-xs text-[#5b6b7a]">
         {selectedDates.length === 0 && 'Cliquez sur les dates disponibles pour les sélectionner'}
         {selectedDates.length > 0 && (
           <span>
@@ -20344,7 +20072,7 @@ const ExperienceCalendar = ({
             </span>
           ))}
           {selectedDates.length > 5 && (
-            <span className="text-xs text-gray-400">+{selectedDates.length - 5} autres</span>
+            <span className="text-xs text-[#5b6b7a]">+{selectedDates.length - 5} autres</span>
           )}
         </div>
       )}
@@ -20585,17 +20313,17 @@ const ExperienceDetailModal = ({
       <div className="fixed inset-0 z-50 bg-white overflow-y-auto">
         <div className="min-h-screen pb-20">
           <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b px-3 sm:px-4 py-3 flex justify-between items-center">
-            <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100 transition-all">
+            <button onClick={onClose} className="p-2 rounded-full hover:bg-[#e8faf6] transition-all">
               <ArrowLeft className="w-5 h-5" />
             </button>
             <h1 className="text-sm sm:text-base font-semibold text-[#0F2940] truncate max-w-[50%]">
               {exp.name}
             </h1>
             <div className="flex gap-2">
-              <button className="p-2 rounded-full hover:bg-gray-100 transition-all">
+              <button className="p-2 rounded-full hover:bg-[#e8faf6] transition-all">
                 <Share2 className="w-5 h-5" />
               </button>
-              <button className="p-2 rounded-full hover:bg-gray-100 transition-all">
+              <button className="p-2 rounded-full hover:bg-[#e8faf6] transition-all">
                 <Heart className="w-5 h-5" />
               </button>
             </div>
@@ -20606,7 +20334,7 @@ const ExperienceDetailModal = ({
             <div className="mb-6">
               <div className="relative">
                 <div 
-                  className="relative rounded-2xl overflow-hidden cursor-pointer group aspect-[16/9] bg-gray-100"
+                  className="relative rounded-2xl overflow-hidden cursor-pointer group aspect-[16/9] bg-[#e8faf6]"
                   onClick={() => setIsGalleryOpen(true)}
                 >
                   <img 
@@ -20630,7 +20358,7 @@ const ExperienceDetailModal = ({
                     {images.slice(1, 5).map((img, index) => (
                       <div 
                         key={index} 
-                        className="aspect-[4/3] rounded-xl overflow-hidden cursor-pointer hover:ring-2 hover:ring-[#00c9a7] transition-all bg-gray-100"
+                        className="aspect-[4/3] rounded-xl overflow-hidden cursor-pointer hover:ring-2 hover:ring-[#00c9a7] transition-all bg-[#e8faf6]"
                         onClick={() => {
                           setGalleryIndex(index + 1);
                           setIsGalleryOpen(true);
@@ -20664,23 +20392,23 @@ const ExperienceDetailModal = ({
               {/* Colonne gauche */}
               <div className="flex-1 space-y-6 sm:space-y-8">
                 <div className="border-b pb-4">
-                  <div className="text-xs sm:text-sm text-gray-500">
+                  <div className="text-xs sm:text-sm text-[#5b6b7a]">
                     Expérience · {exp.location || 'Bénin'}
                   </div>
                   <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-[#0F2940] mt-1">
                     {exp.name}
                   </h1>
                   <div className="flex items-center gap-2 mt-2">
-                    <Star className="w-4 h-4 fill-current text-yellow-400" />
+                    <Star className="w-4 h-4 fill-current text-[#ffc93c]" />
                     <span className="font-medium text-sm">{rating > 0 ? rating.toFixed(1) : 'Nouveau'}</span>
                     {reviews > 0 && (
                       <>
-                        <span className="text-gray-300">·</span>
-                        <span className="text-gray-500 text-sm">{reviews} commentaires</span>
+                        <span className="text-[#9fb3c4]">·</span>
+                        <span className="text-[#5b6b7a] text-sm">{reviews} commentaires</span>
                       </>
                     )}
-                    <span className="text-gray-300">·</span>
-                    <span className="text-gray-500 text-sm">{availableDates.length} dates disponibles</span>
+                    <span className="text-[#9fb3c4]">·</span>
+                    <span className="text-[#5b6b7a] text-sm">{availableDates.length} dates disponibles</span>
                   </div>
                 </div>
 
@@ -20690,13 +20418,13 @@ const ExperienceDetailModal = ({
                     <div className="font-semibold text-[#0F2940] text-base sm:text-lg">
                       Hôte : {hostName}
                     </div>
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-[#5b6b7a]">
                       {exp.host?.host_type || 'Hôte expérimenté'}
                     </div>
                   </div>
                 </div>
 
-                <div className="text-sm sm:text-base text-gray-700 leading-relaxed">
+                <div className="text-sm sm:text-base text-[#1c3b56] leading-relaxed">
                   {exp.description || 'Aucune description disponible'}
                 </div>
 
@@ -20706,12 +20434,12 @@ const ExperienceDetailModal = ({
                       <Sparkles className="w-5 h-5 text-[#00c9a7]" />
                       Programme de l'expérience
                     </h3>
-                    <span className="text-sm text-gray-400">{steps.length} étapes</span>
+                    <span className="text-sm text-[#5b6b7a]">{steps.length} étapes</span>
                   </div>
                   
                   <div className="space-y-3">
                     {(showAllSteps ? steps : steps.slice(0, 3)).map((step: string, index: number) => (
-                      <div key={index} className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl hover:shadow-md transition-shadow">
+                      <div key={index} className="flex items-start gap-3 p-3 bg-[#f4fffe] rounded-xl hover:shadow-md transition-shadow">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="w-7 h-7 rounded-full bg-[#00c9a7] text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
@@ -20719,7 +20447,7 @@ const ExperienceDetailModal = ({
                             </span>
                             <span className="text-sm font-semibold text-[#0F2940]">Étape {index + 1}</span>
                           </div>
-                          <p className="text-sm text-gray-700">{step}</p>
+                          <p className="text-sm text-[#1c3b56]">{step}</p>
                         </div>
                       </div>
                     ))}
@@ -20738,15 +20466,15 @@ const ExperienceDetailModal = ({
 
               {/* Colonne droite - Réservation */}
               <div className="lg:w-96 xl:w-[420px] flex-shrink-0">
-                <div className="sticky top-24 bg-white border border-gray-200 rounded-2xl p-5 shadow-lg">
+                <div className="sticky top-24 bg-white border border-[#e2f5f2] rounded-2xl p-5 shadow-lg">
                   <div className="mb-4">
                     <div className="flex items-baseline gap-1">
                       <span className="text-2xl font-bold text-[#0F2940]">
                         {formatFCFA(price)}
                       </span>
-                      <span className="text-sm text-gray-500">/ adulte</span>
+                      <span className="text-sm text-[#5b6b7a]">/ adulte</span>
                     </div>
-                    <div className="text-sm text-gray-400">
+                    <div className="text-sm text-[#5b6b7a]">
                       {formatEuro(price)}
                     </div>
                   </div>
@@ -20765,46 +20493,46 @@ const ExperienceDetailModal = ({
                     </div>
 
                     <div className="p-3 border-t">
-                      <div className="text-xs font-bold text-gray-500 uppercase mb-3">Participants</div>
+                      <div className="text-xs font-bold text-[#5b6b7a] uppercase mb-3">Participants</div>
                       
-                      <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <div className="flex justify-between items-center py-2 border-b border-[#e2f5f2]">
                         <div>
                           <span className="text-sm font-medium">Adultes</span>
-                          <p className="text-[10px] text-gray-400">À partir de 12 ans</p>
+                          <p className="text-[10px] text-[#5b6b7a]">À partir de 12 ans</p>
                         </div>
                         <div className="flex gap-3 items-center">
                           <button 
                             onClick={() => setAdults(Math.max(1, adults - 1))} 
-                            className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors"
+                            className="w-7 h-7 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors"
                           >
                             -
                           </button>
                           <span className="min-w-[20px] text-center font-medium">{adults}</span>
                           <button 
                             onClick={() => setAdults(Math.min(maxParticipants, adults + 1))} 
-                            className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors"
+                            className="w-7 h-7 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors"
                           >
                             +
                           </button>
                         </div>
                       </div>
 
-                      <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <div className="flex justify-between items-center py-2 border-b border-[#e2f5f2]">
                         <div>
                           <span className="text-sm font-medium">Enfants</span>
-                          <p className="text-[10px] text-gray-400">2 - 11 ans (50% réduction)</p>
+                          <p className="text-[10px] text-[#5b6b7a]">2 - 11 ans (50% réduction)</p>
                         </div>
                         <div className="flex gap-3 items-center">
                           <button 
                             onClick={() => setChildren(Math.max(0, children - 1))} 
-                            className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors"
+                            className="w-7 h-7 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors"
                           >
                             -
                           </button>
                           <span className="min-w-[20px] text-center font-medium">{children}</span>
                           <button 
                             onClick={() => setChildren(Math.min(maxParticipants - adults, children + 1))} 
-                            className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors"
+                            className="w-7 h-7 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors"
                           >
                             +
                           </button>
@@ -20814,28 +20542,28 @@ const ExperienceDetailModal = ({
                       <div className="flex justify-between items-center py-2">
                         <div>
                           <span className="text-sm font-medium">Bébés</span>
-                          <p className="text-[10px] text-gray-400">Moins de 2 ans (gratuit)</p>
+                          <p className="text-[10px] text-[#5b6b7a]">Moins de 2 ans (gratuit)</p>
                         </div>
                         <div className="flex gap-3 items-center">
                           <button 
                             onClick={() => setInfants(Math.max(0, infants - 1))} 
-                            className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors"
+                            className="w-7 h-7 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors"
                           >
                             -
                           </button>
                           <span className="min-w-[20px] text-center font-medium">{infants}</span>
                           <button 
                             onClick={() => setInfants(Math.min(maxParticipants - adults - children, infants + 1))} 
-                            className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors"
+                            className="w-7 h-7 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors"
                           >
                             +
                           </button>
                         </div>
                       </div>
 
-                      <div className="mt-3 pt-3 border-t border-gray-200">
+                      <div className="mt-3 pt-3 border-t border-[#e2f5f2]">
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-600">Total participants</span>
+                          <span className="text-[#5b6b7a]">Total participants</span>
                           <span className="font-semibold text-[#0F2940]">{totalGuests}</span>
                         </div>
                       </div>
@@ -20845,48 +20573,48 @@ const ExperienceDetailModal = ({
                   {selectedDates.length > 0 && (
                     <div className="space-y-2 mb-4 text-sm">
                       {adults > 0 && (
-                        <div className="flex justify-between text-gray-600">
+                        <div className="flex justify-between text-[#5b6b7a]">
                           <span>{adults} adulte{adults > 1 ? 's' : ''} × {formatFCFA(price)}</span>
                           <div className="text-right">
                             <div>{formatFCFA(price * adults)}</div>
-                            <div className="text-xs text-gray-400">{formatEuro(price * adults)}</div>
+                            <div className="text-xs text-[#5b6b7a]">{formatEuro(price * adults)}</div>
                           </div>
                         </div>
                       )}
                       {children > 0 && (
-                        <div className="flex justify-between text-gray-600">
+                        <div className="flex justify-between text-[#5b6b7a]">
                           <span>{children} enfant{children > 1 ? 's' : ''} × {formatFCFA(price * 0.5)} (50%)</span>
                           <div className="text-right">
                             <div>{formatFCFA(Math.round(price * 0.5 * children))}</div>
-                            <div className="text-xs text-gray-400">{formatEuro(price * 0.5 * children)}</div>
+                            <div className="text-xs text-[#5b6b7a]">{formatEuro(price * 0.5 * children)}</div>
                           </div>
                         </div>
                       )}
                       {infants > 0 && (
-                        <div className="flex justify-between text-gray-400">
+                        <div className="flex justify-between text-[#5b6b7a]">
                           <span>{infants} bébé{infants > 1 ? 's' : ''}</span>
                           <span>Gratuit</span>
                         </div>
                       )}
-                      <div className="flex justify-between text-gray-600 border-t border-gray-100 pt-2">
+                      <div className="flex justify-between text-[#5b6b7a] border-t border-[#e2f5f2] pt-2">
                         <span>Sous-total × {nights} nuit{nights > 1 ? 's' : ''}</span>
                         <div className="text-right">
                           <div>{formatFCFA(subtotal)}</div>
-                          <div className="text-xs text-gray-400">{formatEuro(subtotal)}</div>
+                          <div className="text-xs text-[#5b6b7a]">{formatEuro(subtotal)}</div>
                         </div>
                       </div>
-                      <div className="flex justify-between text-gray-600">
+                      <div className="flex justify-between text-[#5b6b7a]">
                         <span>Frais de service</span>
                         <div className="text-right">
                           <div>{formatFCFA(Math.round(serviceFee))}</div>
-                          <div className="text-xs text-gray-400">{formatEuro(serviceFee)}</div>
+                          <div className="text-xs text-[#5b6b7a]">{formatEuro(serviceFee)}</div>
                         </div>
                       </div>
-                      <div className="flex justify-between font-bold pt-2 border-t border-gray-200">
+                      <div className="flex justify-between font-bold pt-2 border-t border-[#e2f5f2]">
                         <span className="text-[#0F2940]">Total</span>
                         <div className="text-right">
                           <div className="text-[#00c9a7]">{formatFCFA(Math.round(total))}</div>
-                          <div className="text-xs font-normal text-gray-400">{formatEuro(total)}</div>
+                          <div className="text-xs font-normal text-[#5b6b7a]">{formatEuro(total)}</div>
                         </div>
                       </div>
                     </div>
@@ -20897,8 +20625,8 @@ const ExperienceDetailModal = ({
                     disabled={availabilityStatus !== 'available' || selectedDates.length < 2 || isBooking || totalGuests === 0} 
                     className={`w-full py-3.5 rounded-xl font-semibold text-sm sm:text-base transition-all ${
                       availabilityStatus === 'available' && selectedDates.length >= 2 && totalGuests > 0 && !isBooking
-                        ? 'bg-gradient-to-r from-[#00c9a7] to-[#00a887] text-white hover:shadow-lg hover:scale-[1.02]' 
-                        : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                        ? 'bg-[#00c9a7] text-white hover:shadow-lg hover:scale-[1.02]' 
+                        : 'bg-[#e2f5f2] text-[#5b6b7a] cursor-not-allowed'
                     }`}
                   >
                     {isBooking ? 'Réservation en cours...' : 
@@ -21063,7 +20791,7 @@ export function ExperiencePage({ onNavigate }: PageProps) {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#00c9a7] border-t-transparent mx-auto mb-4"></div>
-          <p className="text-gray-500">Chargement des expériences...</p>
+          <p className="text-[#5b6b7a]">Chargement des expériences...</p>
         </div>
       </div>
     );
@@ -21073,7 +20801,7 @@ export function ExperiencePage({ onNavigate }: PageProps) {
     return (
       <div className="min-h-screen bg-white">
         <div className="sticky top-0 bg-white border-b px-4 py-3 flex items-center gap-4 z-20">
-          <button onClick={() => onNavigate?.({ name: 'home' })} className="p-2 rounded-full hover:bg-gray-100">
+          <button onClick={() => onNavigate?.({ name: 'home' })} className="p-2 rounded-full hover:bg-[#e8faf6]">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-xl font-semibold text-[#0F2940]">Expériences au Bénin</h1>
@@ -21081,10 +20809,10 @@ export function ExperiencePage({ onNavigate }: PageProps) {
         <div className="max-w-7xl mx-auto px-4 py-12 text-center">
           <div className="text-6xl mb-4">🎭</div>
           <p className="text-red-500 mb-2">{error}</p>
-          <p className="text-sm text-gray-400 mb-4">Vérifiez votre connexion ou réessayez</p>
+          <p className="text-sm text-[#5b6b7a] mb-4">Vérifiez votre connexion ou réessayez</p>
           <button 
             onClick={fetchExperiences} 
-            className="px-6 py-2.5 bg-[#00c9a7] text-white rounded-full hover:bg-[#00b892] transition shadow-lg hover:shadow-xl flex items-center gap-2 mx-auto"
+            className="px-6 py-2.5 bg-[#00c9a7] text-white rounded-full hover:bg-[#00b396] transition shadow-lg hover:shadow-xl flex items-center gap-2 mx-auto"
           >
             <RefreshCw className="w-4 h-4" />
             Réessayer
@@ -21097,21 +20825,21 @@ export function ExperiencePage({ onNavigate }: PageProps) {
   return (
     <div className="min-h-screen bg-white">
       <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b px-4 py-3 flex items-center gap-4 z-20">
-        <button onClick={() => onNavigate?.({ name: 'home' })} className="p-2 rounded-full hover:bg-gray-100 transition">
+        <button onClick={() => onNavigate?.({ name: 'home' })} className="p-2 rounded-full hover:bg-[#e8faf6] transition">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-xl font-semibold text-[#0F2940]">Expériences au Bénin</h1>
         <button 
           onClick={refreshExperiences} 
-          className="ml-auto p-2 rounded-full hover:bg-gray-100 transition-colors"
+          className="ml-auto p-2 rounded-full hover:bg-[#e8faf6] transition-colors"
           title="Rafraîchir"
         >
-          <RefreshCw className="w-5 h-5 text-gray-500" />
+          <RefreshCw className="w-5 h-5 text-[#5b6b7a]" />
         </button>
       </div>
 
-      <div className="bg-gradient-to-r from-[#00c9a7] to-[#0f2940] py-16 text-white text-center">
-        <h1 className="text-3xl md:text-4xl font-bold mb-3">Expériences de Bluefin-Immo</h1>
+      <div className="bg-[#0f2940] py-16 text-white text-center">
+        <h1 className="text-3xl md:text-4xl font-bold mb-3">Expériences de Bluefin Immo</h1>
         <p className="text-base md:text-lg text-white/90 max-w-2xl mx-auto px-4">
           Découvrez des activités uniques organisées par des hôtes et artisans locaux du Bénin.
         </p>
@@ -21121,7 +20849,7 @@ export function ExperiencePage({ onNavigate }: PageProps) {
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl md:text-2xl font-semibold text-[#0F2940] flex items-center gap-2">
             Toutes les expériences
-            <span className="text-sm font-normal text-gray-500 ml-1">
+            <span className="text-sm font-normal text-[#5b6b7a] ml-1">
               ({experiences.length})
             </span>
           </h2>
@@ -21137,10 +20865,10 @@ export function ExperiencePage({ onNavigate }: PageProps) {
         {experiences.length === 0 ? (
           <div className="text-center py-16">
             <div className="text-6xl mb-4">🎭</div>
-            <p className="text-gray-500">Aucune expérience disponible pour le moment.</p>
+            <p className="text-[#5b6b7a]">Aucune expérience disponible pour le moment.</p>
             <button 
               onClick={refreshExperiences} 
-              className="mt-4 px-6 py-2.5 bg-[#00c9a7] text-white rounded-full hover:bg-[#00b892] transition"
+              className="mt-4 px-6 py-2.5 bg-[#00c9a7] text-white rounded-full hover:bg-[#00b396] transition"
             >
               Actualiser
             </button>
@@ -21256,47 +20984,47 @@ const ParticipantsEditor = ({
   return (
     <div className="space-y-3">
       {/* Adultes */}
-      <div className="flex justify-between items-center py-2 border-b border-gray-100">
+      <div className="flex justify-between items-center py-2 border-b border-[#e2f5f2]">
         <div>
           <span className="font-medium text-sm">Adultes</span>
-          <p className="text-xs text-gray-400">À partir de 12 ans</p>
+          <p className="text-xs text-[#5b6b7a]">À partir de 12 ans</p>
         </div>
         <div className="flex items-center gap-3">
           <button 
             onClick={() => setTempAdults(Math.max(1, tempAdults - 1))}
-            className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors"
+            className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors"
           >
-            <Minus className="w-4 h-4 text-gray-600" />
+            <Minus className="w-4 h-4 text-[#5b6b7a]" />
           </button>
           <span className="font-medium min-w-[24px] text-center">{tempAdults}</span>
           <button 
             onClick={() => setTempAdults(Math.min(maxParticipants, tempAdults + 1))}
-            className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors"
+            className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors"
           >
-            <Plus className="w-4 h-4 text-gray-600" />
+            <Plus className="w-4 h-4 text-[#5b6b7a]" />
           </button>
         </div>
       </div>
 
       {/* Enfants */}
-      <div className="flex justify-between items-center py-2 border-b border-gray-100">
+      <div className="flex justify-between items-center py-2 border-b border-[#e2f5f2]">
         <div>
           <span className="font-medium text-sm">Enfants</span>
-          <p className="text-xs text-gray-400">2 - 11 ans (50% réduction)</p>
+          <p className="text-xs text-[#5b6b7a]">2 - 11 ans (50% réduction)</p>
         </div>
         <div className="flex items-center gap-3">
           <button 
             onClick={() => setTempChildren(Math.max(0, tempChildren - 1))}
-            className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors"
+            className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors"
           >
-            <Minus className="w-4 h-4 text-gray-600" />
+            <Minus className="w-4 h-4 text-[#5b6b7a]" />
           </button>
           <span className="font-medium min-w-[24px] text-center">{tempChildren}</span>
           <button 
             onClick={() => setTempChildren(Math.min(maxParticipants - tempAdults - tempInfants, tempChildren + 1))}
-            className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors"
+            className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors"
           >
-            <Plus className="w-4 h-4 text-gray-600" />
+            <Plus className="w-4 h-4 text-[#5b6b7a]" />
           </button>
         </div>
       </div>
@@ -21305,26 +21033,26 @@ const ParticipantsEditor = ({
       <div className="flex justify-between items-center py-2">
         <div>
           <span className="font-medium text-sm">Bébés</span>
-          <p className="text-xs text-gray-400">Moins de 2 ans (gratuit)</p>
+          <p className="text-xs text-[#5b6b7a]">Moins de 2 ans (gratuit)</p>
         </div>
         <div className="flex items-center gap-3">
           <button 
             onClick={() => setTempInfants(Math.max(0, tempInfants - 1))}
-            className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors"
+            className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors"
           >
-            <Minus className="w-4 h-4 text-gray-600" />
+            <Minus className="w-4 h-4 text-[#5b6b7a]" />
           </button>
           <span className="font-medium min-w-[24px] text-center">{tempInfants}</span>
           <button 
             onClick={() => setTempInfants(Math.min(maxParticipants - tempAdults - tempChildren, tempInfants + 1))}
-            className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] transition-colors"
+            className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] transition-colors"
           >
-            <Plus className="w-4 h-4 text-gray-600" />
+            <Plus className="w-4 h-4 text-[#5b6b7a]" />
           </button>
         </div>
       </div>
 
-      <div className="flex justify-between text-xs text-gray-500 pt-2 border-t border-gray-200">
+      <div className="flex justify-between text-xs text-[#5b6b7a] pt-2 border-t border-[#e2f5f2]">
         <span>Total participants</span>
         <span className={`font-medium ${total > maxParticipants ? 'text-red-500' : ''}`}>
           {total} / {maxParticipants} max.
@@ -21334,14 +21062,14 @@ const ParticipantsEditor = ({
       <div className="flex gap-2">
         <button
           onClick={onCancel}
-          className="flex-1 py-2 border border-gray-300 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-50 transition"
+          className="flex-1 py-2 border border-[#c9f0e8] text-[#5b6b7a] rounded-lg text-sm font-medium hover:bg-[#f4fffe] transition"
         >
           Annuler
         </button>
         <button
           onClick={handleSave}
           disabled={total > maxParticipants || total < 1}
-          className="flex-1 py-2 bg-[#00c9a7] text-white rounded-lg text-sm font-medium hover:bg-[#00b892] transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 py-2 bg-[#00c9a7] text-white rounded-lg text-sm font-medium hover:bg-[#00b396] transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Check className="w-4 h-4 inline mr-1" /> Enregistrer
         </button>
@@ -21871,8 +21599,8 @@ const saveBookingData = () => {
     return (
       <div className="min-h-screen flex justify-center items-center bg-[#f4fffe] p-4">
         <div className="text-center bg-white rounded-2xl p-8 max-w-md">
-          <Sparkles className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500 mb-4">Aucune réservation en cours</p>
+          <Sparkles className="w-16 h-16 text-[#9fb3c4] mx-auto mb-4" />
+          <p className="text-[#5b6b7a] mb-4">Aucune réservation en cours</p>
           <button onClick={() => onNavigate?.({ name: 'experience' })} className="text-[#00c9a7] underline">
             Retour aux expériences
           </button>
@@ -21884,17 +21612,17 @@ const saveBookingData = () => {
   return (
     <div className="bg-[#f4fffe] min-h-screen pb-32 md:pb-12">
       {/* En-tête */}
-      <div className="sticky top-0 z-40 bg-white border-b border-gray-100 px-4 py-3 shadow-sm">
+      <div className="sticky top-0 z-40 bg-white border-b border-[#e2f5f2] px-4 py-3 shadow-sm">
         <div className="flex items-center gap-3">
           <button 
             onClick={() => onNavigate?.({ name: 'experience' })} 
-            className="p-2 -ml-2 rounded-full hover:bg-gray-100 transition"
+            className="p-2 -ml-2 rounded-full hover:bg-[#e8faf6] transition"
           >
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
+            <ArrowLeft className="w-5 h-5 text-[#5b6b7a]" />
           </button>
           <div>
             <h1 className="font-semibold text-[#0F2940] text-base sm:text-lg">Confirmation</h1>
-            <p className="text-xs text-gray-500">Vérifiez et modifiez vos informations</p>
+            <p className="text-xs text-[#5b6b7a]">Vérifiez et modifiez vos informations</p>
           </div>
         </div>
       </div>
@@ -21902,15 +21630,15 @@ const saveBookingData = () => {
       <div className="max-w-[1200px] mx-auto px-4 py-4 md:py-6">
         <div className="text-center py-6">
           <h2 className="text-2xl font-bold text-[#0F2940] mb-2">Réservation d'expérience</h2>
-          <p className="text-gray-500">{experience?.name}</p>
-          <p className="text-gray-400 text-sm mt-1">{experience?.location}</p>
+          <p className="text-[#5b6b7a]">{experience?.name}</p>
+          <p className="text-[#5b6b7a] text-sm mt-1">{experience?.location}</p>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-4 md:gap-6">
           {/* Colonne gauche - Détails modifiables */}
           <div className="flex-1 space-y-4">
             {/* Dates avec édition */}
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-[#e2f5f2]">
               <div className="flex justify-between items-center mb-3">
                 <h2 className="font-semibold text-[#0F2940] flex items-center gap-2 text-base">
                   <Calendar className="w-5 h-5 text-[#00c9a7]" />
@@ -21919,7 +21647,7 @@ const saveBookingData = () => {
                 {!isEditingDates && (
                   <button 
                     onClick={handleEditDates}
-                    className="p-1.5 rounded-full hover:bg-gray-100 transition-colors text-gray-400 hover:text-[#00c9a7]"
+                    className="p-1.5 rounded-full hover:bg-[#e8faf6] transition-colors text-[#5b6b7a] hover:text-[#00c9a7]"
                     title="Modifier les dates"
                   >
                     <Pencil className="w-4 h-4" />
@@ -21941,14 +21669,14 @@ const saveBookingData = () => {
                   <div className="flex gap-2">
                     <button
                       onClick={handleCancelEditDates}
-                      className="flex-1 py-2 border border-gray-300 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-50 transition"
+                      className="flex-1 py-2 border border-[#c9f0e8] text-[#5b6b7a] rounded-lg text-sm font-medium hover:bg-[#f4fffe] transition"
                     >
                       Annuler
                     </button>
                     <button
                       onClick={() => handleSaveDates(tempSelectedDates)}
                       disabled={tempSelectedDates.length < 2}
-                      className="flex-1 py-2 bg-[#00c9a7] text-white rounded-lg text-sm font-medium hover:bg-[#00b892] transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex-1 py-2 bg-[#00c9a7] text-white rounded-lg text-sm font-medium hover:bg-[#00b396] transition disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Check className="w-4 h-4 inline mr-1" /> 
                       {tempSelectedDates.length < 2 ? 'Sélectionnez 2 dates' : `Enregistrer (${tempSelectedDates.length} dates)`}
@@ -21958,15 +21686,15 @@ const saveBookingData = () => {
               ) : (
                 <div className="grid grid-cols-3 gap-3 text-sm">
                   <div>
-                    <p className="text-gray-500 text-xs">Arrivée</p>
+                    <p className="text-[#5b6b7a] text-xs">Arrivée</p>
                     <p className="font-medium">{checkIn || '-'}</p>
                   </div>
                   <div>
-                    <p className="text-gray-500 text-xs">Départ</p>
+                    <p className="text-[#5b6b7a] text-xs">Départ</p>
                     <p className="font-medium">{checkOut || '-'}</p>
                   </div>
                   <div>
-                    <p className="text-gray-500 text-xs">Durée</p>
+                    <p className="text-[#5b6b7a] text-xs">Durée</p>
                     <p className="font-medium">{nights} nuit{nights > 1 ? 's' : ''}</p>
                   </div>
                 </div>
@@ -21974,7 +21702,7 @@ const saveBookingData = () => {
             </div>
 
             {/* Participants avec édition */}
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-[#e2f5f2]">
               <div className="flex justify-between items-center mb-3">
                 <h2 className="font-semibold text-[#0F2940] flex items-center gap-2 text-base">
                   <Users className="w-5 h-5 text-[#00c9a7]" />
@@ -21983,7 +21711,7 @@ const saveBookingData = () => {
                 {!isEditingParticipants && (
                   <button 
                     onClick={() => setIsEditingParticipants(true)}
-                    className="p-1.5 rounded-full hover:bg-gray-100 transition-colors text-gray-400 hover:text-[#00c9a7]"
+                    className="p-1.5 rounded-full hover:bg-[#e8faf6] transition-colors text-[#5b6b7a] hover:text-[#00c9a7]"
                     title="Modifier les participants"
                   >
                     <Pencil className="w-4 h-4" />
@@ -22004,19 +21732,19 @@ const saveBookingData = () => {
                 <>
                   <div className="grid grid-cols-3 gap-3 text-sm">
                     <div>
-                      <p className="text-gray-500 text-xs">Adultes</p>
+                      <p className="text-[#5b6b7a] text-xs">Adultes</p>
                       <p className="font-medium">{adults}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 text-xs">Enfants (2-11 ans)</p>
+                      <p className="text-[#5b6b7a] text-xs">Enfants (2-11 ans)</p>
                       <p className="font-medium">{children}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 text-xs">Bébés (-2 ans)</p>
+                      <p className="text-[#5b6b7a] text-xs">Bébés (-2 ans)</p>
                       <p className="font-medium">{infants}</p>
                     </div>
                   </div>
-                  <div className="mt-2 text-xs text-gray-500">
+                  <div className="mt-2 text-xs text-[#5b6b7a]">
                     Total : {totalGuests} participant{totalGuests > 1 ? 's' : ''} / {maxParticipants} max.
                   </div>
                 </>
@@ -22024,29 +21752,29 @@ const saveBookingData = () => {
             </div>
 
             {/* Informations */}
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-[#e2f5f2]">
               <h2 className="font-semibold text-[#0F2940] flex items-center gap-2 text-base">
                 <User className="w-5 h-5 text-[#00c9a7]" />
                 Vos informations
               </h2>
               <div className="space-y-2 text-sm mt-3">
                 <div className="flex justify-between py-1">
-                  <span className="text-gray-500">Nom complet</span>
+                  <span className="text-[#5b6b7a]">Nom complet</span>
                   <span className="font-medium">{bookingFormData?.guest_details?.full_name || user?.first_name ? `${user?.first_name || ''} ${user?.last_name || ''}` : '-'}</span>
                 </div>
                 <div className="flex justify-between py-1 border-t">
-                  <span className="text-gray-500">Email</span>
+                  <span className="text-[#5b6b7a]">Email</span>
                   <span className="font-medium break-all">{bookingFormData?.guest_details?.email || user?.email || '-'}</span>
                 </div>
                 <div className="flex justify-between py-1 border-t">
-                  <span className="text-gray-500">Téléphone</span>
+                  <span className="text-[#5b6b7a]">Téléphone</span>
                   <span className="font-medium">{bookingFormData?.guest_details?.phone || user?.phone || '-'}</span>
                 </div>
               </div>
             </div>
 
             {/* Demandes spéciales */}
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-[#e2f5f2]">
               <h2 className="font-semibold text-[#0F2940] flex items-center gap-2 text-base">
                 <MessageCircle className="w-5 h-5 text-[#00c9a7]" />
                 Demandes spéciales
@@ -22055,7 +21783,7 @@ const saveBookingData = () => {
                 value={specialRequests} 
                 onChange={(e) => setSpecialRequests(e.target.value)} 
                 placeholder="Allergies, besoins particuliers, etc." 
-                className="w-full mt-2 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent resize-none text-sm" 
+                className="w-full mt-2 px-4 py-3 border border-[#e2f5f2] rounded-xl focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent resize-none text-sm" 
                 rows={3} 
               />
             </div>
@@ -22063,30 +21791,30 @@ const saveBookingData = () => {
 
           {/* Colonne droite - Prix */}
           <div className="lg:w-96 space-y-4">
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 sticky top-20">
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-[#e2f5f2] sticky top-20">
               <h2 className="font-semibold text-[#0F2940] mb-3 text-base">Détail des prix</h2>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">{price.toLocaleString()} FCFA × {nights} nuits × {totalGuests} pers.</span>
+                  <span className="text-[#5b6b7a]">{price.toLocaleString()} FCFA × {nights} nuits × {totalGuests} pers.</span>
                   <span>{subtotal.toLocaleString()} FCFA</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Frais de service (10%)</span>
+                  <span className="text-[#5b6b7a]">Frais de service (10%)</span>
                   <span>{Math.floor(serviceFee).toLocaleString()} FCFA</span>
                 </div>
-                <div className="border-t border-gray-200 pt-3 mt-3">
+                <div className="border-t border-[#e2f5f2] pt-3 mt-3">
                   <div className="flex justify-between items-center">
                     <span className="font-semibold">Total</span>
                     <span className="font-bold text-[#00c9a7] text-base sm:text-lg">{total.toLocaleString()} FCFA</span>
                   </div>
-                  <div className="text-right text-xs text-gray-400">{formatEuro(total)}</div>
+                  <div className="text-right text-xs text-[#5b6b7a]">{formatEuro(total)}</div>
                 </div>
               </div>
               
               <button
                 onClick={handleFedapayRedirect}
                 disabled={loading}
-                className="w-full mt-4 bg-gradient-to-r from-[#00c9a7] to-[#00a887] text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 text-sm active:scale-[0.98] flex items-center justify-center gap-2"
+                className="w-full mt-4 bg-[#00c9a7] text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 text-sm active:scale-[0.98] flex items-center justify-center gap-2"
               >
                 <Wallet className="w-4 h-4" />
                 {loading ? 'Préparation...' : 'Payer avec Fedapay'}
@@ -22096,7 +21824,7 @@ const saveBookingData = () => {
                   JSX (aucun effet au clic) — voir audit formulaires. Fedapay gère
                   déjà Mobile Money et carte sur sa page de paiement hébergée. */}
 
-              <div className="mt-3 flex items-center justify-center gap-4 text-xs text-gray-400">
+              <div className="mt-3 flex items-center justify-center gap-4 text-xs text-[#5b6b7a]">
                 <div className="flex items-center gap-1">
                   <Lock className="w-3 h-3" />
                   <span>Paiement sécurisé</span>
@@ -22115,7 +21843,7 @@ const saveBookingData = () => {
       {showPaymentModal && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 bg-black/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] flex flex-col animate-fadeInUp shadow-2xl">
-            <div className="sticky top-0 bg-white border-b border-gray-100 p-4 rounded-t-2xl flex justify-between items-center z-10">
+            <div className="sticky top-0 bg-white border-b border-[#e2f5f2] p-4 rounded-t-2xl flex justify-between items-center z-10">
               <h3 className="text-base sm:text-lg font-semibold text-[#0F2940]">
                 {paymentStep === 'form' && 'Choisissez votre paiement'}
                 {paymentStep === 'processing' && 'Traitement en cours...'}
@@ -22128,17 +21856,17 @@ const saveBookingData = () => {
                   setPaymentStep('form'); 
                   setError(''); 
                 }} 
-                className="p-2 rounded-full hover:bg-gray-100 transition"
+                className="p-2 rounded-full hover:bg-[#e8faf6] transition"
               >
-                <X className="w-5 h-5 text-gray-500" />
+                <X className="w-5 h-5 text-[#5b6b7a]" />
               </button>
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 sm:p-6">
               {paymentStep === 'form' && (
                 <div className="space-y-5">
-                  <div className="bg-gradient-to-r from-[#00c9a7]/10 to-[#0F2940]/10 rounded-xl p-4 text-center">
-                    <p className="text-xs sm:text-sm text-gray-600">Montant à payer</p>
+                  <div className="bg-[#f4fffe] rounded-xl p-4 text-center">
+                    <p className="text-xs sm:text-sm text-[#5b6b7a]">Montant à payer</p>
                     <p className="text-2xl sm:text-3xl font-bold text-[#00c9a7]">{total.toLocaleString()} FCFA</p>
                   </div>
 
@@ -22148,10 +21876,10 @@ const saveBookingData = () => {
                       className={`flex flex-col items-center gap-2 p-3 sm:p-4 border-2 rounded-xl transition ${
                         paymentMethod === 'mobile_money' 
                           ? 'border-[#00c9a7] bg-[#00c9a7]/5' 
-                          : 'border-gray-200 hover:border-gray-300'
+                          : 'border-[#e2f5f2] hover:border-[#c9f0e8]'
                       }`}
                     >
-                      <Smartphone className={`w-5 h-5 ${paymentMethod === 'mobile_money' ? 'text-[#00c9a7]' : 'text-gray-400'}`} />
+                      <Smartphone className={`w-5 h-5 ${paymentMethod === 'mobile_money' ? 'text-[#00c9a7]' : 'text-[#5b6b7a]'}`} />
                       <span className="text-xs sm:text-sm font-medium">Mobile Money</span>
                     </button>
                     <button 
@@ -22159,10 +21887,10 @@ const saveBookingData = () => {
                       className={`flex flex-col items-center gap-2 p-3 sm:p-4 border-2 rounded-xl transition ${
                         paymentMethod === 'card' 
                           ? 'border-[#00c9a7] bg-[#00c9a7]/5' 
-                          : 'border-gray-200 hover:border-gray-300'
+                          : 'border-[#e2f5f2] hover:border-[#c9f0e8]'
                       }`}
                     >
-                      <CreditCard className={`w-5 h-5 ${paymentMethod === 'card' ? 'text-[#00c9a7]' : 'text-gray-400'}`} />
+                      <CreditCard className={`w-5 h-5 ${paymentMethod === 'card' ? 'text-[#00c9a7]' : 'text-[#5b6b7a]'}`} />
                       <span className="text-xs sm:text-sm font-medium">Carte bancaire</span>
                     </button>
                   </div>
@@ -22170,7 +21898,7 @@ const saveBookingData = () => {
                   {paymentMethod === 'mobile_money' && (
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Opérateur</label>
+                        <label className="block text-sm font-medium text-[#1c3b56] mb-2">Opérateur</label>
                         <div className="grid grid-cols-3 gap-2">
                           {(['MTN', 'Moov', 'Orange'] as const).map((provider) => (
                             <button 
@@ -22179,7 +21907,7 @@ const saveBookingData = () => {
                               className={`py-2 rounded-xl border-2 ${
                                 mobileProvider === provider 
                                   ? 'border-[#00c9a7] bg-[#00c9a7]/5 text-[#00c9a7]' 
-                                  : 'border-gray-200'
+                                  : 'border-[#e2f5f2]'
                               }`}
                             >
                               {provider}
@@ -22188,13 +21916,13 @@ const saveBookingData = () => {
                         </div>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Numéro Mobile Money</label>
+                        <label className="block text-sm font-medium text-[#1c3b56] mb-2">Numéro Mobile Money</label>
                         <input 
                           type="tel" 
                           value={mobileMoneyNumber} 
                           onChange={(e) => { setMobileMoneyNumber(e.target.value); setError(''); }} 
                           placeholder="97 00 00 00" 
-                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#00c9a7] text-sm" 
+                          className="w-full px-4 py-3 border border-[#e2f5f2] rounded-xl focus:ring-2 focus:ring-[#00c9a7] text-sm" 
                         />
                       </div>
                     </div>
@@ -22203,7 +21931,7 @@ const saveBookingData = () => {
                   {paymentMethod === 'card' && (
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Numéro de carte</label>
+                        <label className="block text-sm font-medium text-[#1c3b56] mb-2">Numéro de carte</label>
                         <input 
                           type="text" 
                           value={cardNumber} 
@@ -22213,12 +21941,12 @@ const saveBookingData = () => {
                           }} 
                           placeholder="1234 5678 9012 3456" 
                           maxLength={19} 
-                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#00c9a7] text-sm" 
+                          className="w-full px-4 py-3 border border-[#e2f5f2] rounded-xl focus:ring-2 focus:ring-[#00c9a7] text-sm" 
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Date d'expiration</label>
+                          <label className="block text-sm font-medium text-[#1c3b56] mb-2">Date d'expiration</label>
                           <input 
                             type="text" 
                             value={cardExpiry} 
@@ -22231,11 +21959,11 @@ const saveBookingData = () => {
                             }} 
                             placeholder="MM/AA" 
                             maxLength={5} 
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#00c9a7] text-sm" 
+                            className="w-full px-4 py-3 border border-[#e2f5f2] rounded-xl focus:ring-2 focus:ring-[#00c9a7] text-sm" 
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">CVV</label>
+                          <label className="block text-sm font-medium text-[#1c3b56] mb-2">CVV</label>
                           <div className="relative">
                             <input 
                               type={showCvv ? 'text' : 'password'} 
@@ -22243,26 +21971,26 @@ const saveBookingData = () => {
                               onChange={(e) => setCardCvv(e.target.value)} 
                               placeholder="123" 
                               maxLength={4} 
-                              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#00c9a7] text-sm pr-10" 
+                              className="w-full px-4 py-3 border border-[#e2f5f2] rounded-xl focus:ring-2 focus:ring-[#00c9a7] text-sm pr-10" 
                             />
                             <button 
                               type="button" 
                               onClick={() => setShowCvv(!showCvv)} 
                               className="absolute right-3 top-1/2 -translate-y-1/2"
                             >
-                              {showCvv ? <EyeOff className="w-4 h-4 text-gray-400" /> : <Eye className="w-4 h-4 text-gray-400" />}
+                              {showCvv ? <EyeOff className="w-4 h-4 text-[#5b6b7a]" /> : <Eye className="w-4 h-4 text-[#5b6b7a]" />}
                             </button>
                           </div>
                         </div>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Nom sur la carte</label>
+                        <label className="block text-sm font-medium text-[#1c3b56] mb-2">Nom sur la carte</label>
                         <input 
                           type="text" 
                           value={cardName} 
                           onChange={(e) => setCardName(e.target.value.toUpperCase())} 
                           placeholder="JEAN DUPONT" 
-                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#00c9a7] text-sm uppercase" 
+                          className="w-full px-4 py-3 border border-[#e2f5f2] rounded-xl focus:ring-2 focus:ring-[#00c9a7] text-sm uppercase" 
                         />
                       </div>
                     </div>
@@ -22280,7 +22008,7 @@ const saveBookingData = () => {
               {paymentStep === 'processing' && (
                 <div className="text-center py-8">
                   <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#00c9a7] mx-auto mb-4"></div>
-                  <p className="text-gray-600">Traitement du paiement en cours...</p>
+                  <p className="text-[#5b6b7a]">Traitement du paiement en cours...</p>
                 </div>
               )}
 
@@ -22290,7 +22018,7 @@ const saveBookingData = () => {
                     <CheckCircle className="w-8 h-8 text-green-500" />
                   </div>
                   <h4 className="text-xl font-semibold text-[#0F2940] mb-2">Paiement réussi !</h4>
-                  <p className="text-gray-500">Votre réservation est en cours de confirmation</p>
+                  <p className="text-[#5b6b7a]">Votre réservation est en cours de confirmation</p>
                 </div>
               )}
 
@@ -22300,7 +22028,7 @@ const saveBookingData = () => {
                     <AlertCircle className="w-8 h-8 text-red-500" />
                   </div>
                   <h4 className="text-xl font-semibold text-[#0F2940] mb-2">Erreur de paiement</h4>
-                  <p className="text-gray-500 mb-4">{error}</p>
+                  <p className="text-[#5b6b7a] mb-4">{error}</p>
                   <button 
                     onClick={() => { setPaymentStep('form'); setError(''); }} 
                     className="px-6 py-2 bg-[#00c9a7] text-white rounded-xl"
@@ -22312,11 +22040,11 @@ const saveBookingData = () => {
             </div>
 
             {paymentStep === 'form' && (
-              <div className="sticky bottom-0 bg-white border-t border-gray-100 p-4 rounded-b-2xl">
+              <div className="sticky bottom-0 bg-white border-t border-[#e2f5f2] p-4 rounded-b-2xl">
                 <button 
                   onClick={handlePaymentSubmit} 
                   disabled={isProcessing} 
-                  className="w-full bg-gradient-to-r from-[#00c9a7] to-[#00a887] text-white py-3 rounded-xl font-semibold disabled:opacity-50"
+                  className="w-full bg-[#00c9a7] text-white py-3 rounded-xl font-semibold disabled:opacity-50"
                 >
                   {isProcessing ? 'Traitement...' : `Payer ${total.toLocaleString()} FCFA`}
                 </button>
@@ -22533,20 +22261,20 @@ const ServiceCalendar = ({
   return (
     <div className="text-center">
       <div className="flex items-center justify-between mb-3">
-        <button onClick={handlePrevMonth} className="p-1 hover:bg-gray-100 rounded-full transition">
+        <button onClick={handlePrevMonth} className="p-1 hover:bg-[#e8faf6] rounded-full transition">
           <ChevronLeft className="w-4 h-4" />
         </button>
         <span className="font-medium text-sm">
           {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
         </span>
-        <button onClick={handleNextMonth} className="p-1 hover:bg-gray-100 rounded-full transition">
+        <button onClick={handleNextMonth} className="p-1 hover:bg-[#e8faf6] rounded-full transition">
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>
       
       <div className="grid grid-cols-7 gap-1 text-xs">
         {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((day, i) => (
-          <div key={i} className="font-medium text-gray-500 py-1">{day}</div>
+          <div key={i} className="font-medium text-[#5b6b7a] py-1">{day}</div>
         ))}
         {Array.from({ length: firstDay === 0 ? 6 : firstDay - 1 }).map((_, i) => (
           <div key={`empty-${i}`} className="py-1" />
@@ -22564,12 +22292,12 @@ const ServiceCalendar = ({
           let hoverEffect = '';
           
           if (!isCurrentMonth) {
-            textColor = 'text-gray-300';
+            textColor = 'text-[#9fb3c4]';
             cursor = 'cursor-default';
           } else if (isPast) {
-            textColor = 'text-gray-300';
+            textColor = 'text-[#9fb3c4]';
             cursor = 'cursor-not-allowed';
-            bgColor = 'bg-gray-50';
+            bgColor = 'bg-[#f4fffe]';
           } else if (!isAvailable) {
             textColor = 'text-red-400';
             cursor = 'cursor-not-allowed';
@@ -22580,7 +22308,7 @@ const ServiceCalendar = ({
             cursor = 'cursor-pointer';
             hoverEffect = 'hover:scale-105';
           } else {
-            textColor = 'text-gray-800';
+            textColor = 'text-[#0f2940]';
             cursor = 'cursor-pointer';
             hoverEffect = 'hover:bg-[#00c9a7]/20';
           }
@@ -22604,23 +22332,23 @@ const ServiceCalendar = ({
       {/* <div className="mt-2 flex flex-wrap items-center justify-center gap-3 text-xs">
         <div className="flex items-center gap-1">
           <div className="w-3 h-3 rounded-full bg-[#00c9a7]"></div>
-          <span className="text-gray-600">Disponible</span>
+          <span className="text-[#5b6b7a]">Disponible</span>
         </div>
         <div className="flex items-center gap-1">
           <div className="w-3 h-3 rounded-full bg-red-200"></div>
-          <span className="text-gray-600">Non disponible</span>
+          <span className="text-[#5b6b7a]">Non disponible</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-3 h-3 rounded-full bg-gray-100 border border-gray-300"></div>
-          <span className="text-gray-600">Passé</span>
+          <div className="w-3 h-3 rounded-full bg-[#e8faf6] border border-[#c9f0e8]"></div>
+          <span className="text-[#5b6b7a]">Passé</span>
         </div>
         <div className="flex items-center gap-1">
           <div className="w-3 h-3 rounded-full bg-[#00c9a7] border-2 border-white shadow"></div>
-          <span className="text-gray-600">Sélectionné</span>
+          <span className="text-[#5b6b7a]">Sélectionné</span>
         </div>
       </div> */}
       
-      <div className="mt-2 text-xs text-gray-400">
+      <div className="mt-2 text-xs text-[#5b6b7a]">
         {selectedDates.length === 0 && 'Cliquez sur une date disponible pour la sélectionner'}
         {selectedDates.length > 0 && (
           <span>
@@ -22647,7 +22375,7 @@ const ServiceCalendar = ({
             </span>
           ))}
           {selectedDates.length > 5 && (
-            <span className="text-xs text-gray-400">+{selectedDates.length - 5} autres</span>
+            <span className="text-xs text-[#5b6b7a]">+{selectedDates.length - 5} autres</span>
           )}
         </div>
       )}
@@ -22666,7 +22394,7 @@ const ServiceCard = ({ service, onClick }: { service: Service; onClick: () => vo
   
   return (
     <div 
-      className="group cursor-pointer bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+      className="group cursor-pointer bg-white rounded-2xl overflow-hidden shadow-sm border border-[#e2f5f2] hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
       onClick={onClick}
     >
       <div className="relative h-56 overflow-hidden">
@@ -22689,22 +22417,22 @@ const ServiceCard = ({ service, onClick }: { service: Service; onClick: () => vo
         <div className="flex justify-between items-start mb-2">
           <h3 className="font-semibold text-[#0F2940] text-base line-clamp-2">{service.title}</h3>
           <div className="flex items-center gap-1 flex-shrink-0">
-            <Star className="w-3 h-3 fill-current text-yellow-400" />
+            <Star className="w-3 h-3 fill-current text-[#ffc93c]" />
             <span className="text-xs font-medium">{rating > 0 ? rating.toFixed(1) : 'Nouveau'}</span>
-            {reviews > 0 && <span className="text-xs text-gray-400">({reviews})</span>}
+            {reviews > 0 && <span className="text-xs text-[#5b6b7a]">({reviews})</span>}
           </div>
         </div>
-        <p className="text-xs text-gray-500 mb-2 flex items-center gap-1">
+        <p className="text-xs text-[#5b6b7a] mb-2 flex items-center gap-1">
           <MapPin className="w-3 h-3" />
           {service.location || 'Bénin'}
         </p>
-        <p className="text-sm text-gray-600 line-clamp-2 mb-3">{service.description}</p>
+        <p className="text-sm text-[#5b6b7a] line-clamp-2 mb-3">{service.description}</p>
         <div className="flex items-center justify-between">
           <div>
             <span className="font-bold text-[#0F2940] text-lg">{formatFCFA(service.price)}</span>
-            <span className="text-xs text-gray-500 block">{formatEuro(service.price)}</span>
+            <span className="text-xs text-[#5b6b7a] block">{formatEuro(service.price)}</span>
           </div>
-          <div className="text-xs text-gray-400 flex items-center gap-1">
+          <div className="text-xs text-[#5b6b7a] flex items-center gap-1">
             <Clock className="w-3 h-3" />
             {formatDuration(service.duration_minutes)}
           </div>
@@ -22905,17 +22633,17 @@ const ServiceDetailModal = ({
       <div className="fixed inset-0 z-50 bg-white overflow-y-auto">
         <div className="min-h-screen pb-20">
           <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b px-3 sm:px-4 py-3 flex justify-between items-center">
-            <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100 transition-all">
+            <button onClick={onClose} className="p-2 rounded-full hover:bg-[#e8faf6] transition-all">
               <ArrowLeft className="w-5 h-5" />
             </button>
             <h1 className="text-sm sm:text-base font-semibold text-[#0F2940] truncate max-w-[50%]">
               {service.title}
             </h1>
             <div className="flex gap-2">
-              <button className="p-2 rounded-full hover:bg-gray-100 transition-all">
+              <button className="p-2 rounded-full hover:bg-[#e8faf6] transition-all">
                 <Share2 className="w-5 h-5" />
               </button>
-              <button className="p-2 rounded-full hover:bg-gray-100 transition-all">
+              <button className="p-2 rounded-full hover:bg-[#e8faf6] transition-all">
                 <Heart className="w-5 h-5" />
               </button>
             </div>
@@ -22926,7 +22654,7 @@ const ServiceDetailModal = ({
             <div className="mb-6">
               <div className="relative">
                 <div 
-                  className="relative rounded-2xl overflow-hidden cursor-pointer group aspect-[16/9] bg-gray-100"
+                  className="relative rounded-2xl overflow-hidden cursor-pointer group aspect-[16/9] bg-[#e8faf6]"
                   onClick={() => setIsGalleryOpen(true)}
                 >
                   <img 
@@ -22950,7 +22678,7 @@ const ServiceDetailModal = ({
                     {images.slice(1, 5).map((img, index) => (
                       <div 
                         key={index} 
-                        className="aspect-[4/3] rounded-xl overflow-hidden cursor-pointer hover:ring-2 hover:ring-[#00c9a7] transition-all bg-gray-100"
+                        className="aspect-[4/3] rounded-xl overflow-hidden cursor-pointer hover:ring-2 hover:ring-[#00c9a7] transition-all bg-[#e8faf6]"
                         onClick={() => {
                           setGalleryIndex(index + 1);
                           setIsGalleryOpen(true);
@@ -22983,27 +22711,27 @@ const ServiceDetailModal = ({
             <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
               <div className="flex-1 space-y-6 sm:space-y-8">
                 <div className="border-b pb-4">
-                  <div className="text-xs sm:text-sm text-gray-500">
+                  <div className="text-xs sm:text-sm text-[#5b6b7a]">
                     Service · {service.location || 'Bénin'}
                   </div>
                   <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-[#0F2940] mt-1">
                     {service.title}
                   </h1>
                   <div className="flex items-center gap-2 mt-2">
-                    <Star className="w-4 h-4 fill-current text-yellow-400" />
+                    <Star className="w-4 h-4 fill-current text-[#ffc93c]" />
                     <span className="font-medium text-sm">{rating > 0 ? rating.toFixed(1) : 'Nouveau'}</span>
                     {reviews > 0 && (
                       <>
-                        <span className="text-gray-300">·</span>
-                        <span className="text-gray-500 text-sm">{reviews} commentaires</span>
+                        <span className="text-[#9fb3c4]">·</span>
+                        <span className="text-[#5b6b7a] text-sm">{reviews} commentaires</span>
                       </>
                     )}
-                    <span className="text-gray-300">·</span>
-                    <span className="text-gray-500 text-sm">{service.service_type}</span>
+                    <span className="text-[#9fb3c4]">·</span>
+                    <span className="text-[#5b6b7a] text-sm">{service.service_type}</span>
                     {availableDates.length > 0 && (
                       <>
-                        <span className="text-gray-300">·</span>
-                        <span className="text-gray-500 text-sm">{availableDates.length} dates disponibles</span>
+                        <span className="text-[#9fb3c4]">·</span>
+                        <span className="text-[#5b6b7a] text-sm">{availableDates.length} dates disponibles</span>
                       </>
                     )}
                   </div>
@@ -23015,13 +22743,13 @@ const ServiceDetailModal = ({
                     <div className="font-semibold text-[#0F2940] text-base sm:text-lg">
                       Prestataire : {hostName}
                     </div>
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-[#5b6b7a]">
                       {service.host?.user_type === 'hote' ? 'Hôte professionnel' : 'Prestataire vérifié'}
                     </div>
                   </div>
                 </div>
 
-                <div className="text-sm sm:text-base text-gray-700 leading-relaxed">
+                <div className="text-sm sm:text-base text-[#1c3b56] leading-relaxed">
                   {service.description || 'Aucune description disponible'}
                 </div>
 
@@ -23031,12 +22759,12 @@ const ServiceDetailModal = ({
                       <Sparkles className="w-5 h-5 text-[#00c9a7]" />
                       Déroulement du service
                     </h3>
-                    <span className="text-sm text-gray-400">{steps.length} étapes</span>
+                    <span className="text-sm text-[#5b6b7a]">{steps.length} étapes</span>
                   </div>
                   
                   <div className="space-y-3">
                     {(showAllSteps ? steps : steps.slice(0, 3)).map((step: string, index: number) => (
-                      <div key={index} className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl hover:shadow-md transition-shadow">
+                      <div key={index} className="flex items-start gap-3 p-3 bg-[#f4fffe] rounded-xl hover:shadow-md transition-shadow">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="w-7 h-7 rounded-full bg-[#00c9a7] text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
@@ -23044,7 +22772,7 @@ const ServiceDetailModal = ({
                             </span>
                             <span className="text-sm font-semibold text-[#0F2940]">Étape {index + 1}</span>
                           </div>
-                          <p className="text-sm text-gray-700">{step}</p>
+                          <p className="text-sm text-[#1c3b56]">{step}</p>
                         </div>
                       </div>
                     ))}
@@ -23062,15 +22790,15 @@ const ServiceDetailModal = ({
               </div>
 
               <div className="lg:w-96 xl:w-[420px] flex-shrink-0">
-                <div className="sticky top-24 bg-white border border-gray-200 rounded-2xl p-5 shadow-lg">
+                <div className="sticky top-24 bg-white border border-[#e2f5f2] rounded-2xl p-5 shadow-lg">
                   <div className="mb-4">
                     <div className="flex items-baseline gap-1">
                       <span className="text-2xl font-bold text-[#0F2940]">
                         {formatFCFA(price)}
                       </span>
-                      <span className="text-sm text-gray-500">/ service</span>
+                      <span className="text-sm text-[#5b6b7a]">/ service</span>
                     </div>
-                    <div className="text-sm text-gray-400">
+                    <div className="text-sm text-[#5b6b7a]">
                       {formatDuration(service.duration_minutes)}
                     </div>
                   </div>
@@ -23088,25 +22816,25 @@ const ServiceDetailModal = ({
                   </div>
 
                   <div className="space-y-2 mb-4 text-sm">
-                    <div className="flex justify-between text-gray-600">
+                    <div className="flex justify-between text-[#5b6b7a]">
                       <span>Service</span>
                       <div className="text-right">
                         <div>{formatFCFA(price)}</div>
-                        <div className="text-xs text-gray-400">{formatEuro(price)}</div>
+                        <div className="text-xs text-[#5b6b7a]">{formatEuro(price)}</div>
                       </div>
                     </div>
-                    <div className="flex justify-between text-gray-600 border-t border-gray-100 pt-2">
+                    <div className="flex justify-between text-[#5b6b7a] border-t border-[#e2f5f2] pt-2">
                       <span>Frais de service (10%)</span>
                       <div className="text-right">
                         <div>{formatFCFA(Math.round(price * 0.10))}</div>
-                        <div className="text-xs text-gray-400">{formatEuro(price * 0.10)}</div>
+                        <div className="text-xs text-[#5b6b7a]">{formatEuro(price * 0.10)}</div>
                       </div>
                     </div>
-                    <div className="flex justify-between font-bold pt-2 border-t border-gray-200">
+                    <div className="flex justify-between font-bold pt-2 border-t border-[#e2f5f2]">
                       <span className="text-[#0F2940]">Total</span>
                       <div className="text-right">
                         <div className="text-[#00c9a7]">{formatFCFA(Math.round(price * 1.10))}</div>
-                        <div className="text-xs font-normal text-gray-400">{formatEuro(price * 1.10)}</div>
+                        <div className="text-xs font-normal text-[#5b6b7a]">{formatEuro(price * 1.10)}</div>
                       </div>
                     </div>
                   </div>
@@ -23116,8 +22844,8 @@ const ServiceDetailModal = ({
                     disabled={availabilityStatus !== 'available' || selectedDates.length < 1 || isBooking} 
                     className={`w-full py-3.5 rounded-xl font-semibold text-sm sm:text-base transition-all ${
                       availabilityStatus === 'available' && selectedDates.length >= 1 && !isBooking
-                        ? 'bg-gradient-to-r from-[#00c9a7] to-[#00a887] text-white hover:shadow-lg hover:scale-[1.02]' 
-                        : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                        ? 'bg-[#00c9a7] text-white hover:shadow-lg hover:scale-[1.02]' 
+                        : 'bg-[#e2f5f2] text-[#5b6b7a] cursor-not-allowed'
                     }`}
                   >
                     {isBooking ? 'Réservation en cours...' : 
@@ -23282,7 +23010,7 @@ export function ServicesPage({ onNavigate }: PageProps) {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#00c9a7] border-t-transparent mx-auto mb-4"></div>
-          <p className="text-gray-500">Chargement des services...</p>
+          <p className="text-[#5b6b7a]">Chargement des services...</p>
         </div>
       </div>
     );
@@ -23292,7 +23020,7 @@ export function ServicesPage({ onNavigate }: PageProps) {
     return (
       <div className="min-h-screen bg-white">
         <div className="sticky top-0 bg-white border-b px-4 py-3 flex items-center gap-4 z-20">
-          <button onClick={() => onNavigate?.({ name: 'home' })} className="p-2 rounded-full hover:bg-gray-100">
+          <button onClick={() => onNavigate?.({ name: 'home' })} className="p-2 rounded-full hover:bg-[#e8faf6]">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-xl font-semibold text-[#0F2940]">Services au Bénin</h1>
@@ -23300,10 +23028,10 @@ export function ServicesPage({ onNavigate }: PageProps) {
         <div className="max-w-7xl mx-auto px-4 py-12 text-center">
           <div className="text-6xl mb-4">🔧</div>
           <p className="text-red-500 mb-2">{error}</p>
-          <p className="text-sm text-gray-400 mb-4">Vérifiez votre connexion ou réessayez</p>
+          <p className="text-sm text-[#5b6b7a] mb-4">Vérifiez votre connexion ou réessayez</p>
           <button 
             onClick={fetchServices} 
-            className="px-6 py-2.5 bg-[#00c9a7] text-white rounded-full hover:bg-[#00b892] transition shadow-lg hover:shadow-xl flex items-center gap-2 mx-auto"
+            className="px-6 py-2.5 bg-[#00c9a7] text-white rounded-full hover:bg-[#00b396] transition shadow-lg hover:shadow-xl flex items-center gap-2 mx-auto"
           >
             <RefreshCw className="w-4 h-4" />
             Réessayer
@@ -23316,21 +23044,21 @@ export function ServicesPage({ onNavigate }: PageProps) {
   return (
     <div className="min-h-screen bg-white">
       <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b px-4 py-3 flex items-center gap-4 z-20">
-        <button onClick={() => onNavigate?.({ name: 'home' })} className="p-2 rounded-full hover:bg-gray-100 transition">
+        <button onClick={() => onNavigate?.({ name: 'home' })} className="p-2 rounded-full hover:bg-[#e8faf6] transition">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-xl font-semibold text-[#0F2940]">Services au Bénin</h1>
         <button 
           onClick={refreshServices} 
-          className="ml-auto p-2 rounded-full hover:bg-gray-100 transition-colors"
+          className="ml-auto p-2 rounded-full hover:bg-[#e8faf6] transition-colors"
           title="Rafraîchir"
         >
-          <RefreshCw className="w-5 h-5 text-gray-500" />
+          <RefreshCw className="w-5 h-5 text-[#5b6b7a]" />
         </button>
       </div>
 
-      <div className="bg-gradient-to-r from-[#00c9a7] to-[#0f2940] py-16 text-white text-center">
-        <h1 className="text-3xl md:text-4xl font-bold mb-3">Services de Bluefin-Immo</h1>
+      <div className="bg-[#0f2940] py-16 text-white text-center">
+        <h1 className="text-3xl md:text-4xl font-bold mb-3">Services de Bluefin Immo</h1>
         <p className="text-base md:text-lg text-white/90 max-w-2xl mx-auto px-4">
           Transport, ménage, assistance, bien-être et plus encore. Tous les services dont vous avez besoin, partout au Bénin.
         </p>
@@ -23340,7 +23068,7 @@ export function ServicesPage({ onNavigate }: PageProps) {
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl md:text-2xl font-semibold text-[#0F2940] flex items-center gap-2">
             Tous les services
-            <span className="text-sm font-normal text-gray-500 ml-1">
+            <span className="text-sm font-normal text-[#5b6b7a] ml-1">
               ({services.length})
             </span>
           </h2>
@@ -23356,10 +23084,10 @@ export function ServicesPage({ onNavigate }: PageProps) {
         {services.length === 0 ? (
           <div className="text-center py-16">
             <div className="text-6xl mb-4">🔧</div>
-            <p className="text-gray-500">Aucun service disponible pour le moment.</p>
+            <p className="text-[#5b6b7a]">Aucun service disponible pour le moment.</p>
             <button 
               onClick={refreshServices} 
-              className="mt-4 px-6 py-2.5 bg-[#00c9a7] text-white rounded-full hover:bg-[#00b892] transition"
+              className="mt-4 px-6 py-2.5 bg-[#00c9a7] text-white rounded-full hover:bg-[#00b396] transition"
             >
               Actualiser
             </button>
@@ -23680,8 +23408,8 @@ export function ServiceBookingPage({ onNavigate, id, search }: any) {
     return (
       <div className="min-h-screen flex justify-center items-center bg-[#f4fffe] p-4">
         <div className="text-center bg-white rounded-2xl p-8 max-w-md">
-          <Sparkles className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500 mb-4">Aucune réservation de service en cours</p>
+          <Sparkles className="w-16 h-16 text-[#9fb3c4] mx-auto mb-4" />
+          <p className="text-[#5b6b7a] mb-4">Aucune réservation de service en cours</p>
           <button onClick={() => onNavigate?.({ name: 'services' })} className="text-[#00c9a7] underline">
             Retour aux services
           </button>
@@ -23693,17 +23421,17 @@ export function ServiceBookingPage({ onNavigate, id, search }: any) {
   return (
     <div className="bg-[#f4fffe] min-h-screen pb-32 md:pb-12">
       {/* En-tête */}
-      <div className="sticky top-0 z-40 bg-white border-b border-gray-100 px-4 py-3 shadow-sm">
+      <div className="sticky top-0 z-40 bg-white border-b border-[#e2f5f2] px-4 py-3 shadow-sm">
         <div className="flex items-center gap-3">
           <button 
             onClick={() => onNavigate?.({ name: 'services' })} 
-            className="p-2 -ml-2 rounded-full hover:bg-gray-100 transition"
+            className="p-2 -ml-2 rounded-full hover:bg-[#e8faf6] transition"
           >
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
+            <ArrowLeft className="w-5 h-5 text-[#5b6b7a]" />
           </button>
           <div>
             <h1 className="font-semibold text-[#0F2940] text-base sm:text-lg">Confirmation</h1>
-            <p className="text-xs text-gray-500">Vérifiez et modifiez vos informations</p>
+            <p className="text-xs text-[#5b6b7a]">Vérifiez et modifiez vos informations</p>
           </div>
         </div>
       </div>
@@ -23711,8 +23439,8 @@ export function ServiceBookingPage({ onNavigate, id, search }: any) {
       <div className="max-w-[1200px] mx-auto px-4 py-4 md:py-6">
         <div className="text-center py-6">
           <h2 className="text-2xl font-bold text-[#0F2940] mb-2">Réservation de service</h2>
-          <p className="text-gray-500">{serviceData?.title || 'Service'}</p>
-          <p className="text-gray-400 text-sm mt-1 flex items-center justify-center gap-2">
+          <p className="text-[#5b6b7a]">{serviceData?.title || 'Service'}</p>
+          <p className="text-[#5b6b7a] text-sm mt-1 flex items-center justify-center gap-2">
             <MapPin className="w-4 h-4" /> {serviceData?.location || 'Bénin'}
           </p>
         </div>
@@ -23721,7 +23449,7 @@ export function ServiceBookingPage({ onNavigate, id, search }: any) {
           {/* Colonne gauche - Détails modifiables */}
           <div className="flex-1 space-y-4">
             {/* Date avec édition - AVEC CALENDRIER */}
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-[#e2f5f2]">
               <div className="flex justify-between items-center mb-3">
                 <h2 className="font-semibold text-[#0F2940] flex items-center gap-2 text-base">
                   <Calendar className="w-5 h-5 text-[#00c9a7]" />
@@ -23730,7 +23458,7 @@ export function ServiceBookingPage({ onNavigate, id, search }: any) {
                 {!isEditingDate && (
                   <button 
                     onClick={handleEditDate}
-                    className="p-1.5 rounded-full hover:bg-gray-100 transition-colors text-gray-400 hover:text-[#00c9a7]"
+                    className="p-1.5 rounded-full hover:bg-[#e8faf6] transition-colors text-[#5b6b7a] hover:text-[#00c9a7]"
                     title="Modifier la date"
                   >
                     <Pencil className="w-4 h-4" />
@@ -23750,14 +23478,14 @@ export function ServiceBookingPage({ onNavigate, id, search }: any) {
                   <div className="flex gap-2">
                     <button
                       onClick={handleCancelEdit}
-                      className="flex-1 py-2 border border-gray-300 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-50 transition"
+                      className="flex-1 py-2 border border-[#c9f0e8] text-[#5b6b7a] rounded-lg text-sm font-medium hover:bg-[#f4fffe] transition"
                     >
                       Annuler
                     </button>
                     <button
                       onClick={handleSaveDate}
                       disabled={tempSelectedDates.length === 0}
-                      className="flex-1 py-2 bg-[#00c9a7] text-white rounded-lg text-sm font-medium hover:bg-[#00b892] transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex-1 py-2 bg-[#00c9a7] text-white rounded-lg text-sm font-medium hover:bg-[#00b396] transition disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Check className="w-4 h-4 inline mr-1" /> 
                       {tempSelectedDates.length === 0 ? 'Sélectionnez une date' : 'Enregistrer'}
@@ -23767,7 +23495,7 @@ export function ServiceBookingPage({ onNavigate, id, search }: any) {
               ) : (
                 <div className="grid grid-cols-1 gap-3 text-sm">
                   <div>
-                    <p className="text-gray-500 text-xs">Date</p>
+                    <p className="text-[#5b6b7a] text-xs">Date</p>
                     <p className="font-medium">
                       {selectedDate 
                         ? new Date(selectedDate).toLocaleDateString('fr-FR', { 
@@ -23784,27 +23512,27 @@ export function ServiceBookingPage({ onNavigate, id, search }: any) {
             </div>
 
             {/* Informations */}
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-[#e2f5f2]">
               <h2 className="font-semibold text-[#0F2940] flex items-center gap-2 text-base">
                 <User className="w-5 h-5 text-[#00c9a7]" />
                 Vos informations
               </h2>
               <div className="space-y-2 text-sm mt-3">
                 <div className="flex justify-between py-1">
-                  <span className="text-gray-500">Nom complet</span>
+                  <span className="text-[#5b6b7a]">Nom complet</span>
                   <span className="font-medium">
                     {bookingFormData?.guest_details?.full_name || 
                      user?.first_name ? `${user?.first_name || ''} ${user?.last_name || ''}` : '-'}
                   </span>
                 </div>
                 <div className="flex justify-between py-1 border-t">
-                  <span className="text-gray-500">Email</span>
+                  <span className="text-[#5b6b7a]">Email</span>
                   <span className="font-medium break-all">
                     {bookingFormData?.guest_details?.email || user?.email || '-'}
                   </span>
                 </div>
                 <div className="flex justify-between py-1 border-t">
-                  <span className="text-gray-500">Téléphone</span>
+                  <span className="text-[#5b6b7a]">Téléphone</span>
                   <span className="font-medium">
                     {bookingFormData?.guest_details?.phone || user?.phone || '-'}
                   </span>
@@ -23813,7 +23541,7 @@ export function ServiceBookingPage({ onNavigate, id, search }: any) {
             </div>
 
             {/* Demandes spéciales */}
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-[#e2f5f2]">
               <h2 className="font-semibold text-[#0F2940] flex items-center gap-2 text-base">
                 <MessageCircle className="w-5 h-5 text-[#00c9a7]" />
                 Demandes spéciales
@@ -23822,7 +23550,7 @@ export function ServiceBookingPage({ onNavigate, id, search }: any) {
                 value={specialRequests} 
                 onChange={(e) => setSpecialRequests(e.target.value)} 
                 placeholder="Besoin spécifique, horaire particulier, etc." 
-                className="w-full mt-2 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent resize-none text-sm" 
+                className="w-full mt-2 px-4 py-3 border border-[#e2f5f2] rounded-xl focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent resize-none text-sm" 
                 rows={3} 
               />
             </div>
@@ -23830,25 +23558,25 @@ export function ServiceBookingPage({ onNavigate, id, search }: any) {
 
           {/* Colonne droite - Prix */}
           <div className="lg:w-96 space-y-4">
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 sticky top-20">
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-[#e2f5f2] sticky top-20">
               <h2 className="font-semibold text-[#0F2940] mb-3 text-base">Détail des prix</h2>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">{formatFCFA(price)}</span>
+                  <span className="text-[#5b6b7a]">{formatFCFA(price)}</span>
                   <span>{formatFCFA(price)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Frais de service (10%)</span>
+                  <span className="text-[#5b6b7a]">Frais de service (10%)</span>
                   <span>{formatFCFA(Math.round(serviceFee))}</span>
                 </div>
-                <div className="border-t border-gray-200 pt-3 mt-3">
+                <div className="border-t border-[#e2f5f2] pt-3 mt-3">
                   <div className="flex justify-between items-center">
                     <span className="font-semibold">Total</span>
                     <span className="font-bold text-[#00c9a7] text-base sm:text-lg">
                       {formatFCFA(total)}
                     </span>
                   </div>
-                  <div className="text-right text-xs text-gray-400">
+                  <div className="text-right text-xs text-[#5b6b7a]">
                     {formatEuro(total)}
                   </div>
                 </div>
@@ -23857,7 +23585,7 @@ export function ServiceBookingPage({ onNavigate, id, search }: any) {
               <button 
                 onClick={handleFedapayRedirect} 
                 disabled={loading || !selectedDate} 
-                className="w-full mt-4 bg-gradient-to-r from-[#00c9a7] to-[#00a887] text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 text-sm active:scale-[0.98] flex items-center justify-center gap-2"
+                className="w-full mt-4 bg-[#00c9a7] text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 text-sm active:scale-[0.98] flex items-center justify-center gap-2"
               >
                 <Wallet className="w-4 h-4" />
                 {loading ? 'Préparation...' : !selectedDate ? 'Sélectionnez une date' : 'Payer avec Fedapay'}
@@ -23866,12 +23594,12 @@ export function ServiceBookingPage({ onNavigate, id, search }: any) {
               <button 
                 onClick={handleOpenPaymentModal} 
                 disabled={loading || !selectedDate} 
-                className="w-full mt-2 py-2 border border-gray-300 text-gray-600 rounded-xl font-medium hover:bg-gray-50 transition-all disabled:opacity-50 text-sm"
+                className="w-full mt-2 py-2 border border-[#c9f0e8] text-[#5b6b7a] rounded-xl font-medium hover:bg-[#f4fffe] transition-all disabled:opacity-50 text-sm"
               >
                 Autres méthodes de paiement
               </button>
               
-              <div className="mt-3 flex items-center justify-center gap-4 text-xs text-gray-400">
+              <div className="mt-3 flex items-center justify-center gap-4 text-xs text-[#5b6b7a]">
                 <div className="flex items-center gap-1">
                   <Lock className="w-3 h-3" />
                   <span>Paiement sécurisé</span>
@@ -23891,7 +23619,7 @@ export function ServiceBookingPage({ onNavigate, id, search }: any) {
       {showPaymentModal && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 bg-black/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] flex flex-col animate-fadeInUp shadow-2xl">
-            <div className="sticky top-0 bg-white border-b border-gray-100 p-4 rounded-t-2xl flex justify-between items-center z-10">
+            <div className="sticky top-0 bg-white border-b border-[#e2f5f2] p-4 rounded-t-2xl flex justify-between items-center z-10">
               <h3 className="text-base sm:text-lg font-semibold text-[#0F2940]">
                 {paymentStep === 'form' && 'Choisissez votre paiement'}
                 {paymentStep === 'processing' && 'Traitement en cours...'}
@@ -23904,17 +23632,17 @@ export function ServiceBookingPage({ onNavigate, id, search }: any) {
                   setPaymentStep('form'); 
                   setError(''); 
                 }} 
-                className="p-2 rounded-full hover:bg-gray-100 transition"
+                className="p-2 rounded-full hover:bg-[#e8faf6] transition"
               >
-                <X className="w-5 h-5 text-gray-500" />
+                <X className="w-5 h-5 text-[#5b6b7a]" />
               </button>
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 sm:p-6">
               {paymentStep === 'form' && (
                 <div className="space-y-5">
-                  <div className="bg-gradient-to-r from-[#00c9a7]/10 to-[#0F2940]/10 rounded-xl p-4 text-center">
-                    <p className="text-xs sm:text-sm text-gray-600">Montant à payer</p>
+                  <div className="bg-[#f4fffe] rounded-xl p-4 text-center">
+                    <p className="text-xs sm:text-sm text-[#5b6b7a]">Montant à payer</p>
                     <p className="text-2xl sm:text-3xl font-bold text-[#00c9a7]">{total.toLocaleString()} FCFA</p>
                   </div>
 
@@ -23924,10 +23652,10 @@ export function ServiceBookingPage({ onNavigate, id, search }: any) {
                       className={`flex flex-col items-center gap-2 p-3 sm:p-4 border-2 rounded-xl transition ${
                         paymentMethod === 'mobile_money' 
                           ? 'border-[#00c9a7] bg-[#00c9a7]/5' 
-                          : 'border-gray-200 hover:border-gray-300'
+                          : 'border-[#e2f5f2] hover:border-[#c9f0e8]'
                       }`}
                     >
-                      <Smartphone className={`w-5 h-5 ${paymentMethod === 'mobile_money' ? 'text-[#00c9a7]' : 'text-gray-400'}`} />
+                      <Smartphone className={`w-5 h-5 ${paymentMethod === 'mobile_money' ? 'text-[#00c9a7]' : 'text-[#5b6b7a]'}`} />
                       <span className="text-xs sm:text-sm font-medium">Mobile Money</span>
                     </button>
                     <button 
@@ -23935,10 +23663,10 @@ export function ServiceBookingPage({ onNavigate, id, search }: any) {
                       className={`flex flex-col items-center gap-2 p-3 sm:p-4 border-2 rounded-xl transition ${
                         paymentMethod === 'card' 
                           ? 'border-[#00c9a7] bg-[#00c9a7]/5' 
-                          : 'border-gray-200 hover:border-gray-300'
+                          : 'border-[#e2f5f2] hover:border-[#c9f0e8]'
                       }`}
                     >
-                      <CreditCard className={`w-5 h-5 ${paymentMethod === 'card' ? 'text-[#00c9a7]' : 'text-gray-400'}`} />
+                      <CreditCard className={`w-5 h-5 ${paymentMethod === 'card' ? 'text-[#00c9a7]' : 'text-[#5b6b7a]'}`} />
                       <span className="text-xs sm:text-sm font-medium">Carte bancaire</span>
                     </button>
                   </div>
@@ -23946,7 +23674,7 @@ export function ServiceBookingPage({ onNavigate, id, search }: any) {
                   {paymentMethod === 'mobile_money' && (
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Opérateur</label>
+                        <label className="block text-sm font-medium text-[#1c3b56] mb-2">Opérateur</label>
                         <div className="grid grid-cols-3 gap-2">
                           {(['MTN', 'Moov', 'Orange'] as const).map((provider) => (
                             <button 
@@ -23955,7 +23683,7 @@ export function ServiceBookingPage({ onNavigate, id, search }: any) {
                               className={`py-2 rounded-xl border-2 ${
                                 mobileProvider === provider 
                                   ? 'border-[#00c9a7] bg-[#00c9a7]/5 text-[#00c9a7]' 
-                                  : 'border-gray-200'
+                                  : 'border-[#e2f5f2]'
                               }`}
                             >
                               {provider}
@@ -23964,13 +23692,13 @@ export function ServiceBookingPage({ onNavigate, id, search }: any) {
                         </div>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Numéro Mobile Money</label>
+                        <label className="block text-sm font-medium text-[#1c3b56] mb-2">Numéro Mobile Money</label>
                         <input 
                           type="tel" 
                           value={mobileMoneyNumber} 
                           onChange={(e) => { setMobileMoneyNumber(e.target.value); setError(''); }} 
                           placeholder="97 00 00 00" 
-                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#00c9a7] text-sm" 
+                          className="w-full px-4 py-3 border border-[#e2f5f2] rounded-xl focus:ring-2 focus:ring-[#00c9a7] text-sm" 
                         />
                       </div>
                     </div>
@@ -23979,7 +23707,7 @@ export function ServiceBookingPage({ onNavigate, id, search }: any) {
                   {paymentMethod === 'card' && (
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Numéro de carte</label>
+                        <label className="block text-sm font-medium text-[#1c3b56] mb-2">Numéro de carte</label>
                         <input 
                           type="text" 
                           value={cardNumber} 
@@ -23989,12 +23717,12 @@ export function ServiceBookingPage({ onNavigate, id, search }: any) {
                           }} 
                           placeholder="1234 5678 9012 3456" 
                           maxLength={19} 
-                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#00c9a7] text-sm" 
+                          className="w-full px-4 py-3 border border-[#e2f5f2] rounded-xl focus:ring-2 focus:ring-[#00c9a7] text-sm" 
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Date d'expiration</label>
+                          <label className="block text-sm font-medium text-[#1c3b56] mb-2">Date d'expiration</label>
                           <input 
                             type="text" 
                             value={cardExpiry} 
@@ -24007,11 +23735,11 @@ export function ServiceBookingPage({ onNavigate, id, search }: any) {
                             }} 
                             placeholder="MM/AA" 
                             maxLength={5} 
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#00c9a7] text-sm" 
+                            className="w-full px-4 py-3 border border-[#e2f5f2] rounded-xl focus:ring-2 focus:ring-[#00c9a7] text-sm" 
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">CVV</label>
+                          <label className="block text-sm font-medium text-[#1c3b56] mb-2">CVV</label>
                           <div className="relative">
                             <input 
                               type={showCvv ? 'text' : 'password'} 
@@ -24019,26 +23747,26 @@ export function ServiceBookingPage({ onNavigate, id, search }: any) {
                               onChange={(e) => setCardCvv(e.target.value)} 
                               placeholder="123" 
                               maxLength={4} 
-                              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#00c9a7] text-sm pr-10" 
+                              className="w-full px-4 py-3 border border-[#e2f5f2] rounded-xl focus:ring-2 focus:ring-[#00c9a7] text-sm pr-10" 
                             />
                             <button 
                               type="button" 
                               onClick={() => setShowCvv(!showCvv)} 
                               className="absolute right-3 top-1/2 -translate-y-1/2"
                             >
-                              {showCvv ? <EyeOff className="w-4 h-4 text-gray-400" /> : <Eye className="w-4 h-4 text-gray-400" />}
+                              {showCvv ? <EyeOff className="w-4 h-4 text-[#5b6b7a]" /> : <Eye className="w-4 h-4 text-[#5b6b7a]" />}
                             </button>
                           </div>
                         </div>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Nom sur la carte</label>
+                        <label className="block text-sm font-medium text-[#1c3b56] mb-2">Nom sur la carte</label>
                         <input 
                           type="text" 
                           value={cardName} 
                           onChange={(e) => setCardName(e.target.value.toUpperCase())} 
                           placeholder="JEAN DUPONT" 
-                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#00c9a7] text-sm uppercase" 
+                          className="w-full px-4 py-3 border border-[#e2f5f2] rounded-xl focus:ring-2 focus:ring-[#00c9a7] text-sm uppercase" 
                         />
                       </div>
                     </div>
@@ -24056,7 +23784,7 @@ export function ServiceBookingPage({ onNavigate, id, search }: any) {
               {paymentStep === 'processing' && (
                 <div className="text-center py-8">
                   <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#00c9a7] mx-auto mb-4"></div>
-                  <p className="text-gray-600">Traitement du paiement en cours...</p>
+                  <p className="text-[#5b6b7a]">Traitement du paiement en cours...</p>
                 </div>
               )}
 
@@ -24066,7 +23794,7 @@ export function ServiceBookingPage({ onNavigate, id, search }: any) {
                     <CheckCircle className="w-8 h-8 text-green-500" />
                   </div>
                   <h4 className="text-xl font-semibold text-[#0F2940] mb-2">Paiement réussi !</h4>
-                  <p className="text-gray-500">Votre réservation est en cours de confirmation</p>
+                  <p className="text-[#5b6b7a]">Votre réservation est en cours de confirmation</p>
                 </div>
               )}
 
@@ -24076,7 +23804,7 @@ export function ServiceBookingPage({ onNavigate, id, search }: any) {
                     <AlertCircle className="w-8 h-8 text-red-500" />
                   </div>
                   <h4 className="text-xl font-semibold text-[#0F2940] mb-2">Erreur de paiement</h4>
-                  <p className="text-gray-500 mb-4">{error}</p>
+                  <p className="text-[#5b6b7a] mb-4">{error}</p>
                   <button 
                     onClick={() => { setPaymentStep('form'); setError(''); }} 
                     className="px-6 py-2 bg-[#00c9a7] text-white rounded-xl"
@@ -24088,11 +23816,11 @@ export function ServiceBookingPage({ onNavigate, id, search }: any) {
             </div>
 
             {paymentStep === 'form' && (
-              <div className="sticky bottom-0 bg-white border-t border-gray-100 p-4 rounded-b-2xl">
+              <div className="sticky bottom-0 bg-white border-t border-[#e2f5f2] p-4 rounded-b-2xl">
                 <button 
                   onClick={handlePaymentSubmit} 
                   disabled={isProcessing} 
-                  className="w-full bg-gradient-to-r from-[#00c9a7] to-[#00a887] text-white py-3 rounded-xl font-semibold disabled:opacity-50"
+                  className="w-full bg-[#00c9a7] text-white py-3 rounded-xl font-semibold disabled:opacity-50"
                 >
                   {isProcessing ? 'Traitement...' : `Payer ${total.toLocaleString()} FCFA`}
                 </button>
@@ -24302,19 +24030,19 @@ export function BecomeHost({ onNavigate }: PageProps) {
       <div className="min-h-screen bg-gradient-to-br from-[#f4fffe] to-white flex items-center justify-center px-4 py-10">
         <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-6 sm:p-8">
           <h2 className="text-2xl font-bold text-[#0F2940] mb-2">Passer en compte hôte</h2>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-[#5b6b7a]">
             Vous êtes connecté avec <strong className="text-[#0F2940]">{user.email}</strong>. Ce compte deviendra un compte hôte
             pour proposer {what}. Vos informations personnelles sont conservées.
           </p>
-          <p className="text-sm text-slate-600 mt-3">
+          <p className="text-sm text-[#5b6b7a] mt-3">
             Votre identité sera ensuite vérifiée par notre équipe avant la publication.
           </p>
           {error && <p className="mt-4 p-3 rounded-xl bg-red-50 text-sm text-red-700">{error}</p>}
           <div className="mt-6 flex flex-col-reverse sm:flex-row gap-2 sm:justify-end">
             <button type="button" onClick={() => { setPendingConversion(null); setError(null); }}
-              className="px-4 py-2.5 rounded-xl text-sm text-slate-600 hover:bg-slate-100">Annuler</button>
+              className="px-4 py-2.5 rounded-xl text-sm text-[#5b6b7a] hover:bg-[#e8faf6]">Annuler</button>
             <button type="button" onClick={confirmConversion} disabled={isLoading}
-              className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#00c9a7] to-[#0f2940] disabled:opacity-50">
+              className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#00c9a7] disabled:opacity-50">
               {isLoading ? 'Un instant…' : 'Devenir hôte'}
             </button>
           </div>
@@ -24338,7 +24066,7 @@ export function BecomeHost({ onNavigate }: PageProps) {
       title: 'Expérience', 
       description: 'Partagez votre passion', 
       icon: Compass, 
-      color: 'from-[#0f2940] to-[#1a3a52]',
+      color: 'from-[#0f2940] to-[#1c3b56]',
       badge: '🎯'
     },
     { 
@@ -24346,7 +24074,7 @@ export function BecomeHost({ onNavigate }: PageProps) {
       title: 'Service', 
       description: 'Proposez vos services', 
       icon: Briefcase, 
-      color: 'from-[#ff6b6b] to-[#ff5252]',
+      color: 'from-[#00806b] to-[#005c4d]',
       badge: '🔧'
     },
   ];
@@ -24359,23 +24087,23 @@ export function BecomeHost({ onNavigate }: PageProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-[#f4fffe]">
-      <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-100 px-4 sm:px-6 py-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#f4fffe] via-white to-[#f4fffe]">
+      <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#e2f5f2] px-4 sm:px-6 py-4">
         <button 
           onClick={() => onNavigate?.({ name: 'home' })} 
-          className="text-sm text-gray-500 mb-3 flex items-center gap-2 hover:text-[#00c9a7] transition-colors group"
+          className="text-sm text-[#5b6b7a] mb-3 flex items-center gap-2 hover:text-[#00c9a7] transition-colors group"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Retour
         </button>
         <h1 className="text-2xl sm:text-3xl font-bold text-[#0F2940]">Devenir hôte</h1>
-        <p className="text-sm text-gray-500 mt-1">Partagez votre espace et créez des revenus supplémentaires</p>
+        <p className="text-sm text-[#5b6b7a] mt-1">Partagez votre espace et créez des revenus supplémentaires</p>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {/* Bannière hero */}
-        <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-r from-[#0f2940] to-[#1a3a52] p-8 sm:p-12 mb-12 text-center">
+        <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-[#0f2940] p-8 sm:p-12 mb-12 text-center">
           <div className="relative z-10">
-            <p className="text-sm uppercase tracking-[0.2em] text-[#00ffdb] mb-3">Hébergeurs</p>
+            <p className="text-sm uppercase tracking-[0.2em] text-[#00c9a7] mb-3">Hébergeurs</p>
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4">Rejoignez la communauté</h2>
             <p className="text-white/80 text-sm md:text-base max-w-2xl mx-auto">
               Créez votre annonce, gérez les réservations et proposez votre offre aux voyageurs.
@@ -24387,7 +24115,7 @@ export function BecomeHost({ onNavigate }: PageProps) {
         <div className="mb-12">
           <div className="text-center mb-8">
             <h3 className="text-xl sm:text-2xl font-semibold text-[#0F2940] mb-2">Comment souhaitez-vous contribuer ?</h3>
-            <p className="text-gray-500 text-sm">Choisissez le type d'offre que vous voulez proposer</p>
+            <p className="text-[#5b6b7a] text-sm">Choisissez le type d'offre que vous voulez proposer</p>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
@@ -24397,7 +24125,7 @@ export function BecomeHost({ onNavigate }: PageProps) {
                 <button
                   key={option.id}
                   onClick={() => handleOptionSelect(option.id)}
-                  className="group relative overflow-hidden rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+                  className="group relative overflow-hidden rounded-xl sm:rounded-2xl border border-[#e2f5f2] bg-white p-4 sm:p-6 text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
                 >
                   <div className={`absolute inset-0 bg-gradient-to-r ${option.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
                   <div className="relative z-10 flex flex-col items-center">
@@ -24407,7 +24135,7 @@ export function BecomeHost({ onNavigate }: PageProps) {
                     <h3 className="text-base sm:text-lg font-semibold text-[#0F2940] mb-1 sm:mb-2 group-hover:text-[#00c9a7] transition-colors">
                       {option.title}
                     </h3>
-                    <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-[#5b6b7a] leading-relaxed">
                       {option.description}
                     </p>
                     <div className="mt-3 sm:mt-4 flex items-center gap-2 text-sm font-medium text-[#00c9a7] opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-1">
@@ -24425,19 +24153,19 @@ export function BecomeHost({ onNavigate }: PageProps) {
         <div className="mb-12">
           <div className="text-center mb-8">
             <h3 className="text-xl sm:text-2xl font-semibold text-[#0F2940] mb-2">Pourquoi devenir hôte ?</h3>
-            <p className="text-gray-500 text-sm">Des avantages conçus pour vous accompagner</p>
+            <p className="text-[#5b6b7a] text-sm">Des avantages conçus pour vous accompagner</p>
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
             {benefits.map((benefit, index) => {
               const Icon = benefit.icon;
               return (
-                <div key={index} className="bg-white rounded-xl sm:rounded-2xl border border-slate-100 p-3 sm:p-4 md:p-6 text-center transition-all duration-300 hover:shadow-lg hover:-translate-y-1 group">
+                <div key={index} className="bg-white rounded-xl sm:rounded-2xl border border-[#e2f5f2] p-3 sm:p-4 md:p-6 text-center transition-all duration-300 hover:shadow-lg hover:-translate-y-1 group">
                   <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl bg-[#00c9a7]/10 text-[#00c9a7] flex items-center justify-center mx-auto mb-2 sm:mb-3 group-hover:scale-110 transition-transform duration-300">
                     <Icon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
                   </div>
                   <h4 className="text-xs sm:text-sm md:text-base font-semibold text-[#0F2940] mb-1">{benefit.title}</h4>
-                  <p className="text-[10px] sm:text-xs text-gray-500 leading-relaxed">{benefit.description}</p>
+                  <p className="text-[10px] sm:text-xs text-[#5b6b7a] leading-relaxed">{benefit.description}</p>
                 </div>
               );
             })}
@@ -24446,10 +24174,10 @@ export function BecomeHost({ onNavigate }: PageProps) {
 
         {/* Bouton d'action — sans objet pour un voyageur connecté : il choisit une offre ci-dessus. */}
         {!(signedIn && user?.user_type !== 'hote' && user?.user_type !== 'admin') && (
-        <div className="flex justify-center pt-6 sm:pt-8 border-t border-slate-200">
+        <div className="flex justify-center pt-6 sm:pt-8 border-t border-[#e2f5f2]">
           <button
             onClick={handleStart}
-            className="group relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-r from-[#00c9a7] to-[#0f2940] px-6 sm:px-8 md:px-12 py-2.5 sm:py-3 md:py-4 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 active:scale-95"
+            className="group relative overflow-hidden rounded-xl sm:rounded-2xl bg-[#00c9a7] px-6 sm:px-8 md:px-12 py-2.5 sm:py-3 md:py-4 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 active:scale-95"
           >
             <span className="relative z-10 flex items-center gap-2 text-sm sm:text-base">
               {signedIn ? 'Accéder à mon espace hôte' : 'Accéder à mon espace'}
@@ -24540,8 +24268,6 @@ function HostOnlyAuthPage({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [successMessage, setSuccessMessage] = useState('');
   const [loading, setLoading] = useState(false);
-
-  const LogoUrl = '/assets/Bluefin Immo_01.jpg.jpeg';
 
   // ✅ Types de propriétés (pour logement)
   const PROPERTY_TYPES = [
@@ -24643,12 +24369,12 @@ function HostOnlyAuthPage({
     if (hostType === 'logement') {
       return (
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">Type de propriété *</label>
+          <label className="block text-sm font-medium text-[#1c3b56] mb-2">Type de propriété *</label>
           <select
             name="property_type"
             value={formData.property_type || ''}
             onChange={handleChange}
-            className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#00c9a7]/20 focus:border-[#00c9a7] outline-none transition-all bg-slate-50/50 ${errors.property_type ? 'border-red-500' : 'border-slate-200'}`}
+            className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#00c9a7]/20 focus:border-[#00c9a7] outline-none transition-all bg-[#f4fffe]/50 ${errors.property_type ? 'border-red-500' : 'border-[#e2f5f2]'}`}
           >
             <option value="">Sélectionnez un type</option>
             {PROPERTY_TYPES.map(type => (
@@ -24664,12 +24390,12 @@ function HostOnlyAuthPage({
     if (hostType === 'experience') {
       return (
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">Type d'expérience *</label>
+          <label className="block text-sm font-medium text-[#1c3b56] mb-2">Type d'expérience *</label>
           <select
             name="experience_type"
             value={formData.experience_type || ''}
             onChange={handleChange}
-            className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#00c9a7]/20 focus:border-[#00c9a7] outline-none transition-all bg-slate-50/50 ${errors.experience_type ? 'border-red-500' : 'border-slate-200'}`}
+            className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#00c9a7]/20 focus:border-[#00c9a7] outline-none transition-all bg-[#f4fffe]/50 ${errors.experience_type ? 'border-red-500' : 'border-[#e2f5f2]'}`}
           >
             <option value="">Sélectionnez un type</option>
             {EXPERIENCE_TYPES.map(type => (
@@ -24685,12 +24411,12 @@ function HostOnlyAuthPage({
     if (hostType === 'service') {
       return (
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">Type de service *</label>
+          <label className="block text-sm font-medium text-[#1c3b56] mb-2">Type de service *</label>
           <select
             name="service_type"
             value={formData.service_type || ''}
             onChange={handleChange}
-            className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#ff6b6b]/20 focus:border-[#ff6b6b] outline-none transition-all bg-slate-50/50 ${errors.service_type ? 'border-red-500' : 'border-slate-200'}`}
+            className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#00c9a7]/20 focus:border-[#00c9a7] outline-none transition-all bg-[#f4fffe]/50 ${errors.service_type ? 'border-red-500' : 'border-[#e2f5f2]'}`}
           >
             <option value="">Sélectionnez un type</option>
             {SERVICE_TYPES.map(type => (
@@ -24813,9 +24539,9 @@ function HostOnlyAuthPage({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-[#f4fffe]">
+    <div className="min-h-screen bg-gradient-to-br from-[#f4fffe] via-white to-[#f4fffe]">
       {!hideBackButton && (
-        <div className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-slate-100 px-4 sm:px-6 py-4 flex items-center gap-4 z-20">
+        <div className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-[#e2f5f2] px-4 sm:px-6 py-4 flex items-center gap-4 z-20">
           <button 
             onClick={() => {
               if (onNavigate) {
@@ -24824,9 +24550,9 @@ function HostOnlyAuthPage({
                 window.location.href = '/become-host';
               }
             }} 
-            className="p-2 rounded-full hover:bg-slate-100 transition-all duration-300 group"
+            className="p-2 rounded-full hover:bg-[#e8faf6] transition-all duration-300 group"
           >
-            <ArrowLeft className="w-5 h-5 text-slate-600 group-hover:text-[#0F2940]" />
+            <ArrowLeft className="w-5 h-5 text-[#5b6b7a] group-hover:text-[#0F2940]" />
           </button>
           <h1 className="text-lg font-semibold text-[#0F2940]">
             {mode === 'login' ? 'Espace Hôte' : 'Devenir Hôte'}
@@ -24843,28 +24569,12 @@ function HostOnlyAuthPage({
             <div className="p-6 sm:p-8 md:p-10">
               {/* Logo et titre */}
               <div className="text-center mb-6 sm:mb-8">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-[#00c9a7]/10 to-[#0f2940]/10 p-1">
-                  <div className="w-full h-full rounded-xl overflow-hidden bg-white">
-                    <img 
-                      src={LogoUrl} 
-                      alt="Bluefin-Immo" 
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                        const parent = target.parentElement;
-                        if (parent) {
-                          parent.innerHTML = '<span class="text-3xl font-bold text-white bg-gradient-to-r from-[#00c9a7] to-[#0f2940] w-full h-full flex items-center justify-center">B</span>';
-                        }
-                      }}
-                    />
-                  </div>
-                </div>
+                <BluefinLogo orientation="stacked" className="mb-4 sm:mb-6" markClassName="h-12 w-auto" wordmarkClassName="h-[1.05rem] w-auto" />
                 
                 <h2 className="text-2xl sm:text-3xl font-bold text-[#0F2940] mb-2">
                   {mode === 'login' ? 'Bon retour parmi nous' : 'Commencez votre aventure'}
                 </h2>
-                <p className="text-slate-500 text-sm">
+                <p className="text-[#5b6b7a] text-sm">
                   {mode === 'login' 
                     ? 'Connectez-vous à votre espace hôte' 
                     : `Créez votre compte et partagez votre ${formData.host_type === 'logement' ? 'logement' : formData.host_type}`}
@@ -24904,43 +24614,43 @@ function HostOnlyAuthPage({
               <>
               <div className="mb-5 space-y-5">
                 <GoogleSignInButton text="signin_with" onCredential={handleGoogleLogin} disabled={googleBusy} />
-                <div className="flex items-center gap-3 text-xs text-slate-400">
-                  <span className="h-px flex-1 bg-slate-200" /> ou avec votre e-mail <span className="h-px flex-1 bg-slate-200" />
+                <div className="flex items-center gap-3 text-xs text-[#5b6b7a]">
+                  <span className="h-px flex-1 bg-[#e2f5f2]" /> ou avec votre e-mail <span className="h-px flex-1 bg-[#e2f5f2]" />
                 </div>
               </div>
               <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
+                  <label className="block text-sm font-medium text-[#1c3b56] mb-2">Email</label>
                   <div className="relative group">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-[#00c9a7] transition-colors" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5b6b7a] group-focus-within:text-[#00c9a7] transition-colors" />
                     <input
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="contact@example.com"
-                      className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#00c9a7]/20 focus:border-[#00c9a7] outline-none transition-all ${errors.email ? 'border-red-500 bg-red-50/50' : 'border-slate-200 bg-slate-50/50'}`}
+                      className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#00c9a7]/20 focus:border-[#00c9a7] outline-none transition-all ${errors.email ? 'border-red-500 bg-red-50/50' : 'border-[#e2f5f2] bg-[#f4fffe]/50'}`}
                     />
                   </div>
                   {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Mot de passe</label>
+                  <label className="block text-sm font-medium text-[#1c3b56] mb-2">Mot de passe</label>
                   <div className="relative group">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-[#00c9a7] transition-colors" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5b6b7a] group-focus-within:text-[#00c9a7] transition-colors" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       name="password"
                       value={formData.password}
                       onChange={handleChange}
                       placeholder="••••••••"
-                      className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:ring-2 focus:ring-[#00c9a7]/20 focus:border-[#00c9a7] outline-none transition-all ${errors.password ? 'border-red-500 bg-red-50/50' : 'border-slate-200 bg-slate-50/50'}`}
+                      className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:ring-2 focus:ring-[#00c9a7]/20 focus:border-[#00c9a7] outline-none transition-all ${errors.password ? 'border-red-500 bg-red-50/50' : 'border-[#e2f5f2] bg-[#f4fffe]/50'}`}
                     />
                     <button 
                       type="button" 
                       onClick={() => setShowPassword(!showPassword)} 
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#5b6b7a] hover:text-[#5b6b7a] transition-colors"
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -24951,7 +24661,7 @@ function HostOnlyAuthPage({
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-gradient-to-r from-[#00c9a7] to-[#0f2940] text-white py-3.5 rounded-xl font-semibold hover:shadow-lg hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:hover:scale-100"
+                  className="w-full bg-[#00c9a7] text-white py-3.5 rounded-xl font-semibold hover:shadow-lg hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:hover:scale-100"
                 >
                   {loading ? (
                     <div className="flex items-center justify-center gap-2">
@@ -24967,16 +24677,16 @@ function HostOnlyAuthPage({
               )}
 
               {/* Switch entre connexion et inscription */}
-              <div className="text-center mt-8 pt-6 border-t border-slate-100">
+              <div className="text-center mt-8 pt-6 border-t border-[#e2f5f2]">
                 {mode === 'login' ? (
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm text-[#5b6b7a]">
                     Pas encore de compte hôte ?{' '}
                     <button onClick={() => setMode('signup')} className="text-[#00c9a7] font-semibold hover:underline">
                       S'inscrire
                     </button>
                   </p>
                 ) : (
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm text-[#5b6b7a]">
                     Déjà un compte hôte ?{' '}
                     <button onClick={() => { setPendingGoogle(null); setMode('login'); }} className="text-[#00c9a7] font-semibold hover:underline">
                       Se connecter
@@ -24987,7 +24697,7 @@ function HostOnlyAuthPage({
             </div>
           </div>
 
-          <p className="text-center text-xs text-slate-400 mt-6">
+          <p className="text-center text-xs text-[#5b6b7a] mt-6">
             En continuant, vous acceptez nos{' '}
             <button className="text-[#00c9a7] hover:underline">conditions générales</button>
           </p>
@@ -25414,10 +25124,10 @@ export function AuthPage({
    if (alreadySignedIn) return null;
 
    return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f4fffe] to-[#e8fffb]">
+    <div className="min-h-screen bg-gradient-to-br from-[#f4fffe] to-[#f4fffe]">
       {!hideBackButton && (
-        <div className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-gray-200 px-4 py-3 flex items-center gap-4 z-20">
-          <button onClick={() => onNavigate?.({ name: 'home' })} className="p-2 rounded-full hover:bg-gray-100 transition-all">
+        <div className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-[#e2f5f2] px-4 py-3 flex items-center gap-4 z-20">
+          <button onClick={() => onNavigate?.({ name: 'home' })} className="p-2 rounded-full hover:bg-[#e8faf6] transition-all">
             <ArrowLeft className="w-5 h-5 text-[#0F2940]" />
           </button>
           <h1 className="text-xl font-semibold text-[#0F2940]">
@@ -25439,10 +25149,10 @@ export function AuthPage({
                       <Check className="w-8 h-8 text-green-600" />
                     </div>
                     <h2 className="text-xl font-bold text-[#0F2940] mb-2">Email envoyé !</h2>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-[#5b6b7a]">
                       Un lien de réinitialisation a été envoyé à <strong>{formData.email}</strong>
                     </p>
-                    <p className="text-xs text-gray-400 mt-2">
+                    <p className="text-xs text-[#5b6b7a] mt-2">
                       Vérifiez vos spams si vous ne recevez rien dans les prochaines minutes.
                     </p>
                   </div>
@@ -25453,7 +25163,7 @@ export function AuthPage({
                       setResetSent(false);
                       setSuccessMessage('');
                     }}
-                    className="w-full bg-[#00c9a7] text-white py-3 rounded-xl font-semibold hover:bg-[#00b892] transition"
+                    className="w-full bg-[#00c9a7] text-white py-3 rounded-xl font-semibold hover:bg-[#00b396] transition"
                   >
                     Retour à la connexion
                   </button>
@@ -25461,41 +25171,27 @@ export function AuthPage({
               ) : (
                 <>
                   <div className="text-center mb-6">
-                    <div className="w-20 h-20 mx-auto mb-4 rounded-2xl overflow-hidden shadow-lg bg-white">
-                      <img 
-                        src={LogoUrl} 
-                        alt="Bluefin-Immo" 
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                          const parent = target.parentElement;
-                          if (parent) {
-                            parent.innerHTML = '<span className="text-2xl font-bold text-white bg-gradient-to-r from-[#00c9a7] to-[#0f2940] w-full h-full flex items-center justify-center">B</span>';
-                          }
-                        }}
-                      />
-                    </div>
+                    <BluefinLogo orientation="stacked" className="mb-4" markClassName="h-11 w-auto" wordmarkClassName="h-[1rem] w-auto" />
                     <h2 className="text-2xl font-bold text-[#0F2940]">
                       {mode === 'login' && 'Bienvenue !'}
-                      {mode === 'signup' && 'Rejoignez Bluefin-Immo'}
+                      {mode === 'signup' && 'Rejoignez Bluefin Immo'}
                       {mode === 'forgot' && 'Mot de passe oublié ?'}
                     </h2>
-                    <p className="text-sm text-gray-500 mt-2">
+                    <p className="text-sm text-[#5b6b7a] mt-2">
                       {mode === 'login' && 'Connectez-vous à votre compte voyageur'}
                       {mode === 'signup' && 'Créez votre compte voyageur en quelques secondes'}
                       {mode === 'forgot' && 'Entrez votre email pour réinitialiser votre mot de passe'}
                     </p>
                     
                     {(redirectTo === 'booking' || localStorage.getItem('redirect_intent') === 'booking') && (
-                      <div className="mt-3 p-2 bg-amber-50 rounded-lg">
-                        <p className="text-xs text-amber-700">🔄 Après connexion, vous serez redirigé vers la page de confirmation et paiement</p>
+                      <div className="mt-3 p-2 bg-[#fffaeb] rounded-lg">
+                        <p className="text-xs text-[#6b4e06]">🔄 Après connexion, vous serez redirigé vers la page de confirmation et paiement</p>
                       </div>
                     )}
                     
                     {localStorage.getItem('redirect_intent') === 'chat' && (
-                      <div className="mt-3 p-2 bg-blue-50 rounded-lg">
-                        <p className="text-xs text-blue-700">💬 Après connexion, vous pourrez discuter avec l'hôte</p>
+                      <div className="mt-3 p-2 bg-[#f4fffe] rounded-lg">
+                        <p className="text-xs text-[#0f2940]">💬 Après connexion, vous pourrez discuter avec l'hôte</p>
                       </div>
                     )}
                   </div>
@@ -25530,24 +25226,24 @@ export function AuthPage({
                   {mode === 'login' && (
                     <div className="mb-5 space-y-5">
                       <GoogleSignInButton text="signin_with" onCredential={handleGoogleLogin} disabled={googleBusy} />
-                      <div className="flex items-center gap-3 text-xs text-gray-400">
-                        <span className="h-px flex-1 bg-gray-200" /> ou avec votre e-mail <span className="h-px flex-1 bg-gray-200" />
+                      <div className="flex items-center gap-3 text-xs text-[#5b6b7a]">
+                        <span className="h-px flex-1 bg-[#e2f5f2]" /> ou avec votre e-mail <span className="h-px flex-1 bg-[#e2f5f2]" />
                       </div>
                     </div>
                   )}
                   <form onSubmit={mode === 'forgot' ? handleForgotPassword : handleSubmit} className="space-y-4">
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                      <label className="block text-sm font-medium text-[#1c3b56] mb-1">Email *</label>
                       <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5b6b7a]" />
                         <input
                           type="email"
                           name="email"
                           value={formData.email}
                           onChange={handleChange}
                           placeholder="votre@email.com"
-                          className={`w-full pl-9 pr-3 py-2 border rounded-xl ${errors.email ? 'border-red-500' : 'border-gray-200'}`}
+                          className={`w-full pl-9 pr-3 py-2 border rounded-xl ${errors.email ? 'border-red-500' : 'border-[#e2f5f2]'}`}
                         />
                       </div>
                       {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
@@ -25556,17 +25252,17 @@ export function AuthPage({
 
                     {mode !== 'forgot' && (
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Mot de passe *</label>
+                        <label className="block text-sm font-medium text-[#1c3b56] mb-1">Mot de passe *</label>
                         <div className="relative">
-                          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5b6b7a]" />
                           <input
                             type={showPassword ? 'text' : 'password'}
                             name="password"
                             value={formData.password}
                             onChange={handleChange}
-                            className={`w-full pl-9 pr-10 py-2 border rounded-xl ${errors.password ? 'border-red-500' : 'border-gray-200'}`}
+                            className={`w-full pl-9 pr-10 py-2 border rounded-xl ${errors.password ? 'border-red-500' : 'border-[#e2f5f2]'}`}
                           />
-                          <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                          <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#5b6b7a]">
                             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </button>
                         </div>
@@ -25586,7 +25282,7 @@ export function AuthPage({
                     <button
                       type="submit"
                       disabled={loading}
-                      className="w-full bg-gradient-to-r from-[#00c9a7] to-[#0f2940] text-white py-2.5 rounded-xl font-semibold disabled:opacity-50 transition-all hover:shadow-lg"
+                      className="w-full bg-[#00c9a7] text-white py-2.5 rounded-xl font-semibold disabled:opacity-50 transition-all hover:shadow-lg"
                     >
                       {loading
                         ? 'Chargement...'
@@ -25600,7 +25296,7 @@ export function AuthPage({
 
                   <div className="text-center mt-5">
                     {mode === 'login' && (
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-[#5b6b7a]">
                         Pas encore de compte ?{' '}
                         <button onClick={() => setMode('signup')} className="text-[#00c9a7] font-medium hover:underline">
                           S'inscrire
@@ -25608,7 +25304,7 @@ export function AuthPage({
                       </p>
                     )}
                     {mode === 'signup' && (
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-[#5b6b7a]">
                         Déjà un compte ?{' '}
                         <button onClick={() => { setPendingGoogle(null); setMode('login'); }} className="text-[#00c9a7] font-medium hover:underline">
                           Se connecter
@@ -25616,7 +25312,7 @@ export function AuthPage({
                       </p>
                     )}
                     {mode === 'forgot' && (
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-[#5b6b7a]">
                         <button onClick={() => setMode('login')} className="text-[#00c9a7] font-medium hover:underline">
                           ← Retour à la connexion
                         </button>
@@ -25768,10 +25464,10 @@ export function HotelsPage({ onNavigate }: HotelsPageProps) {
   return (
     <div className="min-h-screen bg-white flex flex-col pb-16 lg:pb-0">
       {/* Header fixe */}
-      <div className="sticky top-0 z-30 bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-4 shadow-sm">
+      <div className="sticky top-0 z-30 bg-white border-b border-[#e2f5f2] px-4 py-3 flex items-center gap-4 shadow-sm">
         <button 
           onClick={() => handleNavigate({ name: 'home' })} 
-          className="p-2 -ml-2 rounded-full hover:bg-gray-100 transition-colors active:bg-gray-200"
+          className="p-2 -ml-2 rounded-full hover:bg-[#e8faf6] transition-colors active:bg-[#e2f5f2]"
         >
           <ArrowLeft className="w-5 h-5 text-[#0F2940]" />
         </button>
@@ -25779,25 +25475,25 @@ export function HotelsPage({ onNavigate }: HotelsPageProps) {
       </div>
 
       {/* Barre de filtre */}
-      <div className="sticky top-[57px] sm:top-[61px] md:top-[65px] z-20 bg-white border-b border-gray-200 px-4 py-3 shadow-sm">
+      <div className="sticky top-[57px] sm:top-[61px] md:top-[65px] z-20 bg-white border-b border-[#e2f5f2] px-4 py-3 shadow-sm">
         <div className="relative inline-block">
           <button 
             onClick={() => setShowFilterDropdown(!showFilterDropdown)} 
-            className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-300 hover:border-[#00c9a7] transition-colors"
+            className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#c9f0e8] hover:border-[#00c9a7] transition-colors"
           >
             <Filter className="w-4 h-4 text-[#00c9a7]" />
-            <span className="text-sm text-gray-700">Trier : {selectedFilter}</span>
-            <ChevronDown className="w-4 h-4 text-gray-400" />
+            <span className="text-sm text-[#1c3b56]">Trier : {selectedFilter}</span>
+            <ChevronDown className="w-4 h-4 text-[#5b6b7a]" />
           </button>
           
           {showFilterDropdown && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowFilterDropdown(false)} />
-              <div className="absolute top-full left-0 mt-2 bg-white shadow-lg rounded-xl border border-gray-200 w-48 z-20 overflow-hidden">
+              <div className="absolute top-full left-0 mt-2 bg-white shadow-lg rounded-xl border border-[#e2f5f2] w-48 z-20 overflow-hidden">
                 {["Tous", "Prix croissant", "Prix décroissant", "Mieux notés"].map(filter => (
                   <div 
                     key={filter} 
-                    className={`px-4 py-2 hover:bg-[#f4fffe] cursor-pointer text-sm transition-colors ${selectedFilter === filter ? 'text-[#00c9a7] font-medium bg-[#f4fffe]' : 'text-gray-700'}`}
+                    className={`px-4 py-2 hover:bg-[#f4fffe] cursor-pointer text-sm transition-colors ${selectedFilter === filter ? 'text-[#00c9a7] font-medium bg-[#f4fffe]' : 'text-[#1c3b56]'}`}
                     onClick={() => { setSelectedFilter(filter); setShowFilterDropdown(false); }}
                   >
                     {filter}
@@ -25817,11 +25513,11 @@ export function HotelsPage({ onNavigate }: HotelsPageProps) {
             {displayedProperties.map((property) => (
               <div 
                 key={property.id} 
-                className="group bg-white rounded-xl overflow-hidden border border-gray-200 hover:shadow-xl hover:border-[#00c9a7] transition-all duration-300 cursor-pointer"
+                className="group bg-white rounded-xl overflow-hidden border border-[#e2f5f2] hover:shadow-xl hover:border-[#00c9a7] transition-all duration-300 cursor-pointer"
                 onClick={() => setDetailProperty(property)}
               >
                 {/* Image - ratio carré pour mieux s'adapter */}
-                <div className="relative overflow-hidden aspect-square bg-gray-100">
+                <div className="relative overflow-hidden aspect-square bg-[#e8faf6]">
                   <img 
                     src={property.images?.[0] || property.image || '/placeholder.jpg'} 
                     alt={property.title}
@@ -25844,15 +25540,15 @@ export function HotelsPage({ onNavigate }: HotelsPageProps) {
                 {/* Contenu */}
                 <div className="p-2">
                   <h3 className="font-semibold text-[#0F2940] text-sm line-clamp-1">{property.title}</h3>
-                  <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{property.location}</p>
+                  <p className="text-xs text-[#5b6b7a] mt-0.5 line-clamp-1">{property.location}</p>
                   
                   <div className="flex items-center gap-1 mt-1">
-                    <Star className="w-3 h-3 fill-yellow-500 text-yellow-500" />
+                    <Star className="w-3 h-3 fill-[#ffc93c] text-[#e0ac1f]" />
                     <span className="font-medium text-xs">{property.rating}</span>
-                    <span className="text-gray-400 text-xs">({property.reviews})</span>
+                    <span className="text-[#5b6b7a] text-xs">({property.reviews})</span>
                   </div>
                   
-                  <div className="flex items-center gap-2 mt-1 text-gray-500">
+                  <div className="flex items-center gap-2 mt-1 text-[#5b6b7a]">
                     <div className="flex items-center gap-0.5">
                       <Bed className="w-3 h-3" />
                       <span className="text-[10px]">{property.beds}</span>
@@ -25869,7 +25565,7 @@ export function HotelsPage({ onNavigate }: HotelsPageProps) {
                   <div className="mt-2 flex items-baseline justify-between items-center">
                     <div>
                       <span className="font-bold text-[#00c9a7] text-sm">{property.priceDisplay.split('/')[0]}</span>
-                      <span className="text-[10px] text-gray-400"> / nuit</span>
+                      <span className="text-[10px] text-[#5b6b7a]"> / nuit</span>
                     </div>
                     <button 
                       onClick={(e) => {
@@ -25888,13 +25584,13 @@ export function HotelsPage({ onNavigate }: HotelsPageProps) {
           
           {displayedProperties.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-gray-500">Aucun hôtel trouvé</p>
+              <p className="text-[#5b6b7a]">Aucun hôtel trouvé</p>
             </div>
           )}
         </div>
 
         {/* Colonne droite : Carte Google Maps */}
-        <div className="lg:w-1/2 w-full h-[280px] sm:h-[320px] lg:h-auto relative border-t lg:border-t-0 lg:border-l border-gray-200">
+        <div className="lg:w-1/2 w-full h-[280px] sm:h-[320px] lg:h-auto relative border-t lg:border-t-0 lg:border-l border-[#e2f5f2]">
           <iframe 
             title="Carte des hôtels au Bénin" 
             src={getMapUrl()} 
@@ -25908,9 +25604,9 @@ export function HotelsPage({ onNavigate }: HotelsPageProps) {
           <div className="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur-sm rounded-lg px-3 py-2 shadow-md">
             <div className="flex items-center gap-2">
               <MapPin className="w-4 h-4 text-[#00c9a7]" />
-              <span className="text-xs font-medium text-gray-700">📍 Hôtels au Bénin</span>
+              <span className="text-xs font-medium text-[#1c3b56]">📍 Hôtels au Bénin</span>
             </div>
-            <p className="text-[10px] text-gray-500 mt-0.5">{displayedProperties.length} hôtels disponibles</p>
+            <p className="text-[10px] text-[#5b6b7a] mt-0.5">{displayedProperties.length} hôtels disponibles</p>
           </div>
         </div>
       </div>
@@ -26005,7 +25701,7 @@ export function CityPage({ onNavigate, city }: { onNavigate?: (route: Route) => 
               className={`w-5 h-5 transition-all duration-200 ${
                 isFavorite(property.id) 
                   ? 'fill-red-500 text-red-500 scale-110' 
-                  : 'text-gray-700 hover:text-red-500'
+                  : 'text-[#1c3b56] hover:text-red-500'
               }`} 
             />
           </button>
@@ -26014,18 +25710,18 @@ export function CityPage({ onNavigate, city }: { onNavigate?: (route: Route) => 
           <div className="flex justify-between items-start gap-4">
             <div>
               <h3 className="font-semibold text-[#0F2940] line-clamp-1">{property.title}</h3>
-              <p className="text-sm text-gray-500 mt-1">{property.location}</p>
+              <p className="text-sm text-[#5b6b7a] mt-1">{property.location}</p>
             </div>
-            <div className="flex items-center gap-1 text-sm text-gray-500">
+            <div className="flex items-center gap-1 text-sm text-[#5b6b7a]">
               <Star className="w-4 h-4 text-[#00c9a7] fill-current" />
               <span className="font-medium text-[#0F2940]">{property.rating}</span>
               <span>({property.reviews})</span>
             </div>
           </div>
           {showDescription && property.description && (
-            <p className="text-sm text-gray-600 mt-2 line-clamp-2">{property.description}</p>
+            <p className="text-sm text-[#5b6b7a] mt-2 line-clamp-2">{property.description}</p>
           )}
-          <div className="flex flex-wrap items-center gap-3 mt-3 text-sm text-gray-500">
+          <div className="flex flex-wrap items-center gap-3 mt-3 text-sm text-[#5b6b7a]">
             {property.beds && (
               <div className="flex items-center gap-1">
                 <Bed className="w-4 h-4" />
@@ -26050,10 +25746,10 @@ export function CityPage({ onNavigate, city }: { onNavigate?: (route: Route) => 
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-xl text-center p-8">
           <h1 className="text-2xl font-semibold text-[#222222]">Ville introuvable</h1>
-          <p className="mt-4 text-gray-600">La ville demandée n'existe pas.</p>
+          <p className="mt-4 text-[#5b6b7a]">La ville demandée n'existe pas.</p>
           <button 
             onClick={() => handleNavigate({ name: 'home' })} 
-            className="mt-6 rounded-full bg-[#00c9a7] text-[#0F2940] px-6 py-3 font-semibold hover:bg-[#00b892] transition-colors shadow-md"
+            className="mt-6 rounded-full bg-[#00c9a7] text-[#0F2940] px-6 py-3 font-semibold hover:bg-[#00b396] transition-colors shadow-md"
           >
             Retour à l'accueil
           </button>
@@ -26064,7 +25760,7 @@ export function CityPage({ onNavigate, city }: { onNavigate?: (route: Route) => 
 
   return (
     <div className="bg-white min-h-screen pb-16">
-      <div className="bg-gradient-to-r from-[#00c9a7]/10 to-[#0f2940]/10 pt-8 pb-12">
+      <div className="bg-[#f4fffe] pt-8 pb-12">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <button
             onClick={() => handleNavigate({ name: 'home' })}
@@ -26076,15 +25772,15 @@ export function CityPage({ onNavigate, city }: { onNavigate?: (route: Route) => 
             <MapPin className="w-8 h-8 text-[#00c9a7]" />
             <h1 className="text-3xl sm:text-4xl font-bold text-[#0f2940]">Logements à {category.title}</h1>
           </div>
-          <p className="text-gray-600 text-lg">Découvrez les meilleurs hébergements à {category.title}, Bénin</p>
+          <p className="text-[#5b6b7a] text-lg">Découvrez les meilleurs hébergements à {category.title}, Bénin</p>
         </div>
       </div>
 
-      <div className="border-b border-gray-200 sticky top-0 bg-white z-30">
+      <div className="border-b border-[#e2f5f2] sticky top-0 bg-white z-30">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center gap-4">
             <div className="relative">
-              <button onClick={() => setShowFilterDropdown(!showFilterDropdown)} className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-300 hover:border-gray-400 transition-colors">
+              <button onClick={() => setShowFilterDropdown(!showFilterDropdown)} className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#c9f0e8] hover:border-[#9fb3c4] transition-colors">
                 <Filter className="w-4 h-4" />
                 <span className="text-sm">Filtres</span>
                 <ChevronDown className={`w-4 h-4 transition-transform ${showFilterDropdown ? 'rotate-180' : ''}`} />
@@ -26092,9 +25788,9 @@ export function CityPage({ onNavigate, city }: { onNavigate?: (route: Route) => 
               {showFilterDropdown && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setShowFilterDropdown(false)}></div>
-                  <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 z-50 py-2">
+                  <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-[#e2f5f2] z-50 py-2">
                     {filtersList.map(filter => (
-                      <button key={filter} onClick={() => { setSelectedFilter(filter); setShowFilterDropdown(false); }} className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${selectedFilter === filter ? 'text-[#00c9a7] font-medium' : 'text-gray-700'}`}>
+                      <button key={filter} onClick={() => { setSelectedFilter(filter); setShowFilterDropdown(false); }} className={`w-full text-left px-4 py-2 text-sm hover:bg-[#f4fffe] ${selectedFilter === filter ? 'text-[#00c9a7] font-medium' : 'text-[#1c3b56]'}`}>
                         {filter}
                       </button>
                     ))}
@@ -26102,7 +25798,7 @@ export function CityPage({ onNavigate, city }: { onNavigate?: (route: Route) => 
                 </>
               )}
             </div>
-            <div className="text-sm text-gray-500">{filteredProperties.length} logements disponibles</div>
+            <div className="text-sm text-[#5b6b7a]">{filteredProperties.length} logements disponibles</div>
           </div>
         </div>
       </div>
@@ -26122,7 +25818,7 @@ export function CityPage({ onNavigate, city }: { onNavigate?: (route: Route) => 
 // pages/admin/AdminDashboardPage.tsx
 
 
-const COLORS = ['#00c9a7', '#0f2940', '#ff6b6b', '#f5a623', '#4a90e2'];
+const COLORS = ['#00c9a7', '#0f2940', '#d4183d', '#f5a623', '#1c3b56'];
 
 export function AdminDashboardPage({ onNavigate }: { onNavigate?: (route: any) => void }) {
   const { isDark } = useTheme();
@@ -26177,21 +25873,21 @@ export function AdminDashboardPage({ onNavigate }: { onNavigate?: (route: any) =
   ];
 
   return (
-    <div className={`min-h-screen ${isDark ? 'bg-slate-900' : 'bg-gradient-to-br from-slate-50 via-white to-emerald-50/30'} pb-10 transition-colors duration-300`}>
+    <div className={`min-h-screen ${isDark ? 'bg-[#0f2940]' : 'bg-gradient-to-br from-[#f4fffe] via-white to-emerald-50/30'} pb-10 transition-colors duration-300`}>
       <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
         {/* En-tête épuré */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div>
-            <h1 className={`text-2xl md:text-3xl font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-800'}`}>
+            <h1 className={`text-2xl md:text-3xl font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>
               <Sparkles className="w-6 h-6 text-emerald-500" />
               Tableau de bord
             </h1>
-            <p className={`text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Vue d'ensemble de votre plateforme</p>
+            <p className={`text-sm mt-1 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>Vue d'ensemble de votre plateforme</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => refetch()}
-              className={`p-2 ${isDark ? 'bg-slate-800 border-slate-700 text-slate-400' : 'bg-white border-slate-200 text-slate-500'} rounded-xl shadow-sm hover:shadow-md transition-all border`}
+              className={`p-2 ${isDark ? 'bg-[#0f2940] border-[#1c3b56] text-[#5b6b7a]' : 'bg-white border-[#e2f5f2] text-[#5b6b7a]'} rounded-xl shadow-sm hover:shadow-md transition-all border`}
             >
               <RefreshCw className="w-4 h-4" />
             </button>
@@ -26284,18 +25980,18 @@ export function AdminDashboardPage({ onNavigate }: { onNavigate?: (route: any) =
               <ComposedChart data={revenueChartData}>
                 <defs>
                   <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#00c9a7" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#00c9a7" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#334155' : '#f1f5f9'} />
-                <XAxis dataKey="day" tick={{ fontSize: 11, fill: isDark ? '#94a3b8' : '#94a3b8' }} />
-                <YAxis tickFormatter={(v) => `${v}k`} tick={{ fontSize: 11, fill: isDark ? '#94a3b8' : '#94a3b8' }} />
+                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#1c3b56' : '#f1f5f9'} />
+                <XAxis dataKey="day" tick={{ fontSize: 11, fill: isDark ? '#5b6b7a' : '#5b6b7a' }} />
+                <YAxis tickFormatter={(v) => `${v}k`} tick={{ fontSize: 11, fill: isDark ? '#5b6b7a' : '#5b6b7a' }} />
                 <Tooltip 
-                  contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', backgroundColor: isDark ? '#1e293b' : '#fff', color: isDark ? '#fff' : '#000' }}
+                  contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', backgroundColor: isDark ? '#0f2940' : '#fff', color: isDark ? '#fff' : '#000' }}
                   formatter={(v: number) => [`${v}k FCFA`, 'CA']}
                 />
-                <Area type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={2.5} fill="url(#revenueGradient)" name="CA (k FCFA)" />
+                <Area type="monotone" dataKey="revenue" stroke="#00c9a7" strokeWidth={2.5} fill="url(#revenueGradient)" name="CA (k FCFA)" />
               </ComposedChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -26303,15 +25999,15 @@ export function AdminDashboardPage({ onNavigate }: { onNavigate?: (route: any) =
           <ChartCard title="Réservations vs Utilisateurs" isDark={isDark}>
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={revenueChartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#334155' : '#f1f5f9'} />
-                <XAxis dataKey="day" tick={{ fontSize: 11, fill: isDark ? '#94a3b8' : '#94a3b8' }} />
-                <YAxis tick={{ fontSize: 11, fill: isDark ? '#94a3b8' : '#94a3b8' }} />
+                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#1c3b56' : '#f1f5f9'} />
+                <XAxis dataKey="day" tick={{ fontSize: 11, fill: isDark ? '#5b6b7a' : '#5b6b7a' }} />
+                <YAxis tick={{ fontSize: 11, fill: isDark ? '#5b6b7a' : '#5b6b7a' }} />
                 <Tooltip 
-                  contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', backgroundColor: isDark ? '#1e293b' : '#fff', color: isDark ? '#fff' : '#000' }}
+                  contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', backgroundColor: isDark ? '#0f2940' : '#fff', color: isDark ? '#fff' : '#000' }}
                 />
-                <Legend wrapperStyle={{ fontSize: 12, color: isDark ? '#94a3b8' : '#000' }} />
+                <Legend wrapperStyle={{ fontSize: 12, color: isDark ? '#5b6b7a' : '#000' }} />
                 <Bar dataKey="bookings" fill="#0f2940" name="Réservations" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="users" fill="#10b981" name="Nouveaux utilisateurs" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="users" fill="#00c9a7" name="Nouveaux utilisateurs" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -26319,21 +26015,21 @@ export function AdminDashboardPage({ onNavigate }: { onNavigate?: (route: any) =
 
         {/* Destinations + Répartition */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'} rounded-2xl p-5 shadow-sm border transition-colors duration-300`}>
-            <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-slate-800'} mb-4 flex items-center gap-2`}>
+          <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-2xl p-5 shadow-sm border transition-colors duration-300`}>
+            <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-[#0f2940]'} mb-4 flex items-center gap-2`}>
               <MapPin className="w-5 h-5 text-emerald-500" />
               Destinations populaires
             </h3>
             <div className="space-y-3">
               {topDestinations.map((dest, idx) => (
-                <div key={idx} className={`flex items-center justify-between p-2 rounded-xl ${isDark ? 'hover:bg-slate-700' : 'hover:bg-slate-50'} transition`}>
+                <div key={idx} className={`flex items-center justify-between p-2 rounded-xl ${isDark ? 'hover:bg-[#1c3b56]' : 'hover:bg-[#f4fffe]'} transition`}>
                   <div className="flex items-center gap-3">
-                    <span className={`w-6 h-6 rounded-full ${isDark ? 'bg-slate-700 text-slate-300' : 'bg-slate-100 text-slate-600'} flex items-center justify-center text-xs font-bold`}>
+                    <span className={`w-6 h-6 rounded-full ${isDark ? 'bg-[#1c3b56] text-[#9fb3c4]' : 'bg-[#e8faf6] text-[#5b6b7a]'} flex items-center justify-center text-xs font-bold`}>
                       {idx + 1}
                     </span>
                     <div>
-                      <p className={`font-medium text-sm ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>{dest.city}</p>
-                      <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-400'}`}>{dest.count} réservations</p>
+                      <p className={`font-medium text-sm ${isDark ? 'text-[#c9f0e8]' : 'text-[#1c3b56]'}`}>{dest.city}</p>
+                      <p className={`text-xs ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>{dest.count} réservations</p>
                     </div>
                   </div>
                   <p className={`font-semibold text-sm ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`}>{(dest.revenue / 1000000).toFixed(1)}M FCFA</p>
@@ -26342,8 +26038,8 @@ export function AdminDashboardPage({ onNavigate }: { onNavigate?: (route: any) =
             </div>
           </div>
 
-          <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'} rounded-2xl p-5 shadow-sm border lg:col-span-2 transition-colors duration-300`}>
-            <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-slate-800'} mb-4 flex items-center gap-2`}>
+          <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-2xl p-5 shadow-sm border lg:col-span-2 transition-colors duration-300`}>
+            <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-[#0f2940]'} mb-4 flex items-center gap-2`}>
               <PieChart className="w-5 h-5 text-emerald-500" />
               Répartition des propriétés
             </h3>
@@ -26370,20 +26066,20 @@ export function AdminDashboardPage({ onNavigate }: { onNavigate?: (route: any) =
                       <Cell key={i} fill={color} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ borderRadius: 12, border: 'none', backgroundColor: isDark ? '#1e293b' : '#fff', color: isDark ? '#fff' : '#000' }} />
+                  <Tooltip contentStyle={{ borderRadius: 12, border: 'none', backgroundColor: isDark ? '#0f2940' : '#fff', color: isDark ? '#fff' : '#000' }} />
                 </RePieChart>
               </ResponsiveContainer>
               <div className="flex flex-wrap justify-center gap-3">
                 {[
                   { label: 'Appartements', value: 45, color: '#00c9a7' },
                   { label: 'Villas', value: 25, color: '#0f2940' },
-                  { label: 'Studios', value: 15, color: '#ff6b6b' },
+                  { label: 'Studios', value: 15, color: '#d4183d' },
                   { label: 'Maisons', value: 10, color: '#f5a623' },
                 ].map((item, i) => (
                   <div key={i} className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full" style={{ background: item.color }} />
-                    <span className={`text-sm ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{item.label}</span>
-                    <span className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-slate-800'}`}>{item.value}%</span>
+                    <span className={`text-sm ${isDark ? 'text-[#9fb3c4]' : 'text-[#5b6b7a]'}`}>{item.label}</span>
+                    <span className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>{item.value}%</span>
                   </div>
                 ))}
               </div>
@@ -26393,30 +26089,30 @@ export function AdminDashboardPage({ onNavigate }: { onNavigate?: (route: any) =
 
         {/* Activités + Actions rapides */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'} rounded-2xl p-5 shadow-sm border transition-colors duration-300`}>
-            <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-slate-800'} mb-4 flex items-center gap-2`}>
+          <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-2xl p-5 shadow-sm border transition-colors duration-300`}>
+            <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-[#0f2940]'} mb-4 flex items-center gap-2`}>
               <Clock className="w-5 h-5 text-emerald-500" />
               Activités récentes
             </h3>
             <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
               {activities.slice(0, 6).map((act: any, idx: number) => (
-                <div key={idx} className={`flex items-start gap-3 p-2 rounded-xl ${isDark ? 'hover:bg-slate-700' : 'hover:bg-slate-50'} transition`}>
-                  <div className={`w-8 h-8 rounded-full ${isDark ? 'bg-slate-700' : 'bg-slate-100'} flex items-center justify-center shrink-0`}>
-                    {act.type === 'property_submitted' && <Home className="w-4 h-4 text-orange-500" />}
+                <div key={idx} className={`flex items-start gap-3 p-2 rounded-xl ${isDark ? 'hover:bg-[#1c3b56]' : 'hover:bg-[#f4fffe]'} transition`}>
+                  <div className={`w-8 h-8 rounded-full ${isDark ? 'bg-[#1c3b56]' : 'bg-[#e8faf6]'} flex items-center justify-center shrink-0`}>
+                    {act.type === 'property_submitted' && <Home className="w-4 h-4 text-[#e0ac1f]" />}
                     {act.type === 'payment_received' && <CreditCard className="w-4 h-4 text-emerald-500" />}
-                    {act.type === 'user_registered' && <UserPlus className="w-4 h-4 text-blue-500" />}
+                    {act.type === 'user_registered' && <UserPlus className="w-4 h-4 text-[#00806b]" />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className={`text-sm ${isDark ? 'text-slate-200' : 'text-slate-700'} truncate`}>{act.title || act.message}</p>
-                    <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-400'} mt-0.5`}>{act.time}</p>
+                    <p className={`text-sm ${isDark ? 'text-[#c9f0e8]' : 'text-[#1c3b56]'} truncate`}>{act.title || act.message}</p>
+                    <p className={`text-xs ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'} mt-0.5`}>{act.time}</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'} rounded-2xl p-5 shadow-sm border transition-colors duration-300`}>
-            <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-slate-800'} mb-4 flex items-center gap-2`}>
+          <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-2xl p-5 shadow-sm border transition-colors duration-300`}>
+            <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-[#0f2940]'} mb-4 flex items-center gap-2`}>
               <AlertCircle className="w-5 h-5 text-emerald-500" />
               Actions rapides
             </h3>
@@ -26457,10 +26153,10 @@ export function AdminDashboardPage({ onNavigate }: { onNavigate?: (route: any) =
 
 // const StatCard = ({ icon: Icon, title, value, change, color, isDark }: any) => {
 //   const colors = {
-//     blue: 'from-blue-500 to-blue-600',
+//     blue: 'from-[#00c9a7] to-[#00b396]',
 //     emerald: 'from-emerald-500 to-emerald-600',
-//     purple: 'from-purple-500 to-purple-600',
-//     orange: 'from-orange-500 to-orange-600',
+//     purple: 'from-[#0f2940] to-[#1c3b56]',
+//     orange: 'from-[#ffc93c] to-[#e0ac1f]',
 //   };
 
 //   return (
@@ -26480,10 +26176,10 @@ export function AdminDashboardPage({ onNavigate }: { onNavigate?: (route: any) =
 
 const MetricCard = ({ title, value, subtitle, icon: Icon, color, isDark }: any) => {
   const colors = {
-    indigo: `from-indigo-50 to-indigo-100 border-indigo-200 text-indigo-700 ${isDark ? 'dark:from-indigo-900/30 dark:to-indigo-800/30 dark:border-indigo-700 dark:text-indigo-300' : ''}`,
+    indigo: `from-[#f4fffe] to-[#e8faf6] border-[#c9f0e8] text-[#0f2940] ${isDark ? 'dark:from-[#0f2940]/30 dark:to-[#1c3b56]/30 dark:border-[#009c84] dark:text-[#7fd9c6]' : ''}`,
     emerald: `from-emerald-50 to-emerald-100 border-emerald-200 text-emerald-700 ${isDark ? 'dark:from-emerald-900/30 dark:to-emerald-800/30 dark:border-emerald-700 dark:text-emerald-300' : ''}`,
     rose: `from-rose-50 to-rose-100 border-rose-200 text-rose-700 ${isDark ? 'dark:from-rose-900/30 dark:to-rose-800/30 dark:border-rose-700 dark:text-rose-300' : ''}`,
-    amber: `from-amber-50 to-amber-100 border-amber-200 text-amber-700 ${isDark ? 'dark:from-amber-900/30 dark:to-amber-800/30 dark:border-amber-700 dark:text-amber-300' : ''}`,
+    amber: `from-[#fffaeb] to-[#fff3cd] border-[#ffe9a8] text-[#6b4e06] ${isDark ? 'dark:from-[#4a3400]/30 dark:to-[#6b4e06]/30 dark:border-[#a87c10] dark:text-[#ffdc7a]' : ''}`,
   };
 
   return (
@@ -26503,23 +26199,23 @@ const MetricCard = ({ title, value, subtitle, icon: Icon, color, isDark }: any) 
 };
 
 const ChartCard = ({ title, children, isDark }: any) => (
-  <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'} rounded-2xl p-5 shadow-sm border transition-colors duration-300`}>
-    <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-slate-800'} mb-4`}>{title}</h3>
+  <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-2xl p-5 shadow-sm border transition-colors duration-300`}>
+    <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-[#0f2940]'} mb-4`}>{title}</h3>
     {children}
   </div>
 );
 
 const QuickAction = ({ title, count, icon: Icon, color, isDark, onClick }: any) => {
   const colors = {
-    amber: `bg-amber-50 border-amber-200 hover:bg-amber-100 ${isDark ? 'dark:bg-amber-900/30 dark:border-amber-700 dark:hover:bg-amber-800/40' : ''}`,
+    amber: `bg-[#fffaeb] border-[#ffe9a8] hover:bg-[#fff3cd] ${isDark ? 'dark:bg-[#4a3400]/30 dark:border-[#a87c10] dark:hover:bg-[#6b4e06]/40' : ''}`,
     rose: `bg-rose-50 border-rose-200 hover:bg-rose-100 ${isDark ? 'dark:bg-rose-900/30 dark:border-rose-700 dark:hover:bg-rose-800/40' : ''}`,
-    blue: `bg-blue-50 border-blue-200 hover:bg-blue-100 ${isDark ? 'dark:bg-blue-900/30 dark:border-blue-700 dark:hover:bg-blue-800/40' : ''}`,
+    blue: `bg-[#f4fffe] border-[#c9f0e8] hover:bg-[#e8faf6] ${isDark ? 'dark:bg-[#0f2940]/30 dark:border-[#009c84] dark:hover:bg-[#1c3b56]/40' : ''}`,
   };
 
   const textColors = {
-    amber: `${isDark ? 'text-amber-400' : 'text-amber-700'}`,
+    amber: `${isDark ? 'text-[#ffc93c]' : 'text-[#6b4e06]'}`,
     rose: `${isDark ? 'text-rose-400' : 'text-rose-700'}`,
-    blue: `${isDark ? 'text-blue-400' : 'text-blue-700'}`,
+    blue: `${isDark ? 'text-[#00c9a7]' : 'text-[#0f2940]'}`,
   };
 
   return (
@@ -26544,10 +26240,10 @@ const QuickAction = ({ title, count, icon: Icon, color, isDark, onClick }: any) 
 // ============================================
 const StatCard = ({ icon: Icon, label, value, color }: any) => {
   const colors = {
-    yellow: 'from-yellow-500 to-yellow-600',
-    blue: 'from-blue-500 to-blue-600',
+    yellow: 'from-[#ffc93c] to-[#e0ac1f]',
+    blue: 'from-[#00c9a7] to-[#00b396]',
     green: 'from-green-500 to-green-600',
-    purple: 'from-purple-500 to-purple-600',
+    purple: 'from-[#0f2940] to-[#1c3b56]',
   };
 
   return (
@@ -26569,12 +26265,12 @@ const StatCard = ({ icon: Icon, label, value, color }: any) => {
 const LoadingSkeleton = ({ isDark }: { isDark: boolean }) => (
   <div className="p-3 sm:p-4 md:p-6">
     <div className="animate-pulse">
-      <div className={`h-6 sm:h-8 ${isDark ? 'bg-slate-700' : 'bg-gray-200'} rounded w-48 mb-4`}></div>
-      <div className={`${isDark ? 'bg-slate-700' : 'bg-gray-200'} rounded-xl h-12 mb-6`}></div>
+      <div className={`h-6 sm:h-8 ${isDark ? 'bg-[#1c3b56]' : 'bg-[#e2f5f2]'} rounded w-48 mb-4`}></div>
+      <div className={`${isDark ? 'bg-[#1c3b56]' : 'bg-[#e2f5f2]'} rounded-xl h-12 mb-6`}></div>
       <div className="grid grid-cols-4 gap-4 mb-6">
-        {[...Array(4)].map((_, i) => <div key={i} className={`${isDark ? 'bg-slate-700' : 'bg-gray-200'} rounded-xl h-20`}></div>)}
+        {[...Array(4)].map((_, i) => <div key={i} className={`${isDark ? 'bg-[#1c3b56]' : 'bg-[#e2f5f2]'} rounded-xl h-20`}></div>)}
       </div>
-      <div className={`${isDark ? 'bg-slate-700' : 'bg-gray-200'} rounded-xl h-80 mb-6`}></div>
+      <div className={`${isDark ? 'bg-[#1c3b56]' : 'bg-[#e2f5f2]'} rounded-xl h-80 mb-6`}></div>
     </div>
   </div>
 );
@@ -26587,12 +26283,12 @@ const ErrorMessage = ({
   onRetry?: () => void;
 }) => (
   <div className="p-4 md:p-6">
-    <div className={`${isDark ? 'bg-slate-800 border-slate-700 text-slate-200' : 'bg-white border-red-100 text-slate-700'} rounded-2xl border p-6`}>
+    <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56] text-[#c9f0e8]' : 'bg-white border-red-100 text-[#1c3b56]'} rounded-2xl border p-6`}>
       <div className="flex items-start gap-3">
         <AlertCircle className="w-5 h-5 text-red-500 mt-0.5" />
         <div>
           <h3 className="font-semibold">Impossible de charger le dashboard admin</h3>
-          <p className={`text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+          <p className={`text-sm mt-1 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>
             Le serveur a renvoye une erreur. Verifiez votre session admin puis reessayez.
           </p>
           <button
@@ -26626,10 +26322,10 @@ const AdminPropertyCard = ({ property, isDark, onView, onApprove, onReject }: an
   const imageUrl = getFirstImage();
 
   return (
-    <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-xl sm:rounded-2xl p-4 shadow-sm hover:shadow-md transition-all border`}>
+    <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-xl sm:rounded-2xl p-4 shadow-sm hover:shadow-md transition-all border`}>
       <div className="flex flex-col sm:flex-row gap-4">
         {/* Image */}
-        <div className="w-full sm:w-32 h-48 sm:h-32 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
+        <div className="w-full sm:w-32 h-48 sm:h-32 rounded-xl overflow-hidden bg-[#e8faf6] flex-shrink-0">
           {imageUrl ? (
             <img 
               src={imageUrl} 
@@ -26639,30 +26335,30 @@ const AdminPropertyCard = ({ property, isDark, onView, onApprove, onReject }: an
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <Home className={`w-8 h-8 ${isDark ? 'text-slate-600' : 'text-gray-400'}`} />
+              <Home className={`w-8 h-8 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`} />
             </div>
           )}
         </div>
 
         {/* Infos */}
         <div className="flex-1 min-w-0">
-          <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-800'} text-lg`}>{property.title}</h3>
+          <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-[#0f2940]'} text-lg`}>{property.title}</h3>
           <div className="flex flex-wrap items-center gap-2 mt-1">
-            <span className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-yellow-900/30 text-yellow-400' : 'bg-yellow-100 text-yellow-700'}`}>
+            <span className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-[#4a3400]/30 text-[#ffc93c]' : 'bg-[#fff3cd] text-[#6b4e06]'}`}>
               En attente
             </span>
-            <span className={`text-xs ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>• {property.city}, {property.district}</span>
+            <span className={`text-xs ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>• {property.city}, {property.district}</span>
           </div>
           <div className="flex flex-wrap items-center gap-3 mt-2 text-sm">
-            <div className={`flex items-center gap-1 ${isDark ? 'text-slate-300' : 'text-gray-600'}`}>
+            <div className={`flex items-center gap-1 ${isDark ? 'text-[#9fb3c4]' : 'text-[#5b6b7a]'}`}>
               <User className="w-4 h-4" />
               <span>{property.user?.full_name || 'Hôte'}</span>
             </div>
-            <div className={`flex items-center gap-1 ${isDark ? 'text-slate-300' : 'text-gray-600'}`}>
+            <div className={`flex items-center gap-1 ${isDark ? 'text-[#9fb3c4]' : 'text-[#5b6b7a]'}`}>
               <DollarSign className="w-4 h-4" />
               <span>{property.price_per_night?.toLocaleString()} FCFA/nuit</span>
             </div>
-            <div className={`flex items-center gap-1 ${isDark ? 'text-slate-300' : 'text-gray-600'}`}>
+            <div className={`flex items-center gap-1 ${isDark ? 'text-[#9fb3c4]' : 'text-[#5b6b7a]'}`}>
               <CalendarIcon className="w-4 h-4" />
               <span>Soumis le {new Date(property.created_at).toLocaleDateString()}</span>
             </div>
@@ -26673,7 +26369,7 @@ const AdminPropertyCard = ({ property, isDark, onView, onApprove, onReject }: an
         <div className="flex flex-row sm:flex-col gap-2 justify-end">
           <button
             onClick={onView}
-            className={`p-2 ${isDark ? 'bg-slate-700 hover:bg-slate-600 text-slate-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'} rounded-lg transition`}
+            className={`p-2 ${isDark ? 'bg-[#1c3b56] hover:bg-[#5b6b7a] text-[#9fb3c4]' : 'bg-[#e8faf6] hover:bg-[#e2f5f2] text-[#5b6b7a]'} rounded-lg transition`}
             title="Voir les détails"
           >
             <Eye className="w-4 h-4" />
@@ -26767,13 +26463,13 @@ export function AdminPropertiesPage({ onNavigate }: { onNavigate?: (route: any) 
   };
 
   return (
-    <div className={`p-3 sm:p-4 md:p-6 ${isDark ? 'bg-slate-900' : 'bg-gradient-to-br from-gray-50 to-gray-100'} min-h-screen transition-colors duration-300`}>
+    <div className={`p-3 sm:p-4 md:p-6 ${isDark ? 'bg-[#0f2940]' : 'bg-gradient-to-br from-[#f4fffe] to-[#e8faf6]'} min-h-screen transition-colors duration-300`}>
       {/* En-tête */}
       <div className="mb-6">
-        <h1 className={`text-xl sm:text-2xl md:text-3xl font-bold ${isDark ? 'text-white' : 'bg-gradient-to-r from-[#0f2940] to-[#00c9a7] bg-clip-text text-transparent'}`}>
+        <h1 className={`text-xl sm:text-2xl md:text-3xl font-bold ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>
           Modération des propriétés
         </h1>
-        <p className={`text-xs sm:text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>
+        <p className={`text-xs sm:text-sm mt-1 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>
           Validez ou rejetez les annonces en attente
         </p>
       </div>
@@ -26807,9 +26503,9 @@ export function AdminPropertiesPage({ onNavigate }: { onNavigate?: (route: any) 
       </div>
 
       {/* Barre de recherche */}
-      <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm border mb-6 transition-colors duration-300`}>
+      <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm border mb-6 transition-colors duration-300`}>
         <div className="relative">
-          <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isDark ? 'text-slate-500' : 'text-gray-400'}`} />
+          <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`} />
           <input
             type="text"
             placeholder="Rechercher par titre, ville ou hôte..."
@@ -26817,8 +26513,8 @@ export function AdminPropertiesPage({ onNavigate }: { onNavigate?: (route: any) 
             onChange={(e) => setSearchTerm(e.target.value)}
             className={`w-full pl-9 pr-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition-colors duration-300 ${
               isDark 
-                ? 'bg-slate-700 border-slate-600 text-white placeholder-slate-400' 
-                : 'bg-white border-gray-200 text-gray-800 placeholder-gray-400'
+                ? 'bg-[#1c3b56] border-[#5b6b7a] text-white placeholder-[#5b6b7a]' 
+                : 'bg-white border-[#e2f5f2] text-[#0f2940] placeholder-[#5b6b7a]'
             }`}
           />
         </div>
@@ -26827,9 +26523,9 @@ export function AdminPropertiesPage({ onNavigate }: { onNavigate?: (route: any) 
       {/* Liste des propriétés */}
       <div className="space-y-4">
         {filteredProperties.length === 0 ? (
-          <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-xl sm:rounded-2xl p-8 sm:p-12 text-center border transition-colors duration-300`}>
-            <Home className={`w-12 h-12 sm:w-16 sm:h-16 ${isDark ? 'text-slate-600' : 'text-gray-300'} mx-auto mb-3`} />
-            <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>Aucune propriété en attente de modération</p>
+          <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-xl sm:rounded-2xl p-8 sm:p-12 text-center border transition-colors duration-300`}>
+            <Home className={`w-12 h-12 sm:w-16 sm:h-16 ${isDark ? 'text-[#5b6b7a]' : 'text-[#9fb3c4]'} mx-auto mb-3`} />
+            <p className={`text-sm ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>Aucune propriété en attente de modération</p>
           </div>
         ) : (
           filteredProperties.map((property: any) => (
@@ -26929,12 +26625,12 @@ export function AdminUsersPage() {
   };
 
   return (
-    <div className={`p-3 sm:p-4 md:p-6 ${isDark ? 'bg-slate-900' : 'bg-gradient-to-br from-gray-50 to-gray-100'} min-h-screen transition-colors duration-300`}>
+    <div className={`p-3 sm:p-4 md:p-6 ${isDark ? 'bg-[#0f2940]' : 'bg-gradient-to-br from-[#f4fffe] to-[#e8faf6]'} min-h-screen transition-colors duration-300`}>
       <div className="mb-6">
-        <h1 className={`text-xl sm:text-2xl md:text-3xl font-bold ${isDark ? 'text-white' : 'bg-gradient-to-r from-[#0f2940] to-[#00c9a7] bg-clip-text text-transparent'}`}>
+        <h1 className={`text-xl sm:text-2xl md:text-3xl font-bold ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>
           Gestion des utilisateurs
         </h1>
-        <p className={`text-xs sm:text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>
+        <p className={`text-xs sm:text-sm mt-1 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>
           Gérez et modérez les utilisateurs de la plateforme
         </p>
       </div>
@@ -26949,10 +26645,10 @@ export function AdminUsersPage() {
         <StatBadge label="Nouveaux" value={stats.newThisWeek} color="emerald" icon={<UserPlus className="w-3 h-3" />} isDark={isDark} />
       </div>
 
-      <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm border mb-6 transition-colors duration-300`}>
+      <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm border mb-6 transition-colors duration-300`}>
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1 relative">
-            <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isDark ? 'text-slate-500' : 'text-gray-400'}`} />
+            <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`} />
             <input
               type="text"
               placeholder="Rechercher par nom, email ou téléphone..."
@@ -26960,8 +26656,8 @@ export function AdminUsersPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className={`w-full pl-9 pr-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition-colors duration-300 ${
                 isDark 
-                  ? 'bg-slate-700 border-slate-600 text-white placeholder-slate-400' 
-                  : 'bg-white border-gray-200 text-gray-800 placeholder-gray-400'
+                  ? 'bg-[#1c3b56] border-[#5b6b7a] text-white placeholder-[#5b6b7a]' 
+                  : 'bg-white border-[#e2f5f2] text-[#0f2940] placeholder-[#5b6b7a]'
               }`}
             />
           </div>
@@ -26971,8 +26667,8 @@ export function AdminUsersPage() {
               onChange={(e) => setRoleFilter(e.target.value)}
               className={`px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition-colors duration-300 ${
                 isDark 
-                  ? 'bg-slate-700 border-slate-600 text-white' 
-                  : 'bg-white border-gray-200 text-gray-800'
+                  ? 'bg-[#1c3b56] border-[#5b6b7a] text-white' 
+                  : 'bg-white border-[#e2f5f2] text-[#0f2940]'
               }`}
             >
               <option value="all">Tous les rôles</option>
@@ -26985,8 +26681,8 @@ export function AdminUsersPage() {
               onChange={(e) => setStatusFilter(e.target.value)}
               className={`px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition-colors duration-300 ${
                 isDark 
-                  ? 'bg-slate-700 border-slate-600 text-white' 
-                  : 'bg-white border-gray-200 text-gray-800'
+                  ? 'bg-[#1c3b56] border-[#5b6b7a] text-white' 
+                  : 'bg-white border-[#e2f5f2] text-[#0f2940]'
               }`}
             >
               <option value="all">Tous statuts</option>
@@ -26995,7 +26691,7 @@ export function AdminUsersPage() {
             </select>
             <button
               onClick={() => refetch()}
-              className={`px-3 py-2 ${isDark ? 'bg-slate-700 hover:bg-slate-600 text-slate-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'} rounded-xl transition`}
+              className={`px-3 py-2 ${isDark ? 'bg-[#1c3b56] hover:bg-[#5b6b7a] text-[#9fb3c4]' : 'bg-[#e8faf6] hover:bg-[#e2f5f2] text-[#5b6b7a]'} rounded-xl transition`}
             >
               🔄
             </button>
@@ -27005,9 +26701,9 @@ export function AdminUsersPage() {
 
       <div className="space-y-3">
         {filteredUsers.length === 0 ? (
-          <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-xl p-8 text-center border transition-colors duration-300`}>
-            <Users className={`w-12 h-12 ${isDark ? 'text-slate-600' : 'text-gray-300'} mx-auto mb-3`} />
-            <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>Aucun utilisateur trouvé</p>
+          <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-xl p-8 text-center border transition-colors duration-300`}>
+            <Users className={`w-12 h-12 ${isDark ? 'text-[#5b6b7a]' : 'text-[#9fb3c4]'} mx-auto mb-3`} />
+            <p className={`text-sm ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>Aucun utilisateur trouvé</p>
           </div>
         ) : (
           filteredUsers.map((user: any) => (
@@ -27042,33 +26738,33 @@ const UserCard = ({ user, isDark, onView, onSuspend, onActivate }: any) => {
   };
 
   return (
-    <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-xl sm:rounded-2xl p-4 shadow-sm hover:shadow-md transition-all border`}>
+    <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-xl sm:rounded-2xl p-4 shadow-sm hover:shadow-md transition-all border`}>
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#00c9a7] to-[#0f2940] flex items-center justify-center text-white font-bold text-lg shrink-0">
+          <div className="w-12 h-12 rounded-full bg-[#0f2940] flex items-center justify-center text-white font-bold text-lg shrink-0">
             {getInitials()}
           </div>
           <div className="sm:hidden">
-            <p className={`font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>{user.first_name} {user.last_name}</p>
-            <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>{user.user_type}</p>
+            <p className={`font-semibold ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>{user.first_name} {user.last_name}</p>
+            <p className={`text-xs ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>{user.user_type}</p>
           </div>
         </div>
 
         <div className="flex-1 min-w-0">
           <div className="hidden sm:block">
-            <p className={`font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>{user.first_name} {user.last_name}</p>
-            <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>{user.user_type}</p>
+            <p className={`font-semibold ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>{user.first_name} {user.last_name}</p>
+            <p className={`text-sm ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>{user.user_type}</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-2 text-sm">
-            <div className={`flex items-center gap-2 ${isDark ? 'text-slate-300' : 'text-gray-600'}`}>
+            <div className={`flex items-center gap-2 ${isDark ? 'text-[#9fb3c4]' : 'text-[#5b6b7a]'}`}>
               <Mail className="w-3 h-3" />
               <span className="text-xs truncate">{user.email}</span>
             </div>
-            <div className={`flex items-center gap-2 ${isDark ? 'text-slate-300' : 'text-gray-600'}`}>
+            <div className={`flex items-center gap-2 ${isDark ? 'text-[#9fb3c4]' : 'text-[#5b6b7a]'}`}>
               <Phone className="w-3 h-3" />
               <span className="text-xs">{user.phone || 'Non renseigné'}</span>
             </div>
-            <div className={`flex items-center gap-2 ${isDark ? 'text-slate-300' : 'text-gray-600'}`}>
+            <div className={`flex items-center gap-2 ${isDark ? 'text-[#9fb3c4]' : 'text-[#5b6b7a]'}`}>
               <CalendarIcon className="w-3 h-3" />
               <span className="text-xs">Inscrit le {new Date(user.created_at).toLocaleDateString()}</span>
             </div>
@@ -27078,12 +26774,12 @@ const UserCard = ({ user, isDark, onView, onSuspend, onActivate }: any) => {
         <div className="flex items-center justify-between sm:justify-end gap-3">
           <div className="flex items-center gap-2">
             <div className={`w-2 h-2 rounded-full ${user.is_active ? 'bg-green-500' : 'bg-red-500'}`} />
-            <span className={`text-xs ${isDark ? 'text-slate-400' : 'text-gray-500'} hidden sm:inline`}>{user.is_active ? 'Actif' : 'Suspendu'}</span>
+            <span className={`text-xs ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'} hidden sm:inline`}>{user.is_active ? 'Actif' : 'Suspendu'}</span>
           </div>
           
           <button
             onClick={onView}
-            className={`p-2 ${isDark ? 'bg-slate-700 hover:bg-slate-600 text-slate-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'} rounded-lg transition`}
+            className={`p-2 ${isDark ? 'bg-[#1c3b56] hover:bg-[#5b6b7a] text-[#9fb3c4]' : 'bg-[#e8faf6] hover:bg-[#e2f5f2] text-[#5b6b7a]'} rounded-lg transition`}
           >
             <Eye className="w-4 h-4" />
           </button>
@@ -27091,7 +26787,7 @@ const UserCard = ({ user, isDark, onView, onSuspend, onActivate }: any) => {
           {user.is_active ? (
             <button
               onClick={onSuspend}
-              className="p-2 bg-orange-100 text-orange-600 rounded-lg hover:bg-orange-200 transition"
+              className="p-2 bg-[#fff3cd] text-[#a87c10] rounded-lg hover:bg-[#ffe9a8] transition"
               title="Suspendre"
             >
               <Ban className="w-4 h-4" />
@@ -27116,13 +26812,13 @@ const UserCard = ({ user, isDark, onView, onSuspend, onActivate }: any) => {
 // ============================================
 const StatBadge = ({ label, value, color, icon, isDark }: any) => {
   const colorClasses: any = {
-    gray: isDark ? 'bg-slate-700 text-slate-300' : 'bg-gray-100 text-gray-700',
+    gray: isDark ? 'bg-[#1c3b56] text-[#9fb3c4]' : 'bg-[#e8faf6] text-[#1c3b56]',
     green: isDark ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-700',
-    yellow: isDark ? 'bg-yellow-900/30 text-yellow-400' : 'bg-yellow-100 text-yellow-700',
-    blue: isDark ? 'bg-blue-900/30 text-blue-400' : 'bg-blue-100 text-blue-700',
+    yellow: isDark ? 'bg-[#4a3400]/30 text-[#ffc93c]' : 'bg-[#fff3cd] text-[#6b4e06]',
+    blue: isDark ? 'bg-[#0f2940]/30 text-[#00c9a7]' : 'bg-[#e8faf6] text-[#0f2940]',
     red: isDark ? 'bg-red-900/30 text-red-400' : 'bg-red-100 text-red-700',
-    purple: isDark ? 'bg-purple-900/30 text-purple-400' : 'bg-purple-100 text-purple-700',
-    orange: isDark ? 'bg-orange-900/30 text-orange-400' : 'bg-orange-100 text-orange-700',
+    purple: isDark ? 'bg-[#0f2940]/30 text-[#00c9a7]' : 'bg-[#e8faf6] text-[#0f2940]',
+    orange: isDark ? 'bg-[#4a3400]/30 text-[#ffc93c]' : 'bg-[#fff3cd] text-[#6b4e06]',
     emerald: isDark ? 'bg-emerald-900/30 text-emerald-400' : 'bg-emerald-100 text-emerald-700',
   };
 
@@ -27146,95 +26842,95 @@ const UserDetailModal = ({ user, onClose, isDark }: any) => {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className={`${isDark ? 'bg-slate-800' : 'bg-white'} rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto transition-colors duration-300`} onClick={(e) => e.stopPropagation()}>
-        <div className={`sticky top-0 ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} p-4 border-b flex justify-between items-center`}>
-          <h3 className={`font-bold text-lg ${isDark ? 'text-white' : 'text-gray-800'}`}>Détails de l'utilisateur</h3>
-          <button onClick={onClose} className={`p-1 rounded-lg ${isDark ? 'hover:bg-slate-700 text-slate-400' : 'hover:bg-gray-100 text-gray-500'}`}>✕</button>
+      <div className={`${isDark ? 'bg-[#0f2940]' : 'bg-white'} rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto transition-colors duration-300`} onClick={(e) => e.stopPropagation()}>
+        <div className={`sticky top-0 ${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} p-4 border-b flex justify-between items-center`}>
+          <h3 className={`font-bold text-lg ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>Détails de l'utilisateur</h3>
+          <button onClick={onClose} className={`p-1 rounded-lg ${isDark ? 'hover:bg-[#1c3b56] text-[#5b6b7a]' : 'hover:bg-[#e8faf6] text-[#5b6b7a]'}`}>✕</button>
         </div>
 
         <div className="p-5 space-y-5">
           <div className="flex items-center gap-4">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#00c9a7] to-[#0f2940] flex items-center justify-center text-white font-bold text-2xl">
+            <div className="w-20 h-20 rounded-full bg-[#0f2940] flex items-center justify-center text-white font-bold text-2xl">
               {getInitials()}
             </div>
             <div>
-              <p className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-800'}`}>{user.first_name} {user.last_name}</p>
+              <p className={`text-xl font-bold ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>{user.first_name} {user.last_name}</p>
               <div className="flex items-center gap-2 mt-1">
                 <span className={`text-xs px-2 py-0.5 rounded-full ${
                   user.user_type === 'hote' ? 'bg-green-100 text-green-700' :
-                  user.user_type === 'voyageur' ? 'bg-blue-100 text-blue-700' :
-                  'bg-purple-100 text-purple-700'
+                  user.user_type === 'voyageur' ? 'bg-[#e8faf6] text-[#0f2940]' :
+                  'bg-[#e8faf6] text-[#0f2940]'
                 }`}>
                   {user.user_type === 'hote' ? 'Hôte' : user.user_type === 'voyageur' ? 'Voyageur' : 'Admin'}
                 </span>
                 <div className={`w-2 h-2 rounded-full ${user.is_active ? 'bg-green-500' : 'bg-red-500'}`} />
-                <span className={`text-xs ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>{user.is_active ? 'Actif' : 'Suspendu'}</span>
+                <span className={`text-xs ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>{user.is_active ? 'Actif' : 'Suspendu'}</span>
               </div>
             </div>
           </div>
 
-          <div className={`${isDark ? 'bg-slate-700' : 'bg-gray-50'} rounded-xl p-4 transition-colors duration-300`}>
-            <p className={`font-semibold text-sm mb-3 ${isDark ? 'text-white' : 'text-gray-800'}`}>👤 Informations personnelles</p>
+          <div className={`${isDark ? 'bg-[#1c3b56]' : 'bg-[#f4fffe]'} rounded-xl p-4 transition-colors duration-300`}>
+            <p className={`font-semibold text-sm mb-3 ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>👤 Informations personnelles</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-              <div className={`flex justify-between ${isDark ? 'text-slate-300' : 'text-gray-600'}`}>
+              <div className={`flex justify-between ${isDark ? 'text-[#9fb3c4]' : 'text-[#5b6b7a]'}`}>
                 <span>Nom complet</span>
-                <span className={`font-medium ${isDark ? 'text-white' : 'text-gray-800'}`}>{user.first_name} {user.last_name}</span>
+                <span className={`font-medium ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>{user.first_name} {user.last_name}</span>
               </div>
-              <div className={`flex justify-between ${isDark ? 'text-slate-300' : 'text-gray-600'}`}>
+              <div className={`flex justify-between ${isDark ? 'text-[#9fb3c4]' : 'text-[#5b6b7a]'}`}>
                 <span>Email</span>
-                <span className={`font-mono text-xs ${isDark ? 'text-white' : 'text-gray-800'}`}>{user.email}</span>
+                <span className={`font-mono text-xs ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>{user.email}</span>
               </div>
-              <div className={`flex justify-between ${isDark ? 'text-slate-300' : 'text-gray-600'}`}>
+              <div className={`flex justify-between ${isDark ? 'text-[#9fb3c4]' : 'text-[#5b6b7a]'}`}>
                 <span>Téléphone</span>
-                <span className={isDark ? 'text-white' : 'text-gray-800'}>{user.phone || 'Non renseigné'}</span>
+                <span className={isDark ? 'text-white' : 'text-[#0f2940]'}>{user.phone || 'Non renseigné'}</span>
               </div>
-              <div className={`flex justify-between ${isDark ? 'text-slate-300' : 'text-gray-600'}`}>
+              <div className={`flex justify-between ${isDark ? 'text-[#9fb3c4]' : 'text-[#5b6b7a]'}`}>
                 <span>Inscrit le</span>
-                <span className={isDark ? 'text-white' : 'text-gray-800'}>{new Date(user.created_at).toLocaleDateString()}</span>
+                <span className={isDark ? 'text-white' : 'text-[#0f2940]'}>{new Date(user.created_at).toLocaleDateString()}</span>
               </div>
-              <div className={`flex justify-between ${isDark ? 'text-slate-300' : 'text-gray-600'}`}>
+              <div className={`flex justify-between ${isDark ? 'text-[#9fb3c4]' : 'text-[#5b6b7a]'}`}>
                 <span>Dernière connexion</span>
-                <span className={isDark ? 'text-white' : 'text-gray-800'}>{user.last_login_at ? new Date(user.last_login_at).toLocaleString() : 'Jamais'}</span>
+                <span className={isDark ? 'text-white' : 'text-[#0f2940]'}>{user.last_login_at ? new Date(user.last_login_at).toLocaleString() : 'Jamais'}</span>
               </div>
-              <div className={`flex justify-between ${isDark ? 'text-slate-300' : 'text-gray-600'}`}>
+              <div className={`flex justify-between ${isDark ? 'text-[#9fb3c4]' : 'text-[#5b6b7a]'}`}>
                 <span>Vérifié</span>
-                <span className={isDark ? 'text-white' : 'text-gray-800'}>{user.verification_status === 'verified' ? '✅ Oui' : '❌ Non'}</span>
+                <span className={isDark ? 'text-white' : 'text-[#0f2940]'}>{user.verification_status === 'verified' ? '✅ Oui' : '❌ Non'}</span>
               </div>
             </div>
           </div>
 
-          <div className={`${isDark ? 'bg-slate-700' : 'bg-gray-50'} rounded-xl p-4 transition-colors duration-300`}>
-            <p className={`font-semibold text-sm mb-3 ${isDark ? 'text-white' : 'text-gray-800'}`}>📊 Statistiques</p>
+          <div className={`${isDark ? 'bg-[#1c3b56]' : 'bg-[#f4fffe]'} rounded-xl p-4 transition-colors duration-300`}>
+            <p className={`font-semibold text-sm mb-3 ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>📊 Statistiques</p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-              <div className={`${isDark ? 'bg-slate-800' : 'bg-white'} rounded-lg p-2`}>
+              <div className={`${isDark ? 'bg-[#0f2940]' : 'bg-white'} rounded-lg p-2`}>
                 <p className="text-lg font-bold text-[#00c9a7]">{user.total_properties || 0}</p>
-                <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>Propriétés</p>
+                <p className={`text-xs ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>Propriétés</p>
               </div>
-              <div className={`${isDark ? 'bg-slate-800' : 'bg-white'} rounded-lg p-2`}>
+              <div className={`${isDark ? 'bg-[#0f2940]' : 'bg-white'} rounded-lg p-2`}>
                 <p className="text-lg font-bold text-[#00c9a7]">{user.total_bookings || 0}</p>
-                <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>Réservations</p>
+                <p className={`text-xs ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>Réservations</p>
               </div>
-              <div className={`${isDark ? 'bg-slate-800' : 'bg-white'} rounded-lg p-2`}>
+              <div className={`${isDark ? 'bg-[#0f2940]' : 'bg-white'} rounded-lg p-2`}>
                 <p className="text-lg font-bold text-[#00c9a7]">{user.total_reviews || 0}</p>
-                <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>Avis</p>
+                <p className={`text-xs ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>Avis</p>
               </div>
-              <div className={`${isDark ? 'bg-slate-800' : 'bg-white'} rounded-lg p-2`}>
+              <div className={`${isDark ? 'bg-[#0f2940]' : 'bg-white'} rounded-lg p-2`}>
                 <p className="text-lg font-bold text-[#00c9a7]">{user.average_rating || 0}★</p>
-                <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>Note moyenne</p>
+                <p className={`text-xs ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>Note moyenne</p>
               </div>
             </div>
           </div>
 
           {user.suspended_until && (
-            <div className={`${isDark ? 'bg-yellow-900/30 border-yellow-700' : 'bg-yellow-50 border-yellow-200'} rounded-xl p-4 border`}>
-              <div className="flex items-center gap-2 text-yellow-700">
+            <div className={`${isDark ? 'bg-[#4a3400]/30 border-[#a87c10]' : 'bg-[#fffaeb] border-[#ffe9a8]'} rounded-xl p-4 border`}>
+              <div className="flex items-center gap-2 text-[#6b4e06]">
                 <AlertCircle className="w-4 h-4" />
-                <p className={`text-sm font-medium ${isDark ? 'text-yellow-400' : 'text-yellow-700'}`}>
+                <p className={`text-sm font-medium ${isDark ? 'text-[#ffc93c]' : 'text-[#6b4e06]'}`}>
                   Compte suspendu jusqu'au {new Date(user.suspended_until).toLocaleDateString()}
                 </p>
               </div>
               {user.suspension_reason && (
-                <p className={`text-xs mt-2 ${isDark ? 'text-yellow-400/70' : 'text-yellow-600'}`}>
+                <p className={`text-xs mt-2 ${isDark ? 'text-[#ffc93c]/70' : 'text-[#a87c10]'}`}>
                   Raison : {user.suspension_reason}
                 </p>
               )}
@@ -27242,7 +26938,7 @@ const UserDetailModal = ({ user, onClose, isDark }: any) => {
           )}
         </div>
 
-        <div className={`sticky bottom-0 ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} p-4 border-t flex gap-3`}>
+        <div className={`sticky bottom-0 ${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} p-4 border-t flex gap-3`}>
           {user.is_active ? (
             <button
               onClick={() => {
@@ -27251,7 +26947,7 @@ const UserDetailModal = ({ user, onClose, isDark }: any) => {
                   window.location.reload();
                 }
               }}
-              className="flex-1 bg-orange-500 text-white py-3 rounded-xl font-semibold hover:bg-orange-600 transition"
+              className="flex-1 bg-[#ffc93c] text-white py-3 rounded-xl font-semibold hover:bg-[#e0ac1f] transition"
             >
               <Ban className="w-5 h-5 inline mr-2" />
               Suspendre
@@ -27323,12 +27019,12 @@ export function AdminBookingsPage() {
   };
 
   return (
-    <div className={`p-3 sm:p-4 md:p-6 ${isDark ? 'bg-slate-900' : 'bg-gradient-to-br from-gray-50 to-gray-100'} min-h-screen transition-colors duration-300`}>
+    <div className={`p-3 sm:p-4 md:p-6 ${isDark ? 'bg-[#0f2940]' : 'bg-gradient-to-br from-[#f4fffe] to-[#e8faf6]'} min-h-screen transition-colors duration-300`}>
       <div className="mb-5">
-        <h1 className={`text-xl sm:text-2xl md:text-3xl font-bold ${isDark ? 'text-white' : 'bg-gradient-to-r from-[#0f2940] to-[#00c9a7] bg-clip-text text-transparent'}`}>
+        <h1 className={`text-xl sm:text-2xl md:text-3xl font-bold ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>
           Réservations
         </h1>
-        <p className={`text-xs sm:text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>
+        <p className={`text-xs sm:text-sm mt-1 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>
           Gérez toutes les réservations de la plateforme
         </p>
       </div>
@@ -27341,10 +27037,10 @@ export function AdminBookingsPage() {
         <StatBadge label="Annulées" value={stats.cancelled} color="red" isDark={isDark} />
       </div>
 
-      <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm border mb-5 transition-colors duration-300`}>
+      <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm border mb-5 transition-colors duration-300`}>
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1 relative">
-            <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isDark ? 'text-slate-500' : 'text-gray-400'}`} />
+            <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`} />
             <input
               type="text"
               placeholder="Rechercher..."
@@ -27352,8 +27048,8 @@ export function AdminBookingsPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className={`w-full pl-9 pr-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition-colors duration-300 ${
                 isDark 
-                  ? 'bg-slate-700 border-slate-600 text-white placeholder-slate-400' 
-                  : 'bg-white border-gray-200 text-gray-800 placeholder-gray-400'
+                  ? 'bg-[#1c3b56] border-[#5b6b7a] text-white placeholder-[#5b6b7a]' 
+                  : 'bg-white border-[#e2f5f2] text-[#0f2940] placeholder-[#5b6b7a]'
               }`}
             />
           </div>
@@ -27363,8 +27059,8 @@ export function AdminBookingsPage() {
               onChange={(e) => setStatusFilter(e.target.value)}
               className={`px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition-colors duration-300 ${
                 isDark 
-                  ? 'bg-slate-700 border-slate-600 text-white' 
-                  : 'bg-white border-gray-200 text-gray-800'
+                  ? 'bg-[#1c3b56] border-[#5b6b7a] text-white' 
+                  : 'bg-white border-[#e2f5f2] text-[#0f2940]'
               }`}
             >
               <option value="all">Tous</option>
@@ -27375,7 +27071,7 @@ export function AdminBookingsPage() {
             </select>
             <button
               onClick={() => refetch()}
-              className={`px-3 py-2 ${isDark ? 'bg-slate-700 hover:bg-slate-600 text-slate-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'} rounded-xl transition`}
+              className={`px-3 py-2 ${isDark ? 'bg-[#1c3b56] hover:bg-[#5b6b7a] text-[#9fb3c4]' : 'bg-[#e8faf6] hover:bg-[#e2f5f2] text-[#5b6b7a]'} rounded-xl transition`}
             >
               🔄
             </button>
@@ -27385,9 +27081,9 @@ export function AdminBookingsPage() {
 
       <div className="space-y-3">
         {filteredBookings.length === 0 ? (
-          <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-xl sm:rounded-2xl p-8 sm:p-12 text-center border transition-colors duration-300`}>
-            <CalendarIcon className={`w-12 h-12 sm:w-16 sm:h-16 ${isDark ? 'text-slate-600' : 'text-gray-300'} mx-auto mb-3`} />
-            <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>Aucune réservation trouvée</p>
+          <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-xl sm:rounded-2xl p-8 sm:p-12 text-center border transition-colors duration-300`}>
+            <CalendarIcon className={`w-12 h-12 sm:w-16 sm:h-16 ${isDark ? 'text-[#5b6b7a]' : 'text-[#9fb3c4]'} mx-auto mb-3`} />
+            <p className={`text-sm ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>Aucune réservation trouvée</p>
           </div>
         ) : (
           filteredBookings.map((booking: any) => (
@@ -27474,17 +27170,17 @@ function ModerationPage({
   const stats = payload.stats ?? payload.data?.stats ?? { total: items.length, draft: 0, pending: 0, active: 0, rejected: 0 };
 
   return (
-    <div className={`p-3 sm:p-4 md:p-6 ${isDark ? 'bg-slate-900' : 'bg-gradient-to-br from-gray-50 to-gray-100'} min-h-screen transition-colors duration-300`}>
+    <div className={`p-3 sm:p-4 md:p-6 ${isDark ? 'bg-[#0f2940]' : 'bg-gradient-to-br from-[#f4fffe] to-[#e8faf6]'} min-h-screen transition-colors duration-300`}>
       {/* En-tête */}
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className={`text-xl sm:text-2xl md:text-3xl font-bold ${isDark ? 'text-white' : 'bg-gradient-to-r from-[#0f2940] to-[#00c9a7] bg-clip-text text-transparent'}`}>
+          <h1 className={`text-xl sm:text-2xl md:text-3xl font-bold ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>
             {title}
           </h1>
-          <p className={`text-xs sm:text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>{subtitle}</p>
+          <p className={`text-xs sm:text-sm mt-1 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>{subtitle}</p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <button onClick={() => refetch()} className={`px-3 py-2 ${isDark ? 'bg-slate-800 border-slate-700 text-slate-400' : 'bg-white border-gray-200 text-gray-600'} rounded-xl transition border`}>🔄</button>
+          <button onClick={() => refetch()} className={`px-3 py-2 ${isDark ? 'bg-[#0f2940] border-[#1c3b56] text-[#5b6b7a]' : 'bg-white border-[#e2f5f2] text-[#5b6b7a]'} rounded-xl transition border`}>🔄</button>
         </div>
       </div>
 
@@ -27497,13 +27193,13 @@ function ModerationPage({
       </div>
 
       {/* Filtres */}
-      <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm border mb-6 transition-colors duration-300`}>
+      <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm border mb-6 transition-colors duration-300`}>
         <div className="flex flex-wrap gap-2">
           {(['all', 'draft', 'pending', 'active', 'rejected'] as const).map((status) => (
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
-              className={`px-4 py-2 rounded-xl text-sm transition ${statusFilter === status ? 'bg-[#00c9a7] text-white' : isDark ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+              className={`px-4 py-2 rounded-xl text-sm transition ${statusFilter === status ? 'bg-[#00c9a7] text-white' : isDark ? 'bg-[#1c3b56] text-[#9fb3c4] hover:bg-[#5b6b7a]' : 'bg-[#e8faf6] text-[#5b6b7a] hover:bg-[#e2f5f2]'}`}
             >
               {status === 'all' ? 'Toutes' : status}
             </button>
@@ -27514,9 +27210,9 @@ function ModerationPage({
       {/* Liste des items avec bouton Détails */}
       <div className="space-y-4">
         {items.length === 0 ? (
-          <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-xl p-8 text-center border transition-colors duration-300`}>
-            <Sparkles className={`w-12 h-12 ${isDark ? 'text-slate-600' : 'text-gray-300'} mx-auto mb-3`} />
-            <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>Aucun élément trouvé</p>
+          <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-xl p-8 text-center border transition-colors duration-300`}>
+            <Sparkles className={`w-12 h-12 ${isDark ? 'text-[#5b6b7a]' : 'text-[#9fb3c4]'} mx-auto mb-3`} />
+            <p className={`text-sm ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>Aucun élément trouvé</p>
           </div>
         ) : (
           items.map((item: any) => (
@@ -27634,8 +27330,8 @@ function ModerationDetailModal({
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      draft: isDark ? 'bg-slate-700 text-slate-300' : 'bg-slate-100 text-slate-700',
-      pending: isDark ? 'bg-yellow-900/30 text-yellow-400' : 'bg-yellow-100 text-yellow-700',
+      draft: isDark ? 'bg-[#1c3b56] text-[#9fb3c4]' : 'bg-[#e8faf6] text-[#1c3b56]',
+      pending: isDark ? 'bg-[#4a3400]/30 text-[#ffc93c]' : 'bg-[#fff3cd] text-[#6b4e06]',
       active: isDark ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-700',
       rejected: isDark ? 'bg-red-900/30 text-red-400' : 'bg-red-100 text-red-700',
     };
@@ -27644,9 +27340,9 @@ function ModerationDetailModal({
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 p-4" onClick={onClose}>
-      <div className="mx-auto max-w-4xl bg-white dark:bg-slate-800 rounded-2xl shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+      <div className="mx-auto max-w-4xl bg-white dark:bg-[#0f2940] rounded-2xl shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
         {/* En-tête */}
-        <div className="flex items-center justify-between p-4 border-b dark:border-slate-700">
+        <div className="flex items-center justify-between p-4 border-b dark:border-[#1c3b56]">
           <div className="flex items-center gap-3">
             <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}>
               {item.status || 'draft'}
@@ -27655,7 +27351,7 @@ function ModerationDetailModal({
               {item.title || item.name || 'Sans titre'}
             </h2>
           </div>
-          <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 transition">
+          <button onClick={onClose} className="p-2 rounded-full hover:bg-[#e8faf6] dark:hover:bg-[#1c3b56] transition">
             <X className="w-5 h-5 dark:text-white" />
           </button>
         </div>
@@ -27664,7 +27360,7 @@ function ModerationDetailModal({
           <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-6">
             <div>
               {/* Galerie d'images */}
-              <div className="relative overflow-hidden rounded-xl bg-gray-100 dark:bg-slate-700" style={{ height: '300px' }}>
+              <div className="relative overflow-hidden rounded-xl bg-[#e8faf6] dark:bg-[#1c3b56]" style={{ height: '300px' }}>
                 <img 
                   src={displayImages[currentImage]} 
                   alt={item.title} 
@@ -27714,15 +27410,15 @@ function ModerationDetailModal({
               {/* Description */}
               <div className="mt-4">
                 <h3 className="text-sm font-semibold dark:text-white">Description</h3>
-                <p className="text-sm dark:text-slate-300 mt-1">{item.description || 'Aucune description'}</p>
+                <p className="text-sm dark:text-[#9fb3c4] mt-1">{item.description || 'Aucune description'}</p>
               </div>
             </div>
 
             {/* Sidebar */}
             <div className="space-y-4">
-              <div className="bg-gray-50 dark:bg-slate-700/50 rounded-xl p-4">
+              <div className="bg-[#f4fffe] dark:bg-[#1c3b56]/50 rounded-xl p-4">
                 <h3 className="text-sm font-semibold dark:text-white mb-3">Informations</h3>
-                <ul className="space-y-2 text-sm dark:text-slate-300">
+                <ul className="space-y-2 text-sm dark:text-[#9fb3c4]">
                   <li><strong>Type :</strong> {kind === 'service' ? 'Service' : kind === 'experience' ? 'Expérience' : 'Propriété'}</li>
                   {item.service_type && <li><strong>Service :</strong> {item.service_type}</li>}
                   {item.experience_type && <li><strong>Expérience :</strong> {item.experience_type}</li>}
@@ -27734,18 +27430,18 @@ function ModerationDetailModal({
               </div>
 
               {item.host && (
-                <div className="bg-gray-50 dark:bg-slate-700/50 rounded-xl p-4">
+                <div className="bg-[#f4fffe] dark:bg-[#1c3b56]/50 rounded-xl p-4">
                   <h3 className="text-sm font-semibold dark:text-white mb-3">Hôte</h3>
-                  <p className="text-sm dark:text-slate-300">{item.host.first_name} {item.host.last_name}</p>
-                  <p className="text-sm dark:text-slate-400">{item.host.email}</p>
-                  <p className="text-sm dark:text-slate-400">{item.host.phone}</p>
+                  <p className="text-sm dark:text-[#9fb3c4]">{item.host.first_name} {item.host.last_name}</p>
+                  <p className="text-sm dark:text-[#5b6b7a]">{item.host.email}</p>
+                  <p className="text-sm dark:text-[#5b6b7a]">{item.host.phone}</p>
                 </div>
               )}
 
               {item.moderation_notes && (
-                <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl p-4 border border-yellow-200 dark:border-yellow-800">
-                  <h3 className="text-sm font-semibold text-yellow-800 dark:text-yellow-400">Note de modération</h3>
-                  <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">{item.moderation_notes}</p>
+                <div className="bg-[#fffaeb] dark:bg-[#4a3400]/20 rounded-xl p-4 border border-[#ffe9a8] dark:border-[#6b4e06]">
+                  <h3 className="text-sm font-semibold text-[#4a3400] dark:text-[#ffc93c]">Note de modération</h3>
+                  <p className="text-sm text-[#6b4e06] dark:text-[#ffdc7a] mt-1">{item.moderation_notes}</p>
                 </div>
               )}
             </div>
@@ -27775,8 +27471,8 @@ function ModerationItemCard({
 }) {
   const getStatusBadge = (status: string) => {
     const map: Record<string, { bg: string; text: string }> = {
-      draft: { bg: isDark ? 'bg-slate-700' : 'bg-slate-100', text: isDark ? 'text-slate-300' : 'text-slate-700' },
-      pending: { bg: isDark ? 'bg-yellow-900/30' : 'bg-yellow-100', text: isDark ? 'text-yellow-400' : 'text-yellow-700' },
+      draft: { bg: isDark ? 'bg-[#1c3b56]' : 'bg-[#e8faf6]', text: isDark ? 'text-[#9fb3c4]' : 'text-[#1c3b56]' },
+      pending: { bg: isDark ? 'bg-[#4a3400]/30' : 'bg-[#fff3cd]', text: isDark ? 'text-[#ffc93c]' : 'text-[#6b4e06]' },
       active: { bg: isDark ? 'bg-green-900/30' : 'bg-green-100', text: isDark ? 'text-green-400' : 'text-green-700' },
       rejected: { bg: isDark ? 'bg-red-900/30' : 'bg-red-100', text: isDark ? 'text-red-400' : 'text-red-700' },
     };
@@ -27809,10 +27505,10 @@ function ModerationItemCard({
   };
 
   return (
-    <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-xl p-4 shadow-sm border transition-colors duration-300`}>
+    <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-xl p-4 shadow-sm border transition-colors duration-300`}>
       <div className="flex flex-col sm:flex-row gap-4">
         {/* Image */}
-        <div className="w-full sm:w-32 h-32 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-slate-700">
+        <div className="w-full sm:w-32 h-32 rounded-xl overflow-hidden flex-shrink-0 bg-[#e8faf6] dark:bg-[#1c3b56]">
           {isValidImageUrl(imageUrl) ? (
             <img 
               src={imageUrl} 
@@ -27822,8 +27518,8 @@ function ModerationItemCard({
               loading="lazy"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-slate-500 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-600">
-              <span className="text-4xl font-bold text-gray-300 dark:text-slate-500">
+            <div className="w-full h-full flex items-center justify-center text-[#5b6b7a] dark:text-[#5b6b7a] bg-gradient-to-br from-[#e8faf6] to-[#e2f5f2] dark:from-[#1c3b56] dark:to-[#5b6b7a]">
+              <span className="text-4xl font-bold text-[#9fb3c4] dark:text-[#5b6b7a]">
                 {getDisplayName().charAt(0).toUpperCase()}
               </span>
             </div>
@@ -27841,16 +27537,16 @@ function ModerationItemCard({
                 <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(item.status)?.bg} ${getStatusBadge(item.status)?.text}`}>
                   {item.status || 'draft'}
                 </span>
-                <span className={`text-xs ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>
+                <span className={`text-xs ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>
                   {kind === 'service' ? item.service_type : kind === 'experience' ? item.experience_type : item.property_type}
                 </span>
-                <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-gray-400'}`}>•</span>
-                <span className={`text-xs ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>
+                <span className={`text-xs ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>•</span>
+                <span className={`text-xs ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>
                   {item.location || item.city || 'Bénin'}
                 </span>
                 {item.price && (
                   <>
-                    <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-gray-400'}`}>•</span>
+                    <span className={`text-xs ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>•</span>
                     <span className={`text-xs font-medium ${isDark ? 'text-green-400' : 'text-[#00c9a7]'}`}>
                       {formatPriceBoth(parseFloat(item.price) || 0)}
                     </span>
@@ -27863,8 +27559,8 @@ function ModerationItemCard({
                 onClick={onViewDetails}
                 className={`px-3 py-1.5 rounded-xl text-sm transition border ${
                   isDark 
-                    ? 'bg-slate-700 border-slate-600 text-blue-400 hover:bg-slate-600' 
-                    : 'bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100'
+                    ? 'bg-[#1c3b56] border-[#5b6b7a] text-[#00c9a7] hover:bg-[#5b6b7a]' 
+                    : 'bg-[#f4fffe] border-[#c9f0e8] text-[#00806b] hover:bg-[#e8faf6]'
                 }`}
               >
                 <Eye className="w-4 h-4 inline mr-1" /> Détails
@@ -27891,11 +27587,11 @@ function ModerationItemCard({
               </button>
             </div>
           </div>
-          <p className={`text-sm mt-2 line-clamp-2 ${isDark ? 'text-slate-400' : 'text-gray-600'}`}>
+          <p className={`text-sm mt-2 line-clamp-2 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>
             {item.description || 'Aucune description'}
           </p>
           {item.host && (
-            <p className={`text-xs mt-1 ${isDark ? 'text-slate-500' : 'text-gray-400'}`}>
+            <p className={`text-xs mt-1 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>
               👤 {item.host.first_name} {item.host.last_name} · {item.host.email}
             </p>
           )}
@@ -27992,12 +27688,12 @@ function BookingsFilteredPage({
   };
 
   return (
-    <div className={`p-3 sm:p-4 md:p-6 ${isDark ? 'bg-slate-900' : 'bg-gradient-to-br from-gray-50 to-gray-100'} min-h-screen transition-colors duration-300`}>
+    <div className={`p-3 sm:p-4 md:p-6 ${isDark ? 'bg-[#0f2940]' : 'bg-gradient-to-br from-[#f4fffe] to-[#e8faf6]'} min-h-screen transition-colors duration-300`}>
       <div className="mb-5">
-        <h1 className={`text-xl sm:text-2xl md:text-3xl font-bold ${isDark ? 'text-white' : 'bg-gradient-to-r from-[#0f2940] to-[#00c9a7] bg-clip-text text-transparent'}`}>
+        <h1 className={`text-xl sm:text-2xl md:text-3xl font-bold ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>
           {title}
         </h1>
-        <p className={`text-xs sm:text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>{subtitle}</p>
+        <p className={`text-xs sm:text-sm mt-1 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>{subtitle}</p>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-3 mb-5">
@@ -28008,10 +27704,10 @@ function BookingsFilteredPage({
         <StatBadge label="Annulées" value={stats.cancelled} color="red" isDark={isDark} />
       </div>
 
-      <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm border mb-5 transition-colors duration-300`}>
+      <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm border mb-5 transition-colors duration-300`}>
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1 relative">
-            <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isDark ? 'text-slate-500' : 'text-gray-400'}`} />
+            <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`} />
             <input
               type="text"
               placeholder="Rechercher..."
@@ -28019,8 +27715,8 @@ function BookingsFilteredPage({
               onChange={(e) => setSearchTerm(e.target.value)}
               className={`w-full pl-9 pr-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition-colors duration-300 ${
                 isDark 
-                  ? 'bg-slate-700 border-slate-600 text-white placeholder-slate-400' 
-                  : 'bg-white border-gray-200 text-gray-800 placeholder-gray-400'
+                  ? 'bg-[#1c3b56] border-[#5b6b7a] text-white placeholder-[#5b6b7a]' 
+                  : 'bg-white border-[#e2f5f2] text-[#0f2940] placeholder-[#5b6b7a]'
               }`}
             />
           </div>
@@ -28030,8 +27726,8 @@ function BookingsFilteredPage({
               onChange={(e) => setStatusFilter(e.target.value)}
               className={`px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition-colors duration-300 ${
                 isDark 
-                  ? 'bg-slate-700 border-slate-600 text-white' 
-                  : 'bg-white border-gray-200 text-gray-800'
+                  ? 'bg-[#1c3b56] border-[#5b6b7a] text-white' 
+                  : 'bg-white border-[#e2f5f2] text-[#0f2940]'
               }`}
             >
               <option value="all">Tous</option>
@@ -28042,7 +27738,7 @@ function BookingsFilteredPage({
             </select>
             <button
               onClick={() => refetch()}
-              className={`px-3 py-2 ${isDark ? 'bg-slate-700 hover:bg-slate-600 text-slate-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'} rounded-xl transition`}
+              className={`px-3 py-2 ${isDark ? 'bg-[#1c3b56] hover:bg-[#5b6b7a] text-[#9fb3c4]' : 'bg-[#e8faf6] hover:bg-[#e2f5f2] text-[#5b6b7a]'} rounded-xl transition`}
             >
               🔄
             </button>
@@ -28052,9 +27748,9 @@ function BookingsFilteredPage({
 
       <div className="space-y-3">
         {filteredBookings.length === 0 ? (
-          <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-xl sm:rounded-2xl p-8 sm:p-12 text-center border transition-colors duration-300`}>
-            <CalendarIcon className={`w-12 h-12 sm:w-16 sm:h-16 ${isDark ? 'text-slate-600' : 'text-gray-300'} mx-auto mb-3`} />
-            <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>Aucune réservation trouvée</p>
+          <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-xl sm:rounded-2xl p-8 sm:p-12 text-center border transition-colors duration-300`}>
+            <CalendarIcon className={`w-12 h-12 sm:w-16 sm:h-16 ${isDark ? 'text-[#5b6b7a]' : 'text-[#9fb3c4]'} mx-auto mb-3`} />
+            <p className={`text-sm ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>Aucune réservation trouvée</p>
           </div>
         ) : (
           filteredBookings.map((booking: any) => (
@@ -28110,96 +27806,96 @@ const BookingCard = ({ booking, isDark, isExpanded, onToggle, onCancel }: any) =
   const StatusIcon = config.icon;
 
   return (
-    <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-xl sm:rounded-2xl shadow-sm hover:shadow-md transition-all overflow-hidden border`}>
+    <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-xl sm:rounded-2xl shadow-sm hover:shadow-md transition-all overflow-hidden border`}>
       <div 
-        className={`p-3 sm:p-4 cursor-pointer ${isDark ? 'hover:bg-slate-700' : 'hover:bg-gray-50'} transition`}
+        className={`p-3 sm:p-4 cursor-pointer ${isDark ? 'hover:bg-[#1c3b56]' : 'hover:bg-[#f4fffe]'} transition`}
         onClick={onToggle}
       >
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div className="flex items-center gap-3 w-full sm:w-auto">
-            <div className={`w-10 h-10 rounded-xl ${isDark ? 'bg-slate-700' : 'bg-gray-100'} flex items-center justify-center shrink-0`}>
+            <div className={`w-10 h-10 rounded-xl ${isDark ? 'bg-[#1c3b56]' : 'bg-[#e8faf6]'} flex items-center justify-center shrink-0`}>
               <StatusIcon className={`w-5 h-5 text-${config.color}-600`} />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <span className={`font-mono text-xs font-semibold ${isDark ? 'bg-slate-700 text-slate-300' : 'bg-gray-100 text-gray-800'} px-2 py-0.5 rounded`}>
+                <span className={`font-mono text-xs font-semibold ${isDark ? 'bg-[#1c3b56] text-[#9fb3c4]' : 'bg-[#e8faf6] text-[#0f2940]'} px-2 py-0.5 rounded`}>
                   #{booking.booking_reference?.slice(-8)}
                 </span>
                 <span className={`text-xs px-2 py-0.5 rounded-full bg-${config.color}-100 text-${config.color}-700`}>
                   {config.label}
                 </span>
               </div>
-              <p className={`font-semibold ${isDark ? 'text-white' : 'text-gray-800'} text-sm mt-1 truncate`}>{booking.property?.title}</p>
-              <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>{booking.property?.district}</p>
+              <p className={`font-semibold ${isDark ? 'text-white' : 'text-[#0f2940]'} text-sm mt-1 truncate`}>{booking.property?.title}</p>
+              <p className={`text-xs ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>{booking.property?.district}</p>
             </div>
           </div>
           <div className="flex items-center justify-between w-full sm:w-auto gap-3">
             <div className="text-left sm:text-right">
               <p className="text-base sm:text-lg font-bold text-[#00c9a7]">{booking.total_amount?.toLocaleString()} FCFA</p>
-              <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-gray-400'}`}>{booking.check_in} → {booking.check_out}</p>
+              <p className={`text-xs ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>{booking.check_in} → {booking.check_out}</p>
             </div>
-            <ChevronRight className={`w-5 h-5 ${isDark ? 'text-slate-400' : 'text-gray-400'} transition-transform shrink-0 ${isExpanded ? 'rotate-90' : ''}`} />
+            <ChevronRight className={`w-5 h-5 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'} transition-transform shrink-0 ${isExpanded ? 'rotate-90' : ''}`} />
           </div>
         </div>
       </div>
 
       {isExpanded && (
-        <div className={`border-t ${isDark ? 'border-slate-700' : 'border-gray-100'} p-3 sm:p-4 ${isDark ? 'bg-slate-700/50' : 'bg-gray-50'}`}>
+        <div className={`border-t ${isDark ? 'border-[#1c3b56]' : 'border-[#e2f5f2]'} p-3 sm:p-4 ${isDark ? 'bg-[#1c3b56]/50' : 'bg-[#f4fffe]'}`}>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            <div className={`${isDark ? 'bg-slate-800' : 'bg-white'} rounded-xl p-3 shadow-sm`}>
+            <div className={`${isDark ? 'bg-[#0f2940]' : 'bg-white'} rounded-xl p-3 shadow-sm`}>
               <div className="flex items-center gap-2 mb-2">
                 <Users className="w-4 h-4 text-[#00c9a7]" />
-                <h4 className={`font-semibold text-sm ${isDark ? 'text-white' : 'text-gray-800'}`}>Voyageur</h4>
+                <h4 className={`font-semibold text-sm ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>Voyageur</h4>
               </div>
-              <p className={`font-medium text-sm ${isDark ? 'text-white' : 'text-gray-800'}`}>{booking.user?.full_name}</p>
-              <div className={`flex items-center gap-2 mt-1 text-xs ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>
+              <p className={`font-medium text-sm ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>{booking.user?.full_name}</p>
+              <div className={`flex items-center gap-2 mt-1 text-xs ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>
                 <Mail className="w-3 h-3" />
                 <span className="truncate">{booking.user?.email}</span>
               </div>
-              <div className={`flex items-center gap-2 mt-1 text-xs ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>
+              <div className={`flex items-center gap-2 mt-1 text-xs ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>
                 <Phone className="w-3 h-3" />
                 <span>{booking.user?.phone || 'Non renseigné'}</span>
               </div>
             </div>
 
-            <div className={`${isDark ? 'bg-slate-800' : 'bg-white'} rounded-xl p-3 shadow-sm`}>
+            <div className={`${isDark ? 'bg-[#0f2940]' : 'bg-white'} rounded-xl p-3 shadow-sm`}>
               <div className="flex items-center gap-2 mb-2">
                 <CalendarIcon className="w-4 h-4 text-[#00c9a7]" />
-                <h4 className={`font-semibold text-sm ${isDark ? 'text-white' : 'text-gray-800'}`}>Séjour</h4>
+                <h4 className={`font-semibold text-sm ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>Séjour</h4>
               </div>
               <div className="space-y-1 text-xs">
-                <div className={`flex justify-between ${isDark ? 'text-slate-300' : 'text-gray-600'}`}>
+                <div className={`flex justify-between ${isDark ? 'text-[#9fb3c4]' : 'text-[#5b6b7a]'}`}>
                   <span>Arrivée</span>
-                  <span className={`font-medium ${isDark ? 'text-white' : 'text-gray-800'}`}>{booking.check_in}</span>
+                  <span className={`font-medium ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>{booking.check_in}</span>
                 </div>
-                <div className={`flex justify-between ${isDark ? 'text-slate-300' : 'text-gray-600'}`}>
+                <div className={`flex justify-between ${isDark ? 'text-[#9fb3c4]' : 'text-[#5b6b7a]'}`}>
                   <span>Départ</span>
-                  <span className={`font-medium ${isDark ? 'text-white' : 'text-gray-800'}`}>{booking.check_out}</span>
+                  <span className={`font-medium ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>{booking.check_out}</span>
                 </div>
-                <div className={`flex justify-between ${isDark ? 'text-slate-300' : 'text-gray-600'}`}>
+                <div className={`flex justify-between ${isDark ? 'text-[#9fb3c4]' : 'text-[#5b6b7a]'}`}>
                   <span>Nuits</span>
-                  <span className={`font-medium ${isDark ? 'text-white' : 'text-gray-800'}`}>{booking.nights_count || 0}</span>
+                  <span className={`font-medium ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>{booking.nights_count || 0}</span>
                 </div>
-                <div className={`flex justify-between ${isDark ? 'text-slate-300' : 'text-gray-600'}`}>
+                <div className={`flex justify-between ${isDark ? 'text-[#9fb3c4]' : 'text-[#5b6b7a]'}`}>
                   <span>Voyageurs</span>
-                  <span className={`font-medium ${isDark ? 'text-white' : 'text-gray-800'}`}>{booking.guests_count || 1}</span>
+                  <span className={`font-medium ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>{booking.guests_count || 1}</span>
                 </div>
               </div>
             </div>
 
-            <div className={`${isDark ? 'bg-slate-800' : 'bg-white'} rounded-xl p-3 shadow-sm`}>
+            <div className={`${isDark ? 'bg-[#0f2940]' : 'bg-white'} rounded-xl p-3 shadow-sm`}>
               <div className="flex items-center gap-2 mb-2">
                 <CreditCard className="w-4 h-4 text-[#00c9a7]" />
-                <h4 className={`font-semibold text-sm ${isDark ? 'text-white' : 'text-gray-800'}`}>Paiement</h4>
+                <h4 className={`font-semibold text-sm ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>Paiement</h4>
               </div>
               <div className="space-y-1 text-xs">
-                <div className={`flex justify-between ${isDark ? 'text-slate-300' : 'text-gray-600'}`}>
+                <div className={`flex justify-between ${isDark ? 'text-[#9fb3c4]' : 'text-[#5b6b7a]'}`}>
                   <span>Méthode</span>
-                  <span className={`font-medium capitalize ${isDark ? 'text-white' : 'text-gray-800'}`}>{booking.payment_method || '-'}</span>
+                  <span className={`font-medium capitalize ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>{booking.payment_method || '-'}</span>
                 </div>
-                <div className={`flex justify-between ${isDark ? 'text-slate-300' : 'text-gray-600'}`}>
+                <div className={`flex justify-between ${isDark ? 'text-[#9fb3c4]' : 'text-[#5b6b7a]'}`}>
                   <span>Statut</span>
-                  <span className={`font-medium ${booking.payment_status === 'paid' ? 'text-green-600' : 'text-yellow-600'}`}>
+                  <span className={`font-medium ${booking.payment_status === 'paid' ? 'text-green-600' : 'text-[#a87c10]'}`}>
                     {booking.payment_status === 'paid' ? 'Payé' : 'En attente'}
                   </span>
                 </div>
@@ -28265,12 +27961,12 @@ export function AdminPaymentsPage() {
   const successRate = stats.total > 0 ? ((stats.success / stats.total) * 100).toFixed(1) : 0;
 
   return (
-    <div className={`p-3 sm:p-4 md:p-6 ${isDark ? 'bg-slate-900' : 'bg-gradient-to-br from-gray-50 to-gray-100'} min-h-screen transition-colors duration-300`}>
+    <div className={`p-3 sm:p-4 md:p-6 ${isDark ? 'bg-[#0f2940]' : 'bg-gradient-to-br from-[#f4fffe] to-[#e8faf6]'} min-h-screen transition-colors duration-300`}>
       <div className="mb-6">
-        <h1 className={`text-xl sm:text-2xl md:text-3xl font-bold ${isDark ? 'text-white' : 'bg-gradient-to-r from-[#0f2940] to-[#00c9a7] bg-clip-text text-transparent'}`}>
+        <h1 className={`text-xl sm:text-2xl md:text-3xl font-bold ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>
           Suivi des paiements
         </h1>
-        <p className={`text-xs sm:text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>
+        <p className={`text-xs sm:text-sm mt-1 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>
           Analysez et gérez toutes les transactions financières
         </p>
       </div>
@@ -28284,7 +27980,7 @@ export function AdminPaymentsPage() {
         <StatCard icon={TrendingUp} label="Taux succès" value={`${successRate}%`} color="emerald" isDark={isDark} />
       </div>
 
-      <div className={`bg-gradient-to-r from-[#00c9a7] to-[#0f2940] rounded-xl sm:rounded-2xl p-4 mb-6 text-white`}>
+      <div className={`bg-[#00c9a7] rounded-xl sm:rounded-2xl p-4 mb-6 text-white`}>
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div>
             <p className="text-white/80 text-sm">Transactions aujourd'hui</p>
@@ -28303,10 +27999,10 @@ export function AdminPaymentsPage() {
         </div>
       </div>
 
-      <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm border mb-6 transition-colors duration-300`}>
+      <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm border mb-6 transition-colors duration-300`}>
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1 relative">
-            <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isDark ? 'text-slate-500' : 'text-gray-400'}`} />
+            <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`} />
             <input
               type="text"
               placeholder="Rechercher par transaction ID ou réservation..."
@@ -28314,8 +28010,8 @@ export function AdminPaymentsPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className={`w-full pl-9 pr-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition-colors duration-300 ${
                 isDark 
-                  ? 'bg-slate-700 border-slate-600 text-white placeholder-slate-400' 
-                  : 'bg-white border-gray-200 text-gray-800 placeholder-gray-400'
+                  ? 'bg-[#1c3b56] border-[#5b6b7a] text-white placeholder-[#5b6b7a]' 
+                  : 'bg-white border-[#e2f5f2] text-[#0f2940] placeholder-[#5b6b7a]'
               }`}
             />
           </div>
@@ -28325,8 +28021,8 @@ export function AdminPaymentsPage() {
               onChange={(e) => setStatusFilter(e.target.value)}
               className={`px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition-colors duration-300 ${
                 isDark 
-                  ? 'bg-slate-700 border-slate-600 text-white' 
-                  : 'bg-white border-gray-200 text-gray-800'
+                  ? 'bg-[#1c3b56] border-[#5b6b7a] text-white' 
+                  : 'bg-white border-[#e2f5f2] text-[#0f2940]'
               }`}
             >
               <option value="all">Tous statuts</option>
@@ -28336,7 +28032,7 @@ export function AdminPaymentsPage() {
             </select>
             <button
               onClick={() => refetch()}
-              className={`px-3 py-2 ${isDark ? 'bg-slate-700 hover:bg-slate-600 text-slate-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'} rounded-xl transition`}
+              className={`px-3 py-2 ${isDark ? 'bg-[#1c3b56] hover:bg-[#5b6b7a] text-[#9fb3c4]' : 'bg-[#e8faf6] hover:bg-[#e2f5f2] text-[#5b6b7a]'} rounded-xl transition`}
             >
               🔄
             </button>
@@ -28346,9 +28042,9 @@ export function AdminPaymentsPage() {
 
       <div className="space-y-3">
         {filteredPayments.length === 0 ? (
-          <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-xl p-8 text-center border transition-colors duration-300`}>
-            <CreditCard className={`w-12 h-12 ${isDark ? 'text-slate-600' : 'text-gray-300'} mx-auto mb-3`} />
-            <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>Aucune transaction trouvée</p>
+          <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-xl p-8 text-center border transition-colors duration-300`}>
+            <CreditCard className={`w-12 h-12 ${isDark ? 'text-[#5b6b7a]' : 'text-[#9fb3c4]'} mx-auto mb-3`} />
+            <p className={`text-sm ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>Aucune transaction trouvée</p>
           </div>
         ) : (
           filteredPayments.map((payment: any) => (
@@ -28383,38 +28079,38 @@ const PaymentCardComponent = ({ payment, isDark, onView }: any) => {
   const StatusIcon = config.icon;
 
   return (
-    <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm hover:shadow-md transition-all border`}>
+    <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm hover:shadow-md transition-all border`}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className={`w-10 h-10 rounded-xl ${isDark ? 'bg-slate-700' : 'bg-gray-100'} flex items-center justify-center shrink-0`}>
+          <div className={`w-10 h-10 rounded-xl ${isDark ? 'bg-[#1c3b56]' : 'bg-[#e8faf6]'} flex items-center justify-center shrink-0`}>
             <StatusIcon className={`w-5 h-5 text-${config.color}-600`} />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <span className={`font-mono text-xs font-semibold ${isDark ? 'bg-slate-700 text-slate-300' : 'bg-gray-100 text-gray-800'} px-2 py-0.5 rounded`}>
+              <span className={`font-mono text-xs font-semibold ${isDark ? 'bg-[#1c3b56] text-[#9fb3c4]' : 'bg-[#e8faf6] text-[#0f2940]'} px-2 py-0.5 rounded`}>
                 {payment.transaction_id?.slice(-12)}
               </span>
               <span className={`text-xs px-2 py-0.5 rounded-full bg-${config.color}-100 text-${config.color}-700`}>
                 {config.label}
               </span>
             </div>
-            <p className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-gray-800'} mt-1`}>
+            <p className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-[#0f2940]'} mt-1`}>
               {payment.booking?.property?.title || 'Réservation'}
             </p>
-            <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>Réf: {payment.booking?.booking_reference || '-'}</p>
+            <p className={`text-xs ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>Réf: {payment.booking?.booking_reference || '-'}</p>
           </div>
         </div>
         <div className="flex items-center justify-between w-full sm:w-auto gap-3">
           <div className="text-left sm:text-right">
             <p className="text-base sm:text-lg font-bold text-[#00c9a7]">{payment.amount?.toLocaleString()} FCFA</p>
             <div className="flex items-center gap-1 mt-1">
-              <Smartphone className={`w-3 h-3 ${isDark ? 'text-slate-500' : 'text-gray-400'}`} />
-              <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-gray-400'}`}>{payment.payment_method || 'Mobile Money'}</p>
+              <Smartphone className={`w-3 h-3 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`} />
+              <p className={`text-xs ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>{payment.payment_method || 'Mobile Money'}</p>
             </div>
           </div>
           <button
             onClick={onView}
-            className={`p-2 ${isDark ? 'bg-slate-700 hover:bg-slate-600 text-slate-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'} rounded-lg transition`}
+            className={`p-2 ${isDark ? 'bg-[#1c3b56] hover:bg-[#5b6b7a] text-[#9fb3c4]' : 'bg-[#e8faf6] hover:bg-[#e2f5f2] text-[#5b6b7a]'} rounded-lg transition`}
           >
             <Eye className="w-4 h-4" />
           </button>
@@ -28430,17 +28126,17 @@ const PaymentCardComponent = ({ payment, isDark, onView }: any) => {
 const PaymentDetailModalComponent = ({ payment, onClose, isDark }: any) => {
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className={`${isDark ? 'bg-slate-800' : 'bg-white'} rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto transition-colors duration-300`} onClick={(e) => e.stopPropagation()}>
-        <div className={`sticky top-0 ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} p-5 border-b`}>
+      <div className={`${isDark ? 'bg-[#0f2940]' : 'bg-white'} rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto transition-colors duration-300`} onClick={(e) => e.stopPropagation()}>
+        <div className={`sticky top-0 ${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} p-5 border-b`}>
           <div className="flex justify-between items-center">
-            <h3 className={`font-bold text-lg ${isDark ? 'text-white' : 'text-gray-800'}`}>Détails du paiement</h3>
-            <button onClick={onClose} className={`p-1 rounded-lg ${isDark ? 'hover:bg-slate-700 text-slate-400' : 'hover:bg-gray-100 text-gray-500'}`}>✕</button>
+            <h3 className={`font-bold text-lg ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>Détails du paiement</h3>
+            <button onClick={onClose} className={`p-1 rounded-lg ${isDark ? 'hover:bg-[#1c3b56] text-[#5b6b7a]' : 'hover:bg-[#e8faf6] text-[#5b6b7a]'}`}>✕</button>
           </div>
         </div>
         
         <div className="p-5 space-y-4">
           <div className="text-center">
-            <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>Montant total</p>
+            <p className={`text-sm ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>Montant total</p>
             <p className="text-3xl font-bold text-[#00c9a7]">{payment.amount?.toLocaleString()} FCFA</p>
           </div>
 
@@ -28464,18 +28160,18 @@ const PaymentDetailModalComponent = ({ payment, onClose, isDark }: any) => {
 // DETAIL ROW - MODE SOMBRE
 // ============================================
 const DetailRow = ({ label, value, status, isDark }: any) => (
-  <div className={`flex justify-between items-center py-2 border-b ${isDark ? 'border-slate-700' : 'border-gray-100'}`}>
-    <span className={`text-sm ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>{label}</span>
+  <div className={`flex justify-between items-center py-2 border-b ${isDark ? 'border-[#1c3b56]' : 'border-[#e2f5f2]'}`}>
+    <span className={`text-sm ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>{label}</span>
     {status ? (
       <span className={`text-sm font-medium px-2 py-0.5 rounded-full ${
         value === 'success' ? 'bg-green-100 text-green-700' :
-        value === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+        value === 'pending' ? 'bg-[#fff3cd] text-[#6b4e06]' :
         'bg-red-100 text-red-700'
       }`}>
         {value === 'success' ? 'Succès' : value === 'pending' ? 'En attente' : 'Échoué'}
       </span>
     ) : (
-      <span className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-800'}`}>{value || '-'}</span>
+      <span className={`text-sm font-medium ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>{value || '-'}</span>
     )}
   </div>
 );
@@ -28521,12 +28217,12 @@ export function AdminMessagesPage() {
   };
 
   return (
-    <div className={`p-3 sm:p-4 md:p-6 ${isDark ? 'bg-slate-900' : 'bg-gradient-to-br from-gray-50 to-gray-100'} min-h-screen transition-colors duration-300`}>
+    <div className={`p-3 sm:p-4 md:p-6 ${isDark ? 'bg-[#0f2940]' : 'bg-gradient-to-br from-[#f4fffe] to-[#e8faf6]'} min-h-screen transition-colors duration-300`}>
       <div className="mb-6">
-        <h1 className={`text-xl sm:text-2xl md:text-3xl font-bold ${isDark ? 'text-white' : 'bg-gradient-to-r from-[#0f2940] to-[#00c9a7] bg-clip-text text-transparent'}`}>
+        <h1 className={`text-xl sm:text-2xl md:text-3xl font-bold ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>
           Surveillance des messages
         </h1>
-        <p className={`text-xs sm:text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>
+        <p className={`text-xs sm:text-sm mt-1 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>
           Analysez et modérez les conversations entre utilisateurs
         </p>
       </div>
@@ -28538,10 +28234,10 @@ export function AdminMessagesPage() {
         <StatCard icon={CalendarIcon} label="Aujourd'hui" value={stats.today} color="green" isDark={isDark} />
       </div>
 
-      <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm border mb-6 transition-colors duration-300`}>
+      <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm border mb-6 transition-colors duration-300`}>
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1 relative">
-            <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isDark ? 'text-slate-500' : 'text-gray-400'}`} />
+            <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`} />
             <input
               type="text"
               placeholder="Rechercher par expéditeur, destinataire ou contenu..."
@@ -28549,8 +28245,8 @@ export function AdminMessagesPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className={`w-full pl-9 pr-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition-colors duration-300 ${
                 isDark 
-                  ? 'bg-slate-700 border-slate-600 text-white placeholder-slate-400' 
-                  : 'bg-white border-gray-200 text-gray-800 placeholder-gray-400'
+                  ? 'bg-[#1c3b56] border-[#5b6b7a] text-white placeholder-[#5b6b7a]' 
+                  : 'bg-white border-[#e2f5f2] text-[#0f2940] placeholder-[#5b6b7a]'
               }`}
             />
           </div>
@@ -28560,7 +28256,7 @@ export function AdminMessagesPage() {
             <FilterButton active={filterType === 'flagged'} onClick={() => setFilterType('flagged')} label="Signalés" isDark={isDark} />
             <button
               onClick={() => refetch()}
-              className={`px-3 py-2 ${isDark ? 'bg-slate-700 hover:bg-slate-600 text-slate-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'} rounded-xl transition`}
+              className={`px-3 py-2 ${isDark ? 'bg-[#1c3b56] hover:bg-[#5b6b7a] text-[#9fb3c4]' : 'bg-[#e8faf6] hover:bg-[#e2f5f2] text-[#5b6b7a]'} rounded-xl transition`}
             >
               🔄
             </button>
@@ -28571,9 +28267,9 @@ export function AdminMessagesPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2">
           {filteredMessages.length === 0 ? (
-            <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-xl p-8 text-center border transition-colors duration-300`}>
-              <MessageCircle className={`w-12 h-12 ${isDark ? 'text-slate-600' : 'text-gray-300'} mx-auto mb-3`} />
-              <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>Aucun message trouvé</p>
+            <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-xl p-8 text-center border transition-colors duration-300`}>
+              <MessageCircle className={`w-12 h-12 ${isDark ? 'text-[#5b6b7a]' : 'text-[#9fb3c4]'} mx-auto mb-3`} />
+              <p className={`text-sm ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>Aucun message trouvé</p>
             </div>
           ) : (
             filteredMessages.map((msg: any) => (
@@ -28588,11 +28284,11 @@ export function AdminMessagesPage() {
           )}
         </div>
 
-        <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-xl sm:rounded-2xl shadow-lg overflow-hidden sticky top-4 h-[600px] flex flex-col border transition-colors duration-300`}>
+        <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-xl sm:rounded-2xl shadow-lg overflow-hidden sticky top-4 h-[600px] flex flex-col border transition-colors duration-300`}>
           {selectedMessage ? (
             <MessageDetailComponent message={selectedMessage} onClose={() => setSelectedMessage(null)} isDark={isDark} />
           ) : (
-            <div className={`flex-1 flex flex-col items-center justify-center ${isDark ? 'text-slate-500' : 'text-gray-400'} p-6`}>
+            <div className={`flex-1 flex flex-col items-center justify-center ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'} p-6`}>
               <MessageCircle className="w-16 h-16 mb-4 opacity-50" />
               <p className="text-center">Sélectionnez un message<br />pour voir les détails</p>
             </div>
@@ -28613,8 +28309,8 @@ const FilterButton = ({ active, onClick, label, isDark }: any) => (
       active 
         ? 'bg-[#00c9a7] text-white shadow-md' 
         : isDark 
-          ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' 
-          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          ? 'bg-[#1c3b56] text-[#9fb3c4] hover:bg-[#5b6b7a]' 
+          : 'bg-[#e8faf6] text-[#5b6b7a] hover:bg-[#e2f5f2]'
     }`}
   >
     {label}
@@ -28631,21 +28327,21 @@ const MessageCardComponent = ({ message, isDark, isSelected, onClick }: any) => 
   return (
     <div
       onClick={onClick}
-      className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-xl p-3 sm:p-4 shadow-sm hover:shadow-md transition-all cursor-pointer border-2 ${
+      className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-xl p-3 sm:p-4 shadow-sm hover:shadow-md transition-all cursor-pointer border-2 ${
         isSelected ? 'border-[#00c9a7]' : 'border-transparent'
       } ${isUnread ? `${isDark ? 'border-l-4 border-l-yellow-500' : 'border-l-4 border-l-yellow-400'}` : ''}`}
     >
       <div className="flex items-start gap-3">
-        <div className={`w-10 h-10 rounded-full ${isDark ? 'bg-slate-700' : 'bg-gray-100'} flex items-center justify-center flex-shrink-0`}>
-          <User className={`w-5 h-5 ${isDark ? 'text-slate-400' : 'text-gray-500'}`} />
+        <div className={`w-10 h-10 rounded-full ${isDark ? 'bg-[#1c3b56]' : 'bg-[#e8faf6]'} flex items-center justify-center flex-shrink-0`}>
+          <User className={`w-5 h-5 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`} />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className={`font-semibold text-sm ${isDark ? 'text-white' : 'text-gray-800'}`}>
+            <span className={`font-semibold text-sm ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>
               {message.sender?.full_name || 'Utilisateur'}
             </span>
             {isUnread && (
-              <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-[#fff3cd] text-[#6b4e06]">
                 Non lu
               </span>
             )}
@@ -28655,14 +28351,14 @@ const MessageCardComponent = ({ message, isDark, isSelected, onClick }: any) => 
               </span>
             )}
           </div>
-          <p className={`text-sm ${isDark ? 'text-slate-300' : 'text-gray-600'} truncate`}>{message.message || 'Message'}</p>
-          <div className={`flex items-center gap-3 mt-1 text-xs ${isDark ? 'text-slate-400' : 'text-gray-400'}`}>
+          <p className={`text-sm ${isDark ? 'text-[#9fb3c4]' : 'text-[#5b6b7a]'} truncate`}>{message.message || 'Message'}</p>
+          <div className={`flex items-center gap-3 mt-1 text-xs ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>
             <span>{new Date(message.created_at).toLocaleDateString()}</span>
             <span>•</span>
             <span>{message.receiver?.full_name || 'Destinataire'}</span>
           </div>
         </div>
-        <ChevronRight className={`w-4 h-4 ${isDark ? 'text-slate-500' : 'text-gray-400'} flex-shrink-0`} />
+        <ChevronRight className={`w-4 h-4 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'} flex-shrink-0`} />
       </div>
     </div>
   );
@@ -28676,16 +28372,16 @@ const MessageDetailComponent = ({ message, onClose, isDark }: any) => {
 
   return (
     <div className="flex-1 flex flex-col h-full">
-      <div className={`p-4 border-b ${isDark ? 'border-slate-700 bg-slate-800' : 'border-gray-100 bg-gray-50'} flex justify-between items-start`}>
+      <div className={`p-4 border-b ${isDark ? 'border-[#1c3b56] bg-[#0f2940]' : 'border-[#e2f5f2] bg-[#f4fffe]'} flex justify-between items-start`}>
         <div className="flex items-center gap-3">
-          <button onClick={onClose} className={`p-1 rounded-lg ${isDark ? 'hover:bg-slate-700 text-slate-400' : 'hover:bg-gray-100 text-gray-500'} lg:hidden`}>
+          <button onClick={onClose} className={`p-1 rounded-lg ${isDark ? 'hover:bg-[#1c3b56] text-[#5b6b7a]' : 'hover:bg-[#e8faf6] text-[#5b6b7a]'} lg:hidden`}>
             <ChevronLeft className="w-5 h-5" />
           </button>
           <div>
-            <h3 className={`font-semibold text-sm ${isDark ? 'text-white' : 'text-gray-800'}`}>
+            <h3 className={`font-semibold text-sm ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>
               {message.sender?.full_name || 'Utilisateur'}
             </h3>
-            <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>
+            <p className={`text-xs ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>
               À {message.receiver?.full_name || 'Destinataire'}
             </p>
           </div>
@@ -28693,16 +28389,16 @@ const MessageDetailComponent = ({ message, onClose, isDark }: any) => {
         <div className="flex gap-2">
           <button
             onClick={() => setShowActions(!showActions)}
-            className={`p-1.5 rounded-lg ${isDark ? 'hover:bg-slate-700' : 'hover:bg-gray-100'} transition`}
+            className={`p-1.5 rounded-lg ${isDark ? 'hover:bg-[#1c3b56]' : 'hover:bg-[#e8faf6]'} transition`}
           >
-            <MoreVertical className={`w-4 h-4 ${isDark ? 'text-slate-400' : 'text-gray-500'}`} />
+            <MoreVertical className={`w-4 h-4 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`} />
           </button>
         </div>
       </div>
 
       {showActions && (
-        <div className={`p-3 ${isDark ? 'bg-slate-700 border-slate-600' : 'bg-gray-50 border-gray-100'} border-b flex flex-wrap gap-2`}>
-          <button className={`px-3 py-1.5 ${isDark ? 'bg-blue-900/30 text-blue-400 hover:bg-blue-800/40' : 'bg-blue-100 text-blue-700 hover:bg-blue-200'} rounded-lg text-xs transition`}>
+        <div className={`p-3 ${isDark ? 'bg-[#1c3b56] border-[#5b6b7a]' : 'bg-[#f4fffe] border-[#e2f5f2]'} border-b flex flex-wrap gap-2`}>
+          <button className={`px-3 py-1.5 ${isDark ? 'bg-[#0f2940]/30 text-[#00c9a7] hover:bg-[#1c3b56]/40' : 'bg-[#e8faf6] text-[#0f2940] hover:bg-[#c9f0e8]'} rounded-lg text-xs transition`}>
             <Check className="w-3 h-3 inline mr-1" />
             Marquer comme lu
           </button>
@@ -28710,43 +28406,43 @@ const MessageDetailComponent = ({ message, onClose, isDark }: any) => {
             <Flag className="w-3 h-3 inline mr-1" />
             Signaler
           </button>
-          <button className={`px-3 py-1.5 ${isDark ? 'bg-slate-700 text-slate-400 hover:bg-slate-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'} rounded-lg text-xs transition`}>
+          <button className={`px-3 py-1.5 ${isDark ? 'bg-[#1c3b56] text-[#5b6b7a] hover:bg-[#5b6b7a]' : 'bg-[#e8faf6] text-[#1c3b56] hover:bg-[#e2f5f2]'} rounded-lg text-xs transition`}>
             <Trash2 className="w-3 h-3 inline mr-1" />
             Supprimer
           </button>
         </div>
       )}
 
-      <div className={`flex-1 overflow-y-auto p-4 space-y-4 ${isDark ? 'bg-slate-900' : 'bg-gray-50'}`}>
-        <div className={`${isDark ? 'bg-slate-800' : 'bg-white'} rounded-xl p-4 border ${isDark ? 'border-slate-700' : 'border-gray-200'}`}>
-          <p className={`text-sm ${isDark ? 'text-slate-200' : 'text-gray-700'} whitespace-pre-wrap`}>
+      <div className={`flex-1 overflow-y-auto p-4 space-y-4 ${isDark ? 'bg-[#0f2940]' : 'bg-[#f4fffe]'}`}>
+        <div className={`${isDark ? 'bg-[#0f2940]' : 'bg-white'} rounded-xl p-4 border ${isDark ? 'border-[#1c3b56]' : 'border-[#e2f5f2]'}`}>
+          <p className={`text-sm ${isDark ? 'text-[#c9f0e8]' : 'text-[#1c3b56]'} whitespace-pre-wrap`}>
             {message.message || 'Contenu du message'}
           </p>
         </div>
 
-        <div className={`${isDark ? 'bg-slate-800' : 'bg-white'} rounded-xl p-4 border ${isDark ? 'border-slate-700' : 'border-gray-200'}`}>
+        <div className={`${isDark ? 'bg-[#0f2940]' : 'bg-white'} rounded-xl p-4 border ${isDark ? 'border-[#1c3b56]' : 'border-[#e2f5f2]'}`}>
           <div className="space-y-2 text-sm">
-            <div className={`flex justify-between py-1 border-b ${isDark ? 'border-slate-700' : 'border-gray-100'}`}>
-              <span className={isDark ? 'text-slate-400' : 'text-gray-500'}>Date d'envoi</span>
-              <span className={isDark ? 'text-slate-200' : 'text-gray-700'}>{new Date(message.created_at).toLocaleString()}</span>
+            <div className={`flex justify-between py-1 border-b ${isDark ? 'border-[#1c3b56]' : 'border-[#e2f5f2]'}`}>
+              <span className={isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}>Date d'envoi</span>
+              <span className={isDark ? 'text-[#c9f0e8]' : 'text-[#1c3b56]'}>{new Date(message.created_at).toLocaleString()}</span>
             </div>
             {message.read_at && (
-              <div className={`flex justify-between py-1 border-b ${isDark ? 'border-slate-700' : 'border-gray-100'}`}>
-                <span className={isDark ? 'text-slate-400' : 'text-gray-500'}>Date de lecture</span>
-                <span className={isDark ? 'text-slate-200' : 'text-gray-700'}>{new Date(message.read_at).toLocaleString()}</span>
+              <div className={`flex justify-between py-1 border-b ${isDark ? 'border-[#1c3b56]' : 'border-[#e2f5f2]'}`}>
+                <span className={isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}>Date de lecture</span>
+                <span className={isDark ? 'text-[#c9f0e8]' : 'text-[#1c3b56]'}>{new Date(message.read_at).toLocaleString()}</span>
               </div>
             )}
-            <div className={`flex justify-between py-1 border-b ${isDark ? 'border-slate-700' : 'border-gray-100'}`}>
-              <span className={isDark ? 'text-slate-400' : 'text-gray-500'}>Statut</span>
+            <div className={`flex justify-between py-1 border-b ${isDark ? 'border-[#1c3b56]' : 'border-[#e2f5f2]'}`}>
+              <span className={isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}>Statut</span>
               <span className={`text-sm font-medium px-2 py-0.5 rounded-full ${
-                message.is_read ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                message.is_read ? 'bg-green-100 text-green-700' : 'bg-[#fff3cd] text-[#6b4e06]'
               }`}>
                 {message.is_read ? 'Lu' : 'Non lu'}
               </span>
             </div>
             {message.is_flagged && (
-              <div className={`flex justify-between py-1 border-b ${isDark ? 'border-slate-700' : 'border-gray-100'}`}>
-                <span className={isDark ? 'text-slate-400' : 'text-gray-500'}>Signalement</span>
+              <div className={`flex justify-between py-1 border-b ${isDark ? 'border-[#1c3b56]' : 'border-[#e2f5f2]'}`}>
+                <span className={isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}>Signalement</span>
                 <span className="text-sm font-medium px-2 py-0.5 rounded-full bg-red-100 text-red-700">
                   ⚠️ Signalé
                 </span>
@@ -28755,12 +28451,12 @@ const MessageDetailComponent = ({ message, onClose, isDark }: any) => {
           </div>
         </div>
 
-        <div className={`flex gap-3 pt-4 border-t ${isDark ? 'border-slate-700' : 'border-gray-200'}`}>
-          <button className={`flex-1 py-2 ${isDark ? 'bg-[#00c9a7] hover:bg-[#00b892]' : 'bg-[#00c9a7] hover:bg-[#00b892]'} text-white rounded-xl transition text-sm flex items-center justify-center gap-2`}>
+        <div className={`flex gap-3 pt-4 border-t ${isDark ? 'border-[#1c3b56]' : 'border-[#e2f5f2]'}`}>
+          <button className={`flex-1 py-2 ${isDark ? 'bg-[#00c9a7] hover:bg-[#00b396]' : 'bg-[#00c9a7] hover:bg-[#00b396]'} text-white rounded-xl transition text-sm flex items-center justify-center gap-2`}>
             <Reply className="w-4 h-4" />
             Répondre
           </button>
-          <button className={`flex-1 py-2 ${isDark ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'} rounded-xl transition text-sm flex items-center justify-center gap-2`}>
+          <button className={`flex-1 py-2 ${isDark ? 'bg-[#1c3b56] text-[#9fb3c4] hover:bg-[#5b6b7a]' : 'bg-[#e8faf6] text-[#5b6b7a] hover:bg-[#e2f5f2]'} rounded-xl transition text-sm flex items-center justify-center gap-2`}>
             <User className="w-4 h-4" />
             Voir profil
           </button>
@@ -28816,31 +28512,31 @@ export function AdminReportsPage() {
   ];
 
   return (
-    <div className={`p-3 sm:p-4 md:p-6 ${isDark ? 'bg-slate-900' : 'bg-gradient-to-br from-gray-50 to-gray-100'} min-h-screen transition-colors duration-300`}>
+    <div className={`p-3 sm:p-4 md:p-6 ${isDark ? 'bg-[#0f2940]' : 'bg-gradient-to-br from-[#f4fffe] to-[#e8faf6]'} min-h-screen transition-colors duration-300`}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h1 className={`text-xl sm:text-2xl md:text-3xl font-bold ${isDark ? 'text-white' : 'bg-gradient-to-r from-[#0f2940] to-[#00c9a7] bg-clip-text text-transparent'}`}>
+          <h1 className={`text-xl sm:text-2xl md:text-3xl font-bold ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>
             Rapports & analyses
           </h1>
-          <p className={`text-xs sm:text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>
+          <p className={`text-xs sm:text-sm mt-1 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>
             Analysez la performance de votre plateforme
           </p>
         </div>
         
         <div className="flex gap-2">
-          <button className={`p-2 ${isDark ? 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700' : 'bg-white border-gray-200 hover:bg-gray-50'} rounded-xl transition`} title="Imprimer">
+          <button className={`p-2 ${isDark ? 'bg-[#0f2940] border-[#1c3b56] text-[#5b6b7a] hover:bg-[#1c3b56]' : 'bg-white border-[#e2f5f2] hover:bg-[#f4fffe]'} rounded-xl transition`} title="Imprimer">
             <Printer className="w-4 h-4" />
           </button>
-          <button className={`p-2 ${isDark ? 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700' : 'bg-white border-gray-200 hover:bg-gray-50'} rounded-xl transition`} title="Partager">
+          <button className={`p-2 ${isDark ? 'bg-[#0f2940] border-[#1c3b56] text-[#5b6b7a] hover:bg-[#1c3b56]' : 'bg-white border-[#e2f5f2] hover:bg-[#f4fffe]'} rounded-xl transition`} title="Partager">
             <Share2 className="w-4 h-4" />
           </button>
-          <button onClick={() => refetch()} className={`p-2 ${isDark ? 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700' : 'bg-white border-gray-200 hover:bg-gray-50'} rounded-xl transition`} title="Rafraîchir">
+          <button onClick={() => refetch()} className={`p-2 ${isDark ? 'bg-[#0f2940] border-[#1c3b56] text-[#5b6b7a] hover:bg-[#1c3b56]' : 'bg-white border-[#e2f5f2] hover:bg-[#f4fffe]'} rounded-xl transition`} title="Rafraîchir">
             <RefreshCw className="w-4 h-4" />
           </button>
         </div>
       </div>
 
-      <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm border mb-6 transition-colors duration-300`}>
+      <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm border mb-6 transition-colors duration-300`}>
         <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
           <div className="flex flex-wrap gap-2">
             <PeriodButton active={selectedPeriod === 'monthly'} onClick={() => setSelectedPeriod('monthly')} label="Mensuel" isDark={isDark} />
@@ -28851,21 +28547,21 @@ export function AdminReportsPage() {
             <div className="flex flex-col sm:flex-row gap-2">
               <input type="date" value={customStartDate} onChange={(e) => setCustomStartDate(e.target.value)} className={`px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition-colors duration-300 ${
                 isDark 
-                  ? 'bg-slate-700 border-slate-600 text-white' 
-                  : 'bg-white border-gray-200 text-gray-800'
+                  ? 'bg-[#1c3b56] border-[#5b6b7a] text-white' 
+                  : 'bg-white border-[#e2f5f2] text-[#0f2940]'
               }`} />
-              <span className={`${isDark ? 'text-slate-500' : 'text-gray-400'} self-center hidden sm:inline`}>→</span>
+              <span className={`${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'} self-center hidden sm:inline`}>→</span>
               <input type="date" value={customEndDate} onChange={(e) => setCustomEndDate(e.target.value)} className={`px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition-colors duration-300 ${
                 isDark 
-                  ? 'bg-slate-700 border-slate-600 text-white' 
-                  : 'bg-white border-gray-200 text-gray-800'
+                  ? 'bg-[#1c3b56] border-[#5b6b7a] text-white' 
+                  : 'bg-white border-[#e2f5f2] text-[#0f2940]'
               }`} />
             </div>
           )}
         </div>
       </div>
 
-      <div className={`flex flex-wrap gap-2 mb-6 border-b ${isDark ? 'border-slate-700' : 'border-gray-200'} pb-3`}>
+      <div className={`flex flex-wrap gap-2 mb-6 border-b ${isDark ? 'border-[#1c3b56]' : 'border-[#e2f5f2]'} pb-3`}>
         <TabButton active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} label=" Vue d'ensemble" isDark={isDark} />
         <TabButton active={activeTab === 'financial'} onClick={() => setActiveTab('financial')} label=" Financier" isDark={isDark} />
         <TabButton active={activeTab === 'users'} onClick={() => setActiveTab('users')} label="👥 Utilisateurs" isDark={isDark} />
@@ -28877,8 +28573,8 @@ export function AdminReportsPage() {
       {activeTab === 'users' && <UsersTabComponent report={report} isDark={isDark} />}
       {activeTab === 'properties' && <PropertiesTabComponent report={report} isDark={isDark} />}
 
-      <div className={`mt-6 ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-xl sm:rounded-2xl p-5 shadow-sm border transition-colors duration-300`}>
-        <h3 className={`font-semibold text-base mb-3 flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-800'}`}>
+      <div className={`mt-6 ${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-xl sm:rounded-2xl p-5 shadow-sm border transition-colors duration-300`}>
+        <h3 className={`font-semibold text-base mb-3 flex items-center gap-2 ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>
           <Download className="w-5 h-5 text-[#00c9a7]" />
           Exporter le rapport
         </h3>
@@ -28902,8 +28598,8 @@ const PeriodButton = ({ active, onClick, label, isDark }: any) => (
       active 
         ? 'bg-[#00c9a7] text-white shadow-md' 
         : isDark 
-          ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' 
-          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          ? 'bg-[#1c3b56] text-[#9fb3c4] hover:bg-[#5b6b7a]' 
+          : 'bg-[#e8faf6] text-[#5b6b7a] hover:bg-[#e2f5f2]'
     }`}
   >
     {label}
@@ -28920,8 +28616,8 @@ const TabButton = ({ active, onClick, label, isDark }: any) => (
       active 
         ? 'bg-[#00c9a7] text-white' 
         : isDark 
-          ? 'text-slate-400 hover:bg-slate-800' 
-          : 'text-gray-600 hover:bg-gray-100'
+          ? 'text-[#5b6b7a] hover:bg-[#0f2940]' 
+          : 'text-[#5b6b7a] hover:bg-[#e8faf6]'
     }`}
   >
     {label}
@@ -28934,7 +28630,7 @@ const TabButton = ({ active, onClick, label, isDark }: any) => (
 const ExportButton = ({ onClick, icon, label, color, isDark }: any) => {
   const colors: any = {
     green: isDark ? 'bg-green-900/30 text-green-400 hover:bg-green-800/40' : 'bg-green-50 text-green-600 hover:bg-green-100',
-    blue: isDark ? 'bg-blue-900/30 text-blue-400 hover:bg-blue-800/40' : 'bg-blue-50 text-blue-600 hover:bg-blue-100',
+    blue: isDark ? 'bg-[#0f2940]/30 text-[#00c9a7] hover:bg-[#1c3b56]/40' : 'bg-[#f4fffe] text-[#00806b] hover:bg-[#e8faf6]',
     red: isDark ? 'bg-red-900/30 text-red-400 hover:bg-red-800/40' : 'bg-red-50 text-red-600 hover:bg-red-100',
   };
 
@@ -28960,8 +28656,8 @@ const OverviewTabComponent = ({ report, chartData, isDark }: any) => (
       <KPICard title="Propriétés" value={(report.total_properties || 0).toLocaleString()} icon={<Home className="w-5 h-5" />} color="orange" isDark={isDark} />
     </div>
 
-    <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-xl p-5 shadow-sm border transition-colors duration-300`}>
-      <h3 className={`font-semibold text-base mb-4 flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-800'}`}>
+    <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-xl p-5 shadow-sm border transition-colors duration-300`}>
+      <h3 className={`font-semibold text-base mb-4 flex items-center gap-2 ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>
         <TrendingUp className="w-5 h-5 text-[#00c9a7]" />
         Évolution des revenus
       </h3>
@@ -28973,10 +28669,10 @@ const OverviewTabComponent = ({ report, chartData, isDark }: any) => (
               <stop offset="95%" stopColor="#00c9a7" stopOpacity={0}/>
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#334155' : '#f0f0f0'} />
-          <XAxis dataKey="name" tick={{ fontSize: 12, fill: isDark ? '#94a3b8' : '#666' }} />
-          <YAxis tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`} tick={{ fill: isDark ? '#94a3b8' : '#666' }} />
-          <Tooltip contentStyle={{ backgroundColor: isDark ? '#1e293b' : '#fff', color: isDark ? '#fff' : '#000', borderRadius: 12, border: 'none' }} />
+          <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#1c3b56' : '#e2f5f2'} />
+          <XAxis dataKey="name" tick={{ fontSize: 12, fill: isDark ? '#5b6b7a' : '#666' }} />
+          <YAxis tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`} tick={{ fill: isDark ? '#5b6b7a' : '#666' }} />
+          <Tooltip contentStyle={{ backgroundColor: isDark ? '#0f2940' : '#fff', color: isDark ? '#fff' : '#000', borderRadius: 12, border: 'none' }} />
           <Area type="monotone" dataKey="revenue" stroke="#00c9a7" fill="url(#revenueGradient)" name="CA (FCFA)" />
         </AreaChart>
       </ResponsiveContainer>
@@ -28995,23 +28691,23 @@ const FinancialTabComponent = ({ report, chartData, isDark }: any) => (
         <p className="text-2xl font-bold mt-1">{report.total_revenue?.toLocaleString() || 0} FCFA</p>
         <p className="text-white/60 text-xs mt-2">Depuis la création</p>
       </div>
-      <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-white">
+      <div className="bg-[#00c9a7] rounded-xl p-4 text-white">
         <p className="text-white/80 text-sm">Réservations</p>
         <p className="text-2xl font-bold mt-1">{report.total_bookings || 0}</p>
       </div>
-      <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-4 text-white">
+      <div className="bg-[#00c9a7] rounded-xl p-4 text-white">
         <p className="text-white/80 text-sm">CA aujourd'hui</p>
         <p className="text-2xl font-bold mt-1">{(report.revenue || 0).toLocaleString()} FCFA</p>
       </div>
     </div>
-    <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-xl p-5 shadow-sm border transition-colors duration-300`}>
-      <h3 className={`font-semibold text-base mb-4 ${isDark ? 'text-white' : 'text-gray-800'}`}>Évolution quotidienne</h3>
+    <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-xl p-5 shadow-sm border transition-colors duration-300`}>
+      <h3 className={`font-semibold text-base mb-4 ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>Évolution quotidienne</h3>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={chartData}>
-          <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#334155' : '#f0f0f0'} />
-          <XAxis dataKey="name" tick={{ fontSize: 12, fill: isDark ? '#94a3b8' : '#666' }} />
-          <YAxis tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`} tick={{ fill: isDark ? '#94a3b8' : '#666' }} />
-          <Tooltip contentStyle={{ backgroundColor: isDark ? '#1e293b' : '#fff', color: isDark ? '#fff' : '#000', borderRadius: 12, border: 'none' }} />
+          <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#1c3b56' : '#e2f5f2'} />
+          <XAxis dataKey="name" tick={{ fontSize: 12, fill: isDark ? '#5b6b7a' : '#666' }} />
+          <YAxis tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`} tick={{ fill: isDark ? '#5b6b7a' : '#666' }} />
+          <Tooltip contentStyle={{ backgroundColor: isDark ? '#0f2940' : '#fff', color: isDark ? '#fff' : '#000', borderRadius: 12, border: 'none' }} />
           <Bar dataKey="revenue" fill="#00c9a7" name="CA" radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
@@ -29053,9 +28749,9 @@ const PropertiesTabComponent = ({ report, isDark }: any) => (
 const KPICard = ({ title, value, icon, color, isDark }: any) => {
   const colors: any = {
     green: 'from-green-500 to-green-600',
-    blue: 'from-blue-500 to-blue-600',
-    purple: 'from-purple-500 to-purple-600',
-    orange: 'from-orange-500 to-orange-600',
+    blue: 'from-[#00c9a7] to-[#00b396]',
+    purple: 'from-[#0f2940] to-[#1c3b56]',
+    orange: 'from-[#ffc93c] to-[#e0ac1f]',
   };
 
   return (
@@ -29074,10 +28770,10 @@ const KPICard = ({ title, value, icon, color, isDark }: any) => {
 // ============================================
 const UserStatCard = ({ title, value, icon, color, isDark }: any) => {
   const colors: any = {
-    blue: 'from-blue-500 to-blue-600',
+    blue: 'from-[#00c9a7] to-[#00b396]',
     green: 'from-green-500 to-green-600',
-    purple: 'from-purple-500 to-purple-600',
-    orange: 'from-orange-500 to-orange-600',
+    purple: 'from-[#0f2940] to-[#1c3b56]',
+    orange: 'from-[#ffc93c] to-[#e0ac1f]',
   };
 
   return (
@@ -29097,9 +28793,9 @@ const UserStatCard = ({ title, value, icon, color, isDark }: any) => {
 const PropertyStatCard = ({ title, value, icon, color, isDark }: any) => {
   const colors: any = {
     green: 'from-green-500 to-green-600',
-    blue: 'from-blue-500 to-blue-600',
-    yellow: 'from-yellow-500 to-yellow-600',
-    purple: 'from-purple-500 to-purple-600',
+    blue: 'from-[#00c9a7] to-[#00b396]',
+    yellow: 'from-[#ffc93c] to-[#e0ac1f]',
+    purple: 'from-[#0f2940] to-[#1c3b56]',
   };
 
   return (

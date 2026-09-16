@@ -72,7 +72,7 @@ export function MobileListingCard({ property }: MobileListingCardProps) {
         )}
       </div>
       <div className="p-3">
-        <div className="text-xs text-[#6b7280] mb-1">{location}</div>
+        <div className="text-xs text-[#5b6b7a] mb-1">{location}</div>
         <div className="flex items-center justify-between mb-2">
           <span className="text-[13px] font-bold text-[#0f2940] line-clamp-1">{property.title}</span>
           {rating > 0 && (
@@ -83,7 +83,7 @@ export function MobileListingCard({ property }: MobileListingCardProps) {
           )}
         </div>
         <div className="text-sm font-bold text-[#00c9a7]">
-          {property.price_per_night.toLocaleString()} XOF <span className="text-xs font-normal text-[#6b7280]">/nuit</span>
+          {property.price_per_night.toLocaleString()} XOF <span className="text-xs font-normal text-[#5b6b7a]">/nuit</span>
         </div>
       </div>
     </div>

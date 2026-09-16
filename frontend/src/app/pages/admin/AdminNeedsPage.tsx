@@ -24,21 +24,21 @@ export function AdminNeedsPage(_props: { onNavigate?: unknown }) {
     onSuccess: (res) => { toast.success(res.message); queryClient.invalidateQueries({ queryKey: ['admin-needs'] }); },
   });
 
-  const card = isDark ? 'bg-slate-800 border-slate-700 text-slate-100' : 'bg-white border-slate-200 text-slate-800';
-  const muted = isDark ? 'text-slate-400' : 'text-slate-500';
+  const card = isDark ? 'bg-[#0f2940] border-[#1c3b56] text-[#e8faf6]' : 'bg-white border-[#e2f5f2] text-[#0f2940]';
+  const muted = isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]';
 
   return (
-    <div className={`min-h-screen ${isDark ? 'bg-slate-900' : 'bg-slate-50'} p-4 md:p-6 lg:p-8`}>
+    <div className={`min-h-screen ${isDark ? 'bg-[#0f2940]' : 'bg-[#f4fffe]'} p-4 md:p-6 lg:p-8`}>
       <div className="max-w-5xl mx-auto space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
           <div>
-            <h1 className={`text-2xl md:text-3xl font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-800'}`}>
+            <h1 className={`text-2xl md:text-3xl font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>
               <ClipboardList className="w-6 h-6 text-[#00c9a7]" /> Besoins des voyageurs
             </h1>
             <p className={`text-sm mt-1 ${muted}`}>Demandes publiées et réponses des hôtes. Les coordonnées du voyageur ne sont visibles qu'ici.</p>
           </div>
           <select value={status} onChange={(e) => setStatus(e.target.value as any)}
-            className={`px-3 py-2 rounded-xl text-sm border ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200'}`}>
+            className={`px-3 py-2 rounded-xl text-sm border ${isDark ? 'bg-[#0f2940] border-[#1c3b56] text-white' : 'bg-white border-[#e2f5f2]'}`}>
             <option value="open">Ouverts</option>
             <option value="closed">Clôturés</option>
             <option value="">Tous</option>
@@ -56,7 +56,7 @@ export function AdminNeedsPage(_props: { onNavigate?: unknown }) {
                     {n.start_date ? `${dayFr(n.start_date)} → ${dayFr(n.end_date)}` : 'Dates flexibles'} · {n.guests} pers. · budget {fcfa(n.budget_max)}
                   </p>
                 </div>
-                <span className={`text-xs px-2 py-0.5 rounded-full ${n.status === 'open' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700'}`}>
+                <span className={`text-xs px-2 py-0.5 rounded-full ${n.status === 'open' ? 'bg-emerald-100 text-emerald-800' : 'bg-[#e2f5f2] text-[#1c3b56]'}`}>
                   {n.status === 'open' ? 'Ouvert' : n.status === 'expired' ? 'Dates passées' : 'Clôturé'}
                 </span>
               </div>
@@ -68,7 +68,7 @@ export function AdminNeedsPage(_props: { onNavigate?: unknown }) {
                   <a href={`mailto:${n.traveler.email}`} className="inline-flex items-center gap-1 hover:underline"><Mail className="w-3.5 h-3.5" />{n.traveler.email}</a>
                 </p>
               )}
-              <div className="border-t border-slate-200/60 pt-3 space-y-2">
+              <div className="border-t border-[#e2f5f2]/60 pt-3 space-y-2">
                 <p className="text-sm font-medium">{n.responses_count} réponse{n.responses_count > 1 ? 's' : ''} d'hôtes</p>
                 {n.responses?.map((r) => (
                   <p key={r.id} className={`text-sm ${muted}`}>

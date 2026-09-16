@@ -657,7 +657,7 @@ export function FedapayPaymentPage({ onNavigate, bookingData }: FedapayPaymentPa
         <div className="text-center py-8">
           <Loader2 className="w-16 h-16 text-[#00c9a7] animate-spin mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-[#0F2940] mb-2">Préparation du paiement...</h3>
-          <p className="text-gray-500 text-sm">Nous sécurisons votre transaction</p>
+          <p className="text-[#5b6b7a] text-sm">Nous sécurisons votre transaction</p>
         </div>
       );
     }
@@ -667,7 +667,7 @@ export function FedapayPaymentPage({ onNavigate, bookingData }: FedapayPaymentPa
         <div className="text-center py-8">
           <Loader2 className="w-16 h-16 text-[#00c9a7] animate-spin mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-[#0F2940] mb-2">Redirection vers Fedapay...</h3>
-          <p className="text-gray-500 text-sm">Vous allez être redirigé vers la page de paiement sécurisée</p>
+          <p className="text-[#5b6b7a] text-sm">Vous allez être redirigé vers la page de paiement sécurisée</p>
         </div>
       );
     }
@@ -679,8 +679,8 @@ export function FedapayPaymentPage({ onNavigate, bookingData }: FedapayPaymentPa
             <CheckCircle className="w-12 h-12 text-green-600" />
           </div>
           <h3 className="text-2xl font-bold text-[#0F2940] mb-2">✅ Paiement réussi !</h3>
-          <p className="text-gray-600 mb-2">Votre réservation est confirmée.</p>
-          <p className="text-gray-400 text-sm">Redirection vers l'accueil dans quelques secondes...</p>
+          <p className="text-[#5b6b7a] mb-2">Votre réservation est confirmée.</p>
+          <p className="text-[#5b6b7a] text-sm">Redirection vers l'accueil dans quelques secondes...</p>
           <button
             onClick={() => {
               if (onNavigate) {
@@ -689,7 +689,7 @@ export function FedapayPaymentPage({ onNavigate, bookingData }: FedapayPaymentPa
                 navigate('/');
               }
             }}
-            className="mt-4 px-6 py-2 bg-[#00c9a7] text-white rounded-xl hover:bg-[#00b892] transition flex items-center gap-2 mx-auto"
+            className="mt-4 px-6 py-2 bg-[#00c9a7] text-white rounded-xl hover:bg-[#00b396] transition flex items-center gap-2 mx-auto"
           >
             <Home className="w-4 h-4" />
             Accueil
@@ -705,13 +705,13 @@ export function FedapayPaymentPage({ onNavigate, bookingData }: FedapayPaymentPa
             <XCircle className="w-12 h-12 text-red-600" />
           </div>
           <h3 className="text-2xl font-bold text-[#0F2940] mb-2">❌ Paiement échoué</h3>
-          <p className="text-gray-600 mb-4">{error || 'Une erreur est survenue'}</p>
+          <p className="text-[#5b6b7a] mb-4">{error || 'Une erreur est survenue'}</p>
           <button
             onClick={() => {
               setStatus('idle');
               setError('');
             }}
-            className="px-6 py-2 bg-[#00c9a7] text-white rounded-xl hover:bg-[#00b892] transition"
+            className="px-6 py-2 bg-[#00c9a7] text-white rounded-xl hover:bg-[#00b396] transition"
           >
             Réessayer
           </button>
@@ -737,23 +737,23 @@ export function FedapayPaymentPage({ onNavigate, bookingData }: FedapayPaymentPa
     return (
       <div className="space-y-6">
         {/* Résumé de la réservation */}
-        <div className="bg-gray-50 rounded-xl p-4">
+        <div className="bg-[#f4fffe] rounded-xl p-4">
           <h4 className="font-semibold text-[#0F2940] mb-3 text-sm">📋 Résumé de votre réservation</h4>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-gray-600">Propriété</span>
+              <span className="text-[#5b6b7a]">Propriété</span>
               <span className="font-medium">{localBookingData?.property_title || 'Non spécifié'}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Nuits</span>
+              <span className="text-[#5b6b7a]">Nuits</span>
               <span className="font-medium">{nights} nuits</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Prix par nuit</span>
+              <span className="text-[#5b6b7a]">Prix par nuit</span>
               <span className="font-medium">{pricePerNight.toLocaleString()} FCFA</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Frais de service (10%)</span>
+              <span className="text-[#5b6b7a]">Frais de service (10%)</span>
               <span className="font-medium">{serviceFee.toLocaleString()} FCFA</span>
             </div>
             <div className="border-t pt-2 flex justify-between font-bold text-[#0F2940]">
@@ -764,9 +764,9 @@ export function FedapayPaymentPage({ onNavigate, bookingData }: FedapayPaymentPa
         </div>
 
         {/* Indicateur de disponibilité */}
-        <div className="flex items-center gap-2 text-sm bg-gray-50 p-3 rounded-xl">
+        <div className="flex items-center gap-2 text-sm bg-[#f4fffe] p-3 rounded-xl">
           <Calendar className="w-4 h-4 text-[#00c9a7]" />
-          <span className="text-gray-600">Dates sélectionnées :</span>
+          <span className="text-[#5b6b7a]">Dates sélectionnées :</span>
           <span className="font-medium">
             {localBookingData?.check_in ? new Date(localBookingData.check_in).toLocaleDateString('fr-FR') : '-'}
             {' → '}
@@ -782,16 +782,16 @@ export function FedapayPaymentPage({ onNavigate, bookingData }: FedapayPaymentPa
 
         {/* Informations utilisateur */}
         {user && (
-          <div className="bg-blue-50 rounded-xl p-3 text-sm">
+          <div className="bg-[#f4fffe] rounded-xl p-3 text-sm">
             <p className="font-medium text-[#0F2940] mb-1">👤 Vous payez en tant que :</p>
-            <p className="text-gray-600">{user.first_name} {user.last_name}</p>
-            <p className="text-gray-500 text-xs">{user.email}</p>
+            <p className="text-[#5b6b7a]">{user.first_name} {user.last_name}</p>
+            <p className="text-[#5b6b7a] text-xs">{user.email}</p>
           </div>
         )}
 
         {/* Méthode de paiement */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-[#1c3b56] mb-2">
             Méthode de paiement
           </label>
           <div className="grid grid-cols-2 gap-3">
@@ -803,11 +803,11 @@ export function FedapayPaymentPage({ onNavigate, bookingData }: FedapayPaymentPa
               className={`p-3 rounded-xl border-2 transition ${
                 paymentMethod === 'mobile_money'
                   ? 'border-[#00c9a7] bg-[#00c9a7]/5'
-                  : 'border-gray-200 hover:border-gray-300'
+                  : 'border-[#e2f5f2] hover:border-[#c9f0e8]'
               }`}
             >
               <div className="flex items-center justify-center gap-2">
-                <Smartphone className={`w-5 h-5 ${paymentMethod === 'mobile_money' ? 'text-[#00c9a7]' : 'text-gray-400'}`} />
+                <Smartphone className={`w-5 h-5 ${paymentMethod === 'mobile_money' ? 'text-[#00c9a7]' : 'text-[#5b6b7a]'}`} />
                 <span className="text-sm font-medium">Mobile Money</span>
               </div>
             </button>
@@ -819,11 +819,11 @@ export function FedapayPaymentPage({ onNavigate, bookingData }: FedapayPaymentPa
               className={`p-3 rounded-xl border-2 transition ${
                 paymentMethod === 'card'
                   ? 'border-[#00c9a7] bg-[#00c9a7]/5'
-                  : 'border-gray-200 hover:border-gray-300'
+                  : 'border-[#e2f5f2] hover:border-[#c9f0e8]'
               }`}
             >
               <div className="flex items-center justify-center gap-2">
-                <CreditCard className={`w-5 h-5 ${paymentMethod === 'card' ? 'text-[#00c9a7]' : 'text-gray-400'}`} />
+                <CreditCard className={`w-5 h-5 ${paymentMethod === 'card' ? 'text-[#00c9a7]' : 'text-[#5b6b7a]'}`} />
                 <span className="text-sm font-medium">Carte bancaire</span>
               </div>
             </button>
@@ -833,11 +833,11 @@ export function FedapayPaymentPage({ onNavigate, bookingData }: FedapayPaymentPa
         {/* Numéro de téléphone pour Mobile Money */}
         {paymentMethod === 'mobile_money' && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-[#1c3b56] mb-2">
               Numéro de téléphone (Mobile Money)
             </label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">+229</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#5b6b7a]">+229</span>
               <input
                 type="tel"
                 value={phoneNumber}
@@ -846,10 +846,10 @@ export function FedapayPaymentPage({ onNavigate, bookingData }: FedapayPaymentPa
                   setError('');
                 }}
                 placeholder="90 00 00 00"
-                className="w-full pl-14 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent text-sm"
+                className="w-full pl-14 pr-4 py-3 rounded-xl border border-[#e2f5f2] focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent text-sm"
               />
             </div>
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-[#5b6b7a] mt-1">
               Vous recevrez un code de confirmation sur ce numéro
             </p>
           </div>
@@ -869,8 +869,8 @@ export function FedapayPaymentPage({ onNavigate, bookingData }: FedapayPaymentPa
           disabled={loading || availabilityStatus === 'unavailable' || propertyPrice <= 0 || !isAuthenticated}
           className={`w-full py-3 rounded-xl font-semibold transition transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${
             availabilityStatus === 'unavailable' || propertyPrice <= 0 || !isAuthenticated
-              ? 'bg-gray-300 text-gray-500' 
-              : 'bg-gradient-to-r from-[#00c9a7] to-[#00a887] text-white hover:shadow-lg'
+              ? 'bg-[#c9f0e8] text-[#5b6b7a]' 
+              : 'bg-[#00c9a7] text-white hover:shadow-lg'
           }`}
         >
           {loading ? (
@@ -892,7 +892,7 @@ export function FedapayPaymentPage({ onNavigate, bookingData }: FedapayPaymentPa
           )}
         </button>
 
-        <p className="text-xs text-center text-gray-400">
+        <p className="text-xs text-center text-[#5b6b7a]">
           En cliquant sur "Payer maintenant", vous acceptez nos conditions générales
         </p>
       </div>
@@ -915,7 +915,7 @@ export function FedapayPaymentPage({ onNavigate, bookingData }: FedapayPaymentPa
                 navigate(-1);
               }
             }}
-            className="p-2 rounded-full hover:bg-gray-100 transition"
+            className="p-2 rounded-full hover:bg-[#e8faf6] transition"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -924,7 +924,7 @@ export function FedapayPaymentPage({ onNavigate, bookingData }: FedapayPaymentPa
 
         <div className="bg-white rounded-2xl shadow-lg p-6 border border-[#e2f5f2]">
           {/* Sécurité */}
-          <div className="flex items-center gap-2 text-xs text-gray-500 mb-6 bg-gray-50 px-4 py-2 rounded-lg">
+          <div className="flex items-center gap-2 text-xs text-[#5b6b7a] mb-6 bg-[#f4fffe] px-4 py-2 rounded-lg">
             <Lock className="w-4 h-4 text-[#00c9a7]" />
             <span>Paiement sécurisé par Fedapay</span>
             <span className="mx-1">·</span>
@@ -939,7 +939,7 @@ export function FedapayPaymentPage({ onNavigate, bookingData }: FedapayPaymentPa
 
         {/* Footer */}
         <div className="mt-6 text-center">
-          <div className="flex items-center justify-center gap-4 text-xs text-gray-400">
+          <div className="flex items-center justify-center gap-4 text-xs text-[#5b6b7a]">
             <span className="flex items-center gap-1">
               <Lock className="w-3 h-3" />
               Sécurisé

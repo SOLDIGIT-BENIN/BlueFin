@@ -170,7 +170,7 @@ export function BookingSummaryPage({ onNavigate, id, search }: BookingSummaryPag
         return (
             <div className="min-h-screen flex justify-center items-center bg-[#f4fffe] p-4">
                 <div className="text-center bg-white rounded-2xl p-8 max-w-md">
-                    <Home className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                    <Home className="w-16 h-16 text-[#9fb3c4] mx-auto mb-4" />
                     <p className="text-red-500 mb-4">Propriété introuvable</p>
                     <button onClick={() => onNavigate?.({ name: 'home' })} className="text-[#00c9a7] underline">Retour à l'accueil</button>
                 </div>
@@ -183,19 +183,19 @@ export function BookingSummaryPage({ onNavigate, id, search }: BookingSummaryPag
 
     return (
         <div className="bg-[#f4fffe] min-h-screen pb-32 md:pb-12">
-            <div className="sticky top-0 z-40 bg-white border-b border-gray-100 px-4 py-3 shadow-sm">
+            <div className="sticky top-0 z-40 bg-white border-b border-[#e2f5f2] px-4 py-3 shadow-sm">
                 <div className="flex items-center gap-3">
                     <button 
                         onClick={() => onNavigate?.({ name: 'listing', id: propertyId })} 
-                        className="p-2 -ml-2 rounded-full hover:bg-gray-100 transition active:bg-gray-200"
+                        className="p-2 -ml-2 rounded-full hover:bg-[#e8faf6] transition active:bg-[#e2f5f2]"
                     >
-                        <ArrowLeft className="w-5 h-5 text-gray-600" />
+                        <ArrowLeft className="w-5 h-5 text-[#5b6b7a]" />
                     </button>
                     <div>
                         <h1 className="font-semibold text-[#0F2940] text-base sm:text-lg">
                             {!showPaymentStep ? 'Résumé de votre réservation' : 'Paiement sécurisé'}
                         </h1>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-[#5b6b7a]">
                             {!showPaymentStep ? 'Vérifiez vos informations' : 'Finalisez votre réservation'}
                         </p>
                     </div>
@@ -207,9 +207,9 @@ export function BookingSummaryPage({ onNavigate, id, search }: BookingSummaryPag
                     {/* Colonne gauche - Récapitulatif */}
                     <div className="flex-1 space-y-4">
                         {/* Logement */}
-                        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                        <div className="bg-white rounded-xl p-4 shadow-sm border border-[#e2f5f2]">
                             <div className="flex gap-4">
-                                <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
+                                <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-[#e8faf6]">
                                     <img 
                                         src={property.images?.[0] || property.image} 
                                         alt={property.title}
@@ -219,34 +219,34 @@ export function BookingSummaryPage({ onNavigate, id, search }: BookingSummaryPag
                                 </div>
                                 <div className="flex-1">
                                     <h3 className="font-semibold text-[#0F2940]">{property.title}</h3>
-                                    <p className="text-sm text-gray-500 mt-0.5">{property.district}, {property.city}</p>
+                                    <p className="text-sm text-[#5b6b7a] mt-0.5">{property.district}, {property.city}</p>
                                     <div className="flex items-center gap-2 mt-1">
-                                        <Star className="w-4 h-4 fill-yellow-500 text-yellow-500" />
+                                        <Star className="w-4 h-4 fill-[#ffc93c] text-[#e0ac1f]" />
                                         <span className="text-sm">{Number(property.average_rating) > 0 ? Number(property.average_rating).toFixed(1) : 'Nouveau'}</span>
-                                        <span className="text-gray-400 text-sm">({property.reviews_count || 0} avis)</span>
+                                        <span className="text-[#5b6b7a] text-sm">({property.reviews_count || 0} avis)</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         {/* Dates et voyageurs */}
-                        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                        <div className="bg-white rounded-xl p-4 shadow-sm border border-[#e2f5f2]">
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <h4 className="text-sm font-medium text-gray-500 mb-1 flex items-center gap-1">
+                                    <h4 className="text-sm font-medium text-[#5b6b7a] mb-1 flex items-center gap-1">
                                         <Calendar className="w-4 h-4" /> Arrivée
                                     </h4>
                                     <p className="font-semibold">{new Date(checkIn).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                                 </div>
                                 <div>
-                                    <h4 className="text-sm font-medium text-gray-500 mb-1 flex items-center gap-1">
+                                    <h4 className="text-sm font-medium text-[#5b6b7a] mb-1 flex items-center gap-1">
                                         <Calendar className="w-4 h-4" /> Départ
                                     </h4>
                                     <p className="font-semibold">{new Date(checkOut).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                                 </div>
                             </div>
                             <div className="mt-3 pt-3 border-t">
-                                <h4 className="text-sm font-medium text-gray-500 mb-1 flex items-center gap-1">
+                                <h4 className="text-sm font-medium text-[#5b6b7a] mb-1 flex items-center gap-1">
                                     <Users className="w-4 h-4" /> Voyageurs
                                 </h4>
                                 <p className="font-semibold">{guests} personne{guests > 1 ? 's' : ''}</p>
@@ -254,18 +254,18 @@ export function BookingSummaryPage({ onNavigate, id, search }: BookingSummaryPag
                         </div>
 
                         {/* Détail des prix */}
-                        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                        <div className="bg-white rounded-xl p-4 shadow-sm border border-[#e2f5f2]">
                             <h4 className="font-semibold text-[#0F2940] mb-3 flex items-center gap-2">
                                 <Receipt className="w-4 h-4 text-[#00c9a7]" />
                                 Détail des prix
                             </h4>
                             <div className="space-y-2">
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-gray-600">{pricePerNight.toLocaleString()} FCFA × {nights} nuits</span>
+                                    <span className="text-[#5b6b7a]">{pricePerNight.toLocaleString()} FCFA × {nights} nuits</span>
                                     <span>{subtotal.toLocaleString()} FCFA</span>
                                 </div>
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-gray-600">Frais de service (10%)</span>
+                                    <span className="text-[#5b6b7a]">Frais de service (10%)</span>
                                     <span>{serviceFee.toLocaleString()} FCFA</span>
                                 </div>
                                 <div className="border-t pt-2 mt-2">
@@ -281,23 +281,23 @@ export function BookingSummaryPage({ onNavigate, id, search }: BookingSummaryPag
                     {/* Colonne droite */}
                     <div className="lg:w-96 space-y-4">
                         {!showPaymentStep ? (
-                            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 sticky top-20">
+                            <div className="bg-white rounded-xl p-6 shadow-sm border border-[#e2f5f2] sticky top-20">
                                 <h2 className="text-xl font-bold text-[#0F2940] mb-4">Récapitulatif</h2>
                                 <div className="space-y-3 mb-6">
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-gray-600">Logement</span>
+                                        <span className="text-[#5b6b7a]">Logement</span>
                                         <span className="font-medium">{property.title}</span>
                                     </div>
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-gray-600">Dates</span>
+                                        <span className="text-[#5b6b7a]">Dates</span>
                                         <span className="font-medium">{new Date(checkIn).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} → {new Date(checkOut).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}</span>
                                     </div>
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-gray-600">Durée</span>
+                                        <span className="text-[#5b6b7a]">Durée</span>
                                         <span className="font-medium">{nights} nuit{nights > 1 ? 's' : ''}</span>
                                     </div>
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-gray-600">Voyageurs</span>
+                                        <span className="text-[#5b6b7a]">Voyageurs</span>
                                         <span className="font-medium">{guests} personne{guests > 1 ? 's' : ''}</span>
                                     </div>
                                 </div>
@@ -309,36 +309,36 @@ export function BookingSummaryPage({ onNavigate, id, search }: BookingSummaryPag
                                 </div>
                                 <button 
                                     onClick={() => setShowPaymentStep(true)}
-                                    className="w-full py-3 rounded-xl bg-gradient-to-r from-[#00c9a7] to-[#00a887] text-white font-semibold hover:shadow-lg transition-all"
+                                    className="w-full py-3 rounded-xl bg-[#00c9a7] text-white font-semibold hover:shadow-lg transition-all"
                                 >
                                     Confirmer et payer
                                 </button>
-                                <div className="flex items-center justify-center gap-4 text-xs text-gray-400 mt-3">
+                                <div className="flex items-center justify-center gap-4 text-xs text-[#5b6b7a] mt-3">
                                     <div className="flex items-center gap-1"><Lock className="w-3 h-3" /><span>Paiement sécurisé</span></div>
                                     <div className="flex items-center gap-1"><Shield className="w-3 h-3" /><span>Garantie BF-Immo</span></div>
                                 </div>
                             </div>
                         ) : (
-                            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 sticky top-20">
+                            <div className="bg-white rounded-xl p-6 shadow-sm border border-[#e2f5f2] sticky top-20">
                                 <div className="flex items-center gap-2 mb-4">
                                     <button onClick={() => setShowPaymentStep(false)} className="text-[#00c9a7] hover:underline text-sm">← Retour</button>
                                 </div>
                                 <h2 className="text-xl font-bold text-[#0F2940] mb-4">Paiement</h2>
                                 
-                                <div className="bg-gradient-to-r from-[#00c9a7]/10 to-[#0F2940]/10 rounded-xl p-4 text-center mb-4">
-                                    <p className="text-sm text-gray-600">Montant à payer</p>
+                                <div className="bg-[#f4fffe] rounded-xl p-4 text-center mb-4">
+                                    <p className="text-sm text-[#5b6b7a]">Montant à payer</p>
                                     <p className="text-2xl font-bold text-[#00c9a7]">{total.toLocaleString()} FCFA</p>
                                 </div>
 
                                 <div className="mb-4">
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Méthode de paiement</label>
+                                    <label className="block text-sm font-medium text-[#1c3b56] mb-2">Méthode de paiement</label>
                                     <div className="grid grid-cols-2 gap-3">
-                                        <button onClick={() => { setPaymentMethod('mobile_money'); setPaymentError(''); }} className={`flex flex-col items-center gap-2 p-3 border-2 rounded-xl transition-all ${paymentMethod === 'mobile_money' ? 'border-[#00c9a7] bg-[#00c9a7]/5' : 'border-gray-200'}`}>
-                                            <Smartphone className={`w-5 h-5 ${paymentMethod === 'mobile_money' ? 'text-[#00c9a7]' : 'text-gray-400'}`} />
+                                        <button onClick={() => { setPaymentMethod('mobile_money'); setPaymentError(''); }} className={`flex flex-col items-center gap-2 p-3 border-2 rounded-xl transition-all ${paymentMethod === 'mobile_money' ? 'border-[#00c9a7] bg-[#00c9a7]/5' : 'border-[#e2f5f2]'}`}>
+                                            <Smartphone className={`w-5 h-5 ${paymentMethod === 'mobile_money' ? 'text-[#00c9a7]' : 'text-[#5b6b7a]'}`} />
                                             <span className="text-xs">Mobile Money</span>
                                         </button>
-                                        <button onClick={() => { setPaymentMethod('card'); setPaymentError(''); }} className={`flex flex-col items-center gap-2 p-3 border-2 rounded-xl transition-all ${paymentMethod === 'card' ? 'border-[#00c9a7] bg-[#00c9a7]/5' : 'border-gray-200'}`}>
-                                            <CreditCard className={`w-5 h-5 ${paymentMethod === 'card' ? 'text-[#00c9a7]' : 'text-gray-400'}`} />
+                                        <button onClick={() => { setPaymentMethod('card'); setPaymentError(''); }} className={`flex flex-col items-center gap-2 p-3 border-2 rounded-xl transition-all ${paymentMethod === 'card' ? 'border-[#00c9a7] bg-[#00c9a7]/5' : 'border-[#e2f5f2]'}`}>
+                                            <CreditCard className={`w-5 h-5 ${paymentMethod === 'card' ? 'text-[#00c9a7]' : 'text-[#5b6b7a]'}`} />
                                             <span className="text-xs">Carte bancaire</span>
                                         </button>
                                     </div>
@@ -347,17 +347,17 @@ export function BookingSummaryPage({ onNavigate, id, search }: BookingSummaryPag
                                 {paymentMethod === 'mobile_money' && (
                                     <div className="space-y-3">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Opérateur</label>
+                                            <label className="block text-sm font-medium text-[#1c3b56] mb-1">Opérateur</label>
                                             <div className="grid grid-cols-3 gap-2">
                                                 {(['MTN', 'Moov', 'Orange'] as const).map((provider) => (
-                                                    <button key={provider} onClick={() => { setMobileProvider(provider); setPaymentError(''); }} className={`py-2 rounded-xl border transition-all text-sm ${mobileProvider === provider ? 'border-[#00c9a7] bg-[#00c9a7]/5 text-[#00c9a7]' : 'border-gray-200'}`}>
+                                                    <button key={provider} onClick={() => { setMobileProvider(provider); setPaymentError(''); }} className={`py-2 rounded-xl border transition-all text-sm ${mobileProvider === provider ? 'border-[#00c9a7] bg-[#00c9a7]/5 text-[#00c9a7]' : 'border-[#e2f5f2]'}`}>
                                                         {provider}
                                                     </button>
                                                 ))}
                                             </div>
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Numéro Mobile Money</label>
+                                            <label className="block text-sm font-medium text-[#1c3b56] mb-1">Numéro Mobile Money</label>
                                             <input type="tel" value={mobileMoneyNumber} onChange={(e) => { setMobileMoneyNumber(e.target.value); setPaymentError(''); }} placeholder="97 00 00 00" className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-[#00c9a7]" />
                                         </div>
                                     </div>
@@ -366,16 +366,16 @@ export function BookingSummaryPage({ onNavigate, id, search }: BookingSummaryPag
                                 {paymentMethod === 'card' && (
                                     <div className="space-y-3">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Numéro de carte</label>
+                                            <label className="block text-sm font-medium text-[#1c3b56] mb-1">Numéro de carte</label>
                                             <input type="text" value={cardNumber} onChange={handleCardNumberChange} placeholder="1234 5678 9012 3456" maxLength={19} className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-[#00c9a7]" />
                                         </div>
                                         <div className="grid grid-cols-2 gap-3">
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Expiration</label>
+                                                <label className="block text-sm font-medium text-[#1c3b56] mb-1">Expiration</label>
                                                 <input type="text" value={cardExpiry} onChange={handleExpiryChange} placeholder="MM/AA" maxLength={5} className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-[#00c9a7]" />
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">CVV</label>
+                                                <label className="block text-sm font-medium text-[#1c3b56] mb-1">CVV</label>
                                                 <div className="relative">
                                                     <input type={showCvv ? 'text' : 'password'} value={cardCvv} onChange={(e) => setCardCvv(e.target.value)} placeholder="123" maxLength={4} className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-[#00c9a7] pr-8" />
                                                     <button type="button" onClick={() => setShowCvv(!showCvv)} className="absolute right-2 top-1/2 -translate-y-1/2">{showCvv ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}</button>
@@ -383,7 +383,7 @@ export function BookingSummaryPage({ onNavigate, id, search }: BookingSummaryPag
                                             </div>
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Nom sur la carte</label>
+                                            <label className="block text-sm font-medium text-[#1c3b56] mb-1">Nom sur la carte</label>
                                             <input type="text" value={cardName} onChange={(e) => setCardName(e.target.value.toUpperCase())} placeholder="JEAN DUPONT" className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-[#00c9a7] uppercase" />
                                         </div>
                                     </div>
@@ -391,7 +391,7 @@ export function BookingSummaryPage({ onNavigate, id, search }: BookingSummaryPag
 
                                 {paymentError && <div className="p-2 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600 text-center">{paymentError}</div>}
 
-                                <button onClick={handleConfirmPayment} disabled={isPaying} className="w-full mt-4 py-3 rounded-xl bg-gradient-to-r from-[#00c9a7] to-[#00a887] text-white font-semibold disabled:opacity-50">
+                                <button onClick={handleConfirmPayment} disabled={isPaying} className="w-full mt-4 py-3 rounded-xl bg-[#00c9a7] text-white font-semibold disabled:opacity-50">
                                     {isPaying ? <div className="flex justify-center gap-2"><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Paiement...</div> : `Payer ${total.toLocaleString()} FCFA`}
                                 </button>
                             </div>

@@ -60,14 +60,14 @@ export function AdminBookingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-[#f4fffe] to-[#e8faf6] pb-20">
       <div className="p-3 sm:p-4 md:p-6">
         {/* En-tête */}
         <div className="mb-5">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#0f2940] to-[#00c9a7] bg-clip-text text-transparent">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#0f2940]">
             Réservations
           </h1>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1">Gérez toutes les réservations de la plateforme</p>
+          <p className="text-xs sm:text-sm text-[#5b6b7a] mt-1">Gérez toutes les réservations de la plateforme</p>
         </div>
 
         {/* Statistiques - grille responsive */}
@@ -83,20 +83,20 @@ export function AdminBookingsPage() {
         <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm mb-5">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5b6b7a]" />
               <input
                 type="text"
                 placeholder="Rechercher par référence, propriété ou voyageur..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
+                className="w-full pl-9 pr-3 py-2 border border-[#e2f5f2] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
               />
             </div>
             <div className="flex gap-2">
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7] bg-white"
+                className="px-3 py-2 border border-[#e2f5f2] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7] bg-white"
               >
                 <option value="all">Tous les statuts</option>
                 <option value="confirmed">Confirmées</option>
@@ -106,7 +106,7 @@ export function AdminBookingsPage() {
               </select>
               <button
                 onClick={() => refetch()}
-                className="px-3 py-2 bg-gray-100 rounded-xl hover:bg-gray-200 transition"
+                className="px-3 py-2 bg-[#e8faf6] rounded-xl hover:bg-[#e2f5f2] transition"
                 title="Rafraîchir"
               >
                 🔄
@@ -119,8 +119,8 @@ export function AdminBookingsPage() {
         <div className="space-y-3">
           {filteredBookings.length === 0 ? (
             <div className="bg-white rounded-xl sm:rounded-2xl p-8 sm:p-12 text-center">
-              <Calendar className="w-12 h-12 sm:w-16 sm:h-16 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500 text-sm">Aucune réservation trouvée</p>
+              <Calendar className="w-12 h-12 sm:w-16 sm:h-16 text-[#9fb3c4] mx-auto mb-3" />
+              <p className="text-[#5b6b7a] text-sm">Aucune réservation trouvée</p>
             </div>
           ) : (
             filteredBookings.map((booking: any) => (
@@ -171,7 +171,7 @@ const BookingCard = ({ booking, isExpanded, onToggle, onCancel }: any) => {
     <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm hover:shadow-md transition-all overflow-hidden">
       {/* En-tête de la carte - toujours visible */}
       <div 
-        className="p-3 sm:p-4 cursor-pointer hover:bg-gray-50 transition"
+        className="p-3 sm:p-4 cursor-pointer hover:bg-[#f4fffe] transition"
         onClick={onToggle}
       >
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
@@ -181,26 +181,26 @@ const BookingCard = ({ booking, isExpanded, onToggle, onCancel }: any) => {
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="font-mono text-[10px] sm:text-xs font-semibold bg-gray-100 px-2 py-0.5 rounded">
+                <span className="font-mono text-[10px] sm:text-xs font-semibold bg-[#e8faf6] px-2 py-0.5 rounded">
                   #{booking.booking_reference?.slice(-8) || booking.id}
                 </span>
                 <span className={`text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-${config.color}-100 text-${config.color}-700`}>
                   {config.label}
                 </span>
               </div>
-              <p className="font-semibold text-gray-800 text-xs sm:text-sm mt-1 truncate">{booking.property?.title || 'Propriété'}</p>
-              <p className="text-[10px] sm:text-xs text-gray-500">{booking.property?.district || ''}, {booking.property?.city || ''}</p>
+              <p className="font-semibold text-[#0f2940] text-xs sm:text-sm mt-1 truncate">{booking.property?.title || 'Propriété'}</p>
+              <p className="text-[10px] sm:text-xs text-[#5b6b7a]">{booking.property?.district || ''}, {booking.property?.city || ''}</p>
             </div>
           </div>
           <div className="flex items-center justify-between w-full sm:w-auto gap-3">
             <div className="text-left sm:text-right">
               <p className="text-base sm:text-lg font-bold text-[#00c9a7]">{booking.total_amount?.toLocaleString()} FCFA</p>
-              <p className="text-[10px] sm:text-xs text-gray-400">{nights} nuit{nights > 1 ? 's' : ''}</p>
+              <p className="text-[10px] sm:text-xs text-[#5b6b7a]">{nights} nuit{nights > 1 ? 's' : ''}</p>
             </div>
             {isExpanded ? (
-              <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 shrink-0" />
+              <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-[#5b6b7a] shrink-0" />
             ) : (
-              <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 shrink-0" />
+              <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-[#5b6b7a] shrink-0" />
             )}
           </div>
         </div>
@@ -208,7 +208,7 @@ const BookingCard = ({ booking, isExpanded, onToggle, onCancel }: any) => {
 
       {/* Détails étendus */}
       {isExpanded && (
-        <div className="border-t border-gray-100 p-3 sm:p-4 bg-gray-50">
+        <div className="border-t border-[#e2f5f2] p-3 sm:p-4 bg-[#f4fffe]">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {/* Voyageur */}
             <div className="bg-white rounded-xl p-3 shadow-sm">
@@ -217,11 +217,11 @@ const BookingCard = ({ booking, isExpanded, onToggle, onCancel }: any) => {
                 <h4 className="font-semibold text-sm">Voyageur</h4>
               </div>
               <p className="font-medium text-sm">{booking.user?.full_name || 'Non renseigné'}</p>
-              <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
+              <div className="flex items-center gap-2 mt-1 text-xs text-[#5b6b7a]">
                 <Mail className="w-3 h-3" />
                 <span className="truncate">{booking.user?.email || '-'}</span>
               </div>
-              <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
+              <div className="flex items-center gap-2 mt-1 text-xs text-[#5b6b7a]">
                 <Phone className="w-3 h-3" />
                 <span>{booking.user?.phone || 'Non renseigné'}</span>
               </div>
@@ -235,19 +235,19 @@ const BookingCard = ({ booking, isExpanded, onToggle, onCancel }: any) => {
               </div>
               <div className="space-y-1 text-xs">
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Arrivée</span>
+                  <span className="text-[#5b6b7a]">Arrivée</span>
                   <span className="font-medium">{booking.check_in || '-'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Départ</span>
+                  <span className="text-[#5b6b7a]">Départ</span>
                   <span className="font-medium">{booking.check_out || '-'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Nuits</span>
+                  <span className="text-[#5b6b7a]">Nuits</span>
                   <span className="font-medium">{nights}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Voyageurs</span>
+                  <span className="text-[#5b6b7a]">Voyageurs</span>
                   <span className="font-medium">{booking.guests_count || 1}</span>
                 </div>
               </div>
@@ -261,17 +261,17 @@ const BookingCard = ({ booking, isExpanded, onToggle, onCancel }: any) => {
               </div>
               <div className="space-y-1 text-xs">
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Méthode</span>
+                  <span className="text-[#5b6b7a]">Méthode</span>
                   <span className="font-medium capitalize">{booking.payment_method || '-'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Statut</span>
-                  <span className={`font-medium ${booking.payment_status === 'paid' ? 'text-green-600' : 'text-yellow-600'}`}>
+                  <span className="text-[#5b6b7a]">Statut</span>
+                  <span className={`font-medium ${booking.payment_status === 'paid' ? 'text-green-600' : 'text-[#a87c10]'}`}>
                     {booking.payment_status === 'paid' ? 'Payé' : 'En attente'}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Total</span>
+                  <span className="text-[#5b6b7a]">Total</span>
                   <span className="font-medium text-[#00c9a7]">{booking.total_amount?.toLocaleString()} FCFA</span>
                 </div>
               </div>
@@ -298,10 +298,10 @@ const BookingCard = ({ booking, isExpanded, onToggle, onCancel }: any) => {
 // Composant de badge statistique responsive
 const StatBadge = ({ label, value, color }: { label: string; value: number; color: string }) => {
   const colorClasses: Record<string, string> = {
-    gray: 'bg-gray-100 text-gray-700',
+    gray: 'bg-[#e8faf6] text-[#1c3b56]',
     green: 'bg-green-100 text-green-700',
-    yellow: 'bg-yellow-100 text-yellow-700',
-    blue: 'bg-blue-100 text-blue-700',
+    yellow: 'bg-[#fff3cd] text-[#6b4e06]',
+    blue: 'bg-[#e8faf6] text-[#0f2940]',
     red: 'bg-red-100 text-red-700',
   };
 
@@ -316,16 +316,16 @@ const StatBadge = ({ label, value, color }: { label: string; value: number; colo
 
 // Skeleton de chargement responsive
 const LoadingSkeleton = () => (
-  <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+  <div className="min-h-screen bg-gradient-to-br from-[#f4fffe] to-[#e8faf6]">
     <div className="p-3 sm:p-4 md:p-6">
       <div className="animate-pulse">
-        <div className="h-6 sm:h-8 bg-gray-200 rounded w-32 mb-4"></div>
+        <div className="h-6 sm:h-8 bg-[#e2f5f2] rounded w-32 mb-4"></div>
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-5">
-          {[1, 2, 3, 4, 5].map(i => <div key={i} className="bg-gray-200 rounded-lg h-16"></div>)}
+          {[1, 2, 3, 4, 5].map(i => <div key={i} className="bg-[#e2f5f2] rounded-lg h-16"></div>)}
         </div>
-        <div className="bg-gray-200 rounded-xl h-12 mb-5"></div>
+        <div className="bg-[#e2f5f2] rounded-xl h-12 mb-5"></div>
         <div className="space-y-3">
-          {[1, 2, 3].map(i => <div key={i} className="bg-gray-200 rounded-xl h-24"></div>)}
+          {[1, 2, 3].map(i => <div key={i} className="bg-[#e2f5f2] rounded-xl h-24"></div>)}
         </div>
       </div>
     </div>

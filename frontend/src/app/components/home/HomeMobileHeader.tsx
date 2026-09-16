@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { MapPin, ChevronDown } from 'lucide-react';
-import Logo from '../../assets/Bluefin Immo_01.jpg.jpeg';
+import { BluefinLogo } from '../brand/BluefinLogo';
 import { BENIN_CITIES } from '../../constants/destinations';
 
 export function HomeMobileHeader({ onNavigate }: { onNavigate?: (route: any) => void }) {
@@ -23,10 +23,9 @@ export function HomeMobileHeader({ onNavigate }: { onNavigate?: (route: any) => 
   return (
     <div className="flex items-center justify-between px-4 pt-3 pb-2">
       <button onClick={() => onNavigate?.({ name: 'home' })} className="flex items-center gap-2.5 text-left">
-        <img src={Logo} alt="Bluefin Immo" className="w-9 h-9 rounded-lg object-contain" />
         <span className="leading-none">
-          <span className="font-display block text-[20px] text-[#0f2940]">Bluefin-Immo</span>
-          <span className="block text-[9.5px] font-semibold text-[#00c9a7] mt-0.5">L'hébergement au Bénin</span>
+          <BluefinLogo orientation="horizontal" markClassName="h-8 w-auto" wordmarkClassName="h-[0.85rem] w-auto" />
+          <span className="block text-[9.5px] font-semibold text-[var(--bluefin-text-muted)] mt-1">L'hébergement au Bénin</span>
         </span>
       </button>
 
@@ -41,8 +40,8 @@ export function HomeMobileHeader({ onNavigate }: { onNavigate?: (route: any) => 
         </button>
 
         {cityMenuOpen && (
-          <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl border border-gray-100 z-50 py-2 max-h-72 overflow-y-auto">
-            <p className="px-3 pb-1.5 text-[11px] font-semibold text-gray-400 uppercase tracking-wide">Rechercher une ville</p>
+          <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl border border-[#e2f5f2] z-50 py-2 max-h-72 overflow-y-auto">
+            <p className="px-3 pb-1.5 text-[11px] font-semibold text-[#5b6b7a] uppercase tracking-wide">Rechercher une ville</p>
             {BENIN_CITIES.map((city) => (
               <button
                 key={city}

@@ -524,12 +524,12 @@ class AuthService {
 
     public getHostTypeColor(): string {
         const colors = {
-            'logement': 'bg-blue-100 text-blue-800',
-            'experience': 'bg-purple-100 text-purple-800',
-            'service': 'bg-orange-100 text-orange-800'
+            'logement': 'bg-[#e8faf6] text-[#0f2940]',
+            'experience': 'bg-[#e8faf6] text-[#0f2940]',
+            'service': 'bg-[#fff3cd] text-[#4a3400]'
         };
         const hostType = this.getHostType();
-        return hostType ? colors[hostType] : 'bg-gray-100 text-gray-800';
+        return hostType ? colors[hostType] : 'bg-[#e8faf6] text-[#0f2940]';
     }
 
     public async updateHostType(hostType: 'logement' | 'experience' | 'service'): Promise<User> {

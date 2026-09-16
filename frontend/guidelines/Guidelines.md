@@ -1,61 +1,85 @@
-**Add your own guidelines here**
-<!--
+# Design system Bluefin Immo
 
-System Guidelines
+Règles de rendu de l'application, dérivées de la charte graphique officielle
+(`docs/Bluefin Immo présentation logo.pdf`). Tout ce qui suit est appliqué dans
+le code : si une règle vous gêne, changez la règle et le jeton, pas la valeur
+dans un composant.
 
-Use this file to provide the AI with rules and guidelines you want it to follow.
-This template outlines a few examples of things you can add. You can add your own sections and format it to suit your needs
+## 1. Couleurs — trois, pas quatre
 
-TIP: More context isn't always better. It can confuse the LLM. Try and add the most important rules you need
+| Rôle | Valeur | Jeton CSS | Usage |
+|---|---|---|---|
+| Bleu nuit | `#0f2940` | `--bluefin-navy` | Structure : texte, fonds pleins, bandeaux, pied de page |
+| Turquoise | `#00c9a7` | `--bluefin-teal` | Accent : action principale, état actif, prix |
+| Blanc cassé | `#f4fffe` | `--bluefin-mint` | Fond, respiration |
 
-# General guidelines
+Les variations (`--bluefin-teal-hover`, `--bluefin-navy-soft`,
+`--bluefin-teal-surface`, `--bluefin-border`, `--bluefin-text-muted`…) sont des
+dérivés de ces trois couleurs, définis dans `src/styles/theme.css`. **Aucune
+autre teinte n'est admise** — pas de gris neutre (`gray-500`), pas de bleu
+Tailwind, pas de violet.
 
-Any general rules you want the AI to follow.
-For example:
+Trois exceptions, et seulement celles-là :
+- **Citron `#ffc93c`** : uniquement le badge « Certifié » (`CertifiedBadge`).
+  C'est l'argument de confiance du site ; il doit rester distinct du turquoise,
+  qui signale les actions.
+- **Rouge `#d4183d` / vert `#16a34a`** : erreur et succès. La charte ne peut pas
+  exprimer un état, ces deux couleurs ne servent qu'à ça.
+- **Couleurs de marques tierces** : bouton Google (règles de marque Google),
+  bouton WhatsApp. Ne jamais les recolorer.
 
-* Only use absolute positioning when necessary. Opt for responsive and well structured layouts that use flexbox and grid by default
-* Refactor code as you go to keep code clean
-* Keep file sizes small and put helper functions and components in their own files.
+Le turquoise est un accent : pas de grande surface turquoise. Un bandeau pleine
+largeur est marine ; le turquoise s'y pose en bouton, en surtitre, en pastille.
 
---------------
+## 2. Typographie
 
-# Design system guidelines
-Rules for how the AI should make generations look like your company's design system
+- **Titres** : `--font-display` = Nexa → Montserrat → Plus Jakarta Sans.
+  Graisse 700 (800 pour h1/h2), interlettrage resserré. La charte décrit la
+  typo de marque comme géométrique et capitale ; Nexa est commerciale, donc
+  non distribuée ici — déposez les fichiers dans `public/fonts` + `@font-face`
+  et toute l'application bascule dessus sans autre modification.
+- **Texte** : Plus Jakarta Sans (`--font-primary`).
+- **Surtitre** : classe `.eyebrow` (capitales, interlettrage large, 11 px).
+  C'est la seule façon d'employer les capitales hors logo.
+- Pas de serif. Un titre en serif contredit le dessin du logo.
 
-Additionally, if you select a design system to use in the prompt box, you can reference
-your design system's components, tokens, variables and components.
-For example:
+## 3. Logo
 
-* Use a base font-size of 14px
-* Date formats should always be in the format “Jun 10”
-* The bottom toolbar should only ever have a maximum of 4 items
-* Never use the floating action button with the bottom toolbar
-* Chips should always come in sets of 3 or more
-* Don't use a dropdown if there are 2 or fewer options
+Toujours via les composants de `src/app/components/brand/BluefinLogo.tsx` —
+jamais une image matricielle, jamais le mot « Bluefin Immo » écrit à la main à
+côté d'un pictogramme.
 
-You can also create sub sections and add more specific details
-For example:
+```tsx
+<BluefinLogo orientation="horizontal" />              // barre de navigation
+<BluefinLogo orientation="stacked" />                 // accueil, écrans d'auth
+<BluefinLogo orientation="horizontal" tone="onDark" /> // fond marine
+<BluefinMark className="h-6 w-auto" />                // pictogramme seul
+```
 
+Sur fond marine, `tone="onDark"` : les parties marine passent en blanc, le
+turquoise est conservé — c'est la déclinaison de la charte (panneau, véhicule,
+vitrine). Le nom de la marque s'écrit **Bluefin Immo**, sans trait d'union.
 
-## Button
-The Button component is a fundamental interactive element in our design system, designed to trigger actions or navigate
-users through the application. It provides visual feedback and clear affordances to enhance user experience.
+## 4. Formes
 
-### Usage
-Buttons should be used for important actions that users need to take, such as form submissions, confirming choices,
-or initiating processes. They communicate interactivity and should have clear, action-oriented labels.
+- Cartes : `rounded-2xl`, bordure `--bluefin-border`, ombre discrète.
+- Boutons d'action principale : pilule (`rounded-full`), aplat turquoise,
+  survol `--bluefin-teal-hover`.
+- Champs : `rounded-xl`, bordure `--bluefin-border`, anneau de focus turquoise.
 
-### Variants
-* Primary Button
-  * Purpose : Used for the main action in a section or page
-  * Visual Style : Bold, filled with the primary brand color
-  * Usage : One primary button per section to guide users toward the most important action
-* Secondary Button
-  * Purpose : Used for alternative or supporting actions
-  * Visual Style : Outlined with the primary color, transparent background
-  * Usage : Can appear alongside a primary button for less important actions
-* Tertiary Button
-  * Purpose : Used for the least important actions
-  * Visual Style : Text-only with no border, using primary color
-  * Usage : For actions that should be available but not emphasized
--->
+## 5. Interdits
+
+- **Aucun dégradé de marque** (turquoise → marine). La charte procède par
+  aplats francs. Seule exception : le voile sombre posé sur une photo pour
+  rendre un texte lisible.
+- Pas de texte en dégradé découpé (`bg-clip-text`).
+- Pas d'emoji en guise d'icône — SVG uniquement (lucide-react).
+- Pas de couleur écrite en dur si un jeton existe.
+- Pas de nouvelle famille de couleur Tailwind (`blue-600`, `purple-500`,
+  `gray-400`…) : elles ont toutes été retirées du code, ne les réintroduisez pas.
+
+## 6. Code
+
+- Les nouvelles pages vivent dans `src/app/pages/`, pas dans le monolithe
+  `src/app/pages.tsx` (28 000 lignes, en cours de démantèlement).
+- Un composant partagé plutôt qu'un cinquième badge « Certifié » recopié.

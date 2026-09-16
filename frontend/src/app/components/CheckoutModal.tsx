@@ -52,8 +52,8 @@ export const CheckoutModal = ({ propertyId, propertyTitle, checkIn, checkOut, gu
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl max-w-md w-full p-6">
         <h2 className="text-xl font-bold mb-3">Confirmer la réservation</h2>
-        <p className="text-sm text-gray-600 mb-2">{propertyTitle}</p>
-        <p className="text-sm text-gray-600 mb-4">{checkIn} — {checkOut} · {guests} voyageur(s)</p>
+        <p className="text-sm text-[#5b6b7a] mb-2">{propertyTitle}</p>
+        <p className="text-sm text-[#5b6b7a] mb-4">{checkIn} — {checkOut} · {guests} voyageur(s)</p>
         <div className="border rounded-2xl p-4 mb-4">
           <h3 className="font-medium mb-2">Moyen de paiement</h3>
           <div className="flex gap-2 mb-3">
@@ -63,13 +63,13 @@ export const CheckoutModal = ({ propertyId, propertyTitle, checkIn, checkOut, gu
           </div>
           {paymentMethod === 'mobile_money' && (
             <div>
-              <div className="text-xs text-gray-500 mb-2">Choisissez un opérateur</div>
+              <div className="text-xs text-[#5b6b7a] mb-2">Choisissez un opérateur</div>
               <div className="flex gap-2 mb-2">
                 {['MTN','Moov','Orange'].map(op => (
                   <button key={op} onClick={() => setMobileProvider(op as any)} className={`flex-1 p-2 rounded-lg border ${mobileProvider===op?'border-[#00c9a7] bg-[#f4fffe]':''}`}>{op}</button>
                 ))}
               </div>
-              <div className="text-xs text-gray-500">Paiement demandé sur : {user?.phone}</div>
+              <div className="text-xs text-[#5b6b7a]">Paiement demandé sur : {user?.phone}</div>
             </div>
           )}
         </div>

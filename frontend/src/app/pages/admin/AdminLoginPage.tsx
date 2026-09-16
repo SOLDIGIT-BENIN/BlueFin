@@ -55,16 +55,16 @@ export function AdminLoginPage({ onNavigate }: AdminLoginPageProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f4fffe] to-[#e8fffb] p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f4fffe] to-[#f4fffe] p-4">
       <div className="w-full max-w-md animate-fade-in-up">
         <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-[#e2f5f2]">
           {/* Logo et titre */}
           <div className="text-center mb-8">
-            <div className="w-20 h-20 mx-auto bg-gradient-to-br from-[#00c9a7] to-[#0f2940] rounded-2xl flex items-center justify-center shadow-lg animate-pulse-slow">
+            <div className="w-20 h-20 mx-auto bg-[#0f2940] rounded-2xl flex items-center justify-center shadow-lg animate-pulse-slow">
               <Shield className="w-10 h-10 text-white" />
             </div>
             <h1 className="text-3xl font-bold text-[#0f2940] mt-4">Administration</h1>
-            <p className="text-sm text-[#6b7280] mt-2">Espace réservé aux administrateurs</p>
+            <p className="text-sm text-[#5b6b7a] mt-2">Espace réservé aux administrateurs</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -104,7 +104,7 @@ export function AdminLoginPage({ onNavigate }: AdminLoginPageProps) {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#5b6b7a] hover:text-[#5b6b7a] transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -114,7 +114,7 @@ export function AdminLoginPage({ onNavigate }: AdminLoginPageProps) {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-[#00c9a7] to-[#0f2940] text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full bg-[#00c9a7] text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {isLoading ? (
                 <>
@@ -127,8 +127,8 @@ export function AdminLoginPage({ onNavigate }: AdminLoginPageProps) {
             </button>
           </form>
 
-          <div className="mt-6 text-center text-xs text-[#6b7280]">
-            Accès restreint · Bluefin-Immo
+          <div className="mt-6 text-center text-xs text-[#5b6b7a]">
+            Accès restreint · Bluefin Immo
           </div>
         </div>
       </div>

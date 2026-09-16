@@ -92,16 +92,16 @@ export function IdentityVerification({ onNavigate, onVerificationComplete }: Ide
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-[#f4fffe] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-[#f4fffe] via-white to-[#f4fffe] flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle className="w-10 h-10 text-green-500" />
           </div>
           <h2 className="text-2xl font-bold text-[#0F2940] mb-2">Vérification envoyée !</h2>
-          <p className="text-gray-600 mb-4">
+          <p className="text-[#5b6b7a] mb-4">
             Vos documents ont été soumis avec succès. Nous les examinerons dans les plus brefs délais.
           </p>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-[#5b6b7a]">
             Vous recevrez une notification dès que votre identité sera vérifiée.
           </p>
         </div>
@@ -110,26 +110,26 @@ export function IdentityVerification({ onNavigate, onVerificationComplete }: Ide
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-[#f4fffe]">
-      <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-100 px-4 py-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#f4fffe] via-white to-[#f4fffe]">
+      <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#e2f5f2] px-4 py-4">
         <button 
           onClick={() => onNavigate?.({ name: 'host-listings' })} 
-          className="text-sm text-gray-500 flex items-center gap-2 hover:text-[#00c9a7] transition-colors group"
+          className="text-sm text-[#5b6b7a] flex items-center gap-2 hover:text-[#00c9a7] transition-colors group"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> 
           Retour
         </button>
         <h1 className="text-xl font-bold text-[#0F2940] mt-2">Vérification d'identité</h1>
-        <p className="text-sm text-gray-500">Vérifiez votre identité pour publier des annonces</p>
+        <p className="text-sm text-[#5b6b7a]">Vérifiez votre identité pour publier des annonces</p>
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
+        <div className="bg-[#fffaeb] border border-[#ffe9a8] rounded-xl p-4 mb-6">
           <div className="flex gap-3">
-            <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0" />
+            <AlertCircle className="w-5 h-5 text-[#a87c10] flex-shrink-0" />
             <div>
-              <h3 className="font-semibold text-yellow-800">Vérification requise</h3>
-              <p className="text-sm text-yellow-700">
+              <h3 className="font-semibold text-[#4a3400]">Vérification requise</h3>
+              <p className="text-sm text-[#6b4e06]">
                 Pour garantir la sécurité de notre communauté, vous devez vérifier votre identité 
                 avant de pouvoir publier des annonces.
               </p>
@@ -139,7 +139,7 @@ export function IdentityVerification({ onNavigate, onVerificationComplete }: Ide
 
         <div className="bg-white rounded-2xl shadow-xl p-6">
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-[#1c3b56] mb-2">
               Type de document
             </label>
             <div className="grid grid-cols-2 gap-3">
@@ -149,10 +149,10 @@ export function IdentityVerification({ onNavigate, onVerificationComplete }: Ide
                 className={`p-3 rounded-xl border-2 transition-all ${
                   documentType === 'cni'
                     ? 'border-[#00c9a7] bg-[#00c9a7]/5'
-                    : 'border-gray-200 hover:border-gray-300'
+                    : 'border-[#e2f5f2] hover:border-[#c9f0e8]'
                 }`}
               >
-                <FileText className="w-5 h-5 mx-auto mb-2 text-gray-600" />
+                <FileText className="w-5 h-5 mx-auto mb-2 text-[#5b6b7a]" />
                 <span className="text-sm font-medium">Carte d'identité (CNI)</span>
               </button>
               <button
@@ -161,10 +161,10 @@ export function IdentityVerification({ onNavigate, onVerificationComplete }: Ide
                 className={`p-3 rounded-xl border-2 transition-all ${
                   documentType === 'passeport'
                     ? 'border-[#00c9a7] bg-[#00c9a7]/5'
-                    : 'border-gray-200 hover:border-gray-300'
+                    : 'border-[#e2f5f2] hover:border-[#c9f0e8]'
                 }`}
               >
-                <FileText className="w-5 h-5 mx-auto mb-2 text-gray-600" />
+                <FileText className="w-5 h-5 mx-auto mb-2 text-[#5b6b7a]" />
                 <span className="text-sm font-medium">Passeport</span>
               </button>
             </div>
@@ -173,11 +173,11 @@ export function IdentityVerification({ onNavigate, onVerificationComplete }: Ide
           <div className="space-y-4">
             {/* Recto */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-[#1c3b56] mb-2">
                 Recto du document *
               </label>
               <div className={`border-2 border-dashed rounded-xl p-4 text-center transition-colors ${
-                frontPreview ? 'border-[#00c9a7] bg-[#00c9a7]/5' : 'border-gray-300 hover:border-[#00c9a7]'
+                frontPreview ? 'border-[#00c9a7] bg-[#00c9a7]/5' : 'border-[#c9f0e8] hover:border-[#00c9a7]'
               }`}>
                 {frontPreview ? (
                   <div className="relative">
@@ -200,9 +200,9 @@ export function IdentityVerification({ onNavigate, onVerificationComplete }: Ide
                       onChange={handleFrontFileChange}
                       className="hidden"
                     />
-                    <Camera className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                    <p className="text-sm text-gray-600">Cliquez pour télécharger le recto</p>
-                    <p className="text-xs text-gray-400 mt-1">JPG, PNG ou PDF (max 5MB)</p>
+                    <Camera className="w-8 h-8 mx-auto mb-2 text-[#5b6b7a]" />
+                    <p className="text-sm text-[#5b6b7a]">Cliquez pour télécharger le recto</p>
+                    <p className="text-xs text-[#5b6b7a] mt-1">JPG, PNG ou PDF (max 5MB)</p>
                   </label>
                 )}
               </div>
@@ -211,11 +211,11 @@ export function IdentityVerification({ onNavigate, onVerificationComplete }: Ide
             {/* Verso (uniquement pour CNI) */}
             {documentType === 'cni' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-[#1c3b56] mb-2">
                   Verso du document *
                 </label>
                 <div className={`border-2 border-dashed rounded-xl p-4 text-center transition-colors ${
-                  backPreview ? 'border-[#00c9a7] bg-[#00c9a7]/5' : 'border-gray-300 hover:border-[#00c9a7]'
+                  backPreview ? 'border-[#00c9a7] bg-[#00c9a7]/5' : 'border-[#c9f0e8] hover:border-[#00c9a7]'
                 }`}>
                   {backPreview ? (
                     <div className="relative">
@@ -238,9 +238,9 @@ export function IdentityVerification({ onNavigate, onVerificationComplete }: Ide
                         onChange={handleBackFileChange}
                         className="hidden"
                       />
-                      <Camera className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                      <p className="text-sm text-gray-600">Cliquez pour télécharger le verso</p>
-                      <p className="text-xs text-gray-400 mt-1">JPG, PNG ou PDF (max 5MB)</p>
+                      <Camera className="w-8 h-8 mx-auto mb-2 text-[#5b6b7a]" />
+                      <p className="text-sm text-[#5b6b7a]">Cliquez pour télécharger le verso</p>
+                      <p className="text-xs text-[#5b6b7a] mt-1">JPG, PNG ou PDF (max 5MB)</p>
                     </label>
                   )}
                 </div>
@@ -257,7 +257,7 @@ export function IdentityVerification({ onNavigate, onVerificationComplete }: Ide
           <button
             onClick={handleSubmit}
             disabled={isLoading || !frontDocument || (documentType === 'cni' && !backDocument)}
-            className="w-full mt-6 bg-gradient-to-r from-[#00c9a7] to-[#0f2940] text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full mt-6 bg-[#00c9a7] text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? 'Envoi en cours...' : 'Soumettre pour vérification'}
           </button>

@@ -23,7 +23,7 @@ export function TypeFilterChips({
             className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-sm font-medium border transition-all ${
               isActive
                 ? 'bg-[#0f2940] border-[#0f2940] text-white'
-                : 'bg-white border-gray-200 text-[#6b7280] hover:border-[#0f2940]/40'
+                : 'bg-white border-[#e2f5f2] text-[#5b6b7a] hover:border-[#0f2940]/40'
             }`}
           >
             {opt.label}

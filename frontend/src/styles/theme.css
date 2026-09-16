@@ -3,22 +3,55 @@
 :root {
   --font-size: 16px;
 
-  /* Bluefin-Immo Brand Colors — palette « Lagune vive » */
+  /* ------------------------------------------------------------------
+     Charte graphique Bluefin Immo (document « Bluefin Immo présentation
+     logo.pdf »). La charte ne compte que TROIS couleurs :
+
+       #0f2940  bleu nuit — couleur de structure (la clé, le mot BLUEFIN)
+       #00c9a7  vert turquoise — couleur d'accent (le toit, le mot IMMO)
+       #f4fffe  blanc cassé — couleur de fond, la respiration
+
+     Tout le reste ci-dessous en dérive : ce sont des variations de teinte
+     ou de luminosité de ces trois valeurs, jamais de nouvelles couleurs.
+     Le gris neutre (#6b7280) qui traînait dans le texte secondaire a été
+     remplacé par un gris légèrement bleuté de la même famille que le marine.
+     ------------------------------------------------------------------ */
+
+  /* Turquoise — accent. À utiliser avec parcimonie : action principale,
+     élément actif, prix. Quand tout est turquoise, plus rien ne ressort. */
   --bluefin-teal: #00c9a7;
   --bluefin-teal-hover: #00b396;
+  --bluefin-teal-press: #009c84;
+  /* Turquoise assombri, lisible en texte sur fond clair (4,8:1 et 7,8:1). */
+  --bluefin-teal-ink: #00806b;
+  --bluefin-teal-ink-strong: #005c4d;
+  /* Surfaces teintées turquoise (fonds de pastille, survols discrets). */
+  --bluefin-teal-surface: #e8faf6;
+  --bluefin-teal-border: #c9f0e8;
+
+  /* Marine — structure : texte, fonds pleins, pieds de page. */
   --bluefin-navy: #0f2940;
+  --bluefin-navy-soft: #1c3b56;
+  --bluefin-navy-deep: #081726;
+  /* Marine éclairci, pour le texte secondaire posé sur fond marine. */
+  --bluefin-navy-muted: #9fb3c4;
+
+  /* Blanc cassé — fond général et respiration. */
   --bluefin-mint: #f4fffe;
   --bluefin-white: #ffffff;
+
   --bluefin-text-body: #0f2940;
-  --bluefin-text-muted: #6b7280;
+  /* Texte secondaire : même famille que le marine, plus clair (4,7:1). */
+  --bluefin-text-muted: #5b6b7a;
   --bluefin-border: #e2f5f2;
 
-  /* Citron : couleur d'éclat, réservée aux signaux forts (badge Certifié,
-     accroche d'un bandeau de ville). Ne jamais l'utiliser comme fond de
-     surface large — elle perd son rôle si elle est partout. */
+  /* Citron : hors charte, volontairement conservé pour UN seul usage — le
+     badge « Certifié ». C'est le signal de confiance du site ; il doit rester
+     distinct du turquoise d'interface, sinon il se confond avec les boutons.
+     Ne jamais l'utiliser ailleurs. */
   --bluefin-citron: #ffc93c;
   --bluefin-citron-ink: #4a3400;
-  /* Bleu profond des bandeaux (promo, bandeau de ville sans photo) */
+  /* Fond des bandeaux pleins (promo, bandeau de ville sans photo). */
   --bluefin-deep: #0f2940;
 
   --background: #ffffff;
@@ -32,7 +65,7 @@
   --secondary: #0f2940;
   --secondary-foreground: #ffffff;
   --muted: #f4fffe;
-  --muted-foreground: #6b7280;
+  --muted-foreground: #5b6b7a;
   --accent: #00c9a7;
   --accent-foreground: #ffffff;
   --destructive: #d4183d;
@@ -40,24 +73,26 @@
   --border: #e2f5f2;
   --input: transparent;
   --input-background: #f4fffe;
-  --switch-background: #cbced4;
+  --switch-background: #cfe3de;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
   --ring: #00c9a7;
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
+  /* Séries de graphiques : une progression turquoise → marine, plus le
+     citron en dernier recours. Aucune couleur étrangère à la charte. */
+  --chart-1: #00c9a7;
+  --chart-2: #00806b;
+  --chart-3: #1c3b56;
+  --chart-4: #7fd9c6;
+  --chart-5: #ffc93c;
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: #030213;
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0f2940;
+  --sidebar-primary: #0f2940;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f4fffe;
+  --sidebar-accent-foreground: #0f2940;
+  --sidebar-border: #e2f5f2;
+  --sidebar-ring: #00c9a7;
 }
 
 .dark {
@@ -90,7 +125,7 @@
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.269 0 0);
@@ -148,19 +183,33 @@
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
 
-  /* Police d'affichage (charte d'origine) — noms de ville et titres de
-     section. EB Garamond 600, comme les titres h1-h6. */
+  /* Police d'affichage — noms de ville, titres de section, prix.
+     Géométrique et resserrée, à l'image de la signature du logo. */
   .font-display {
     font-family: var(--font-display);
-    font-weight: 600;
+    font-weight: 800;
+    letter-spacing: -0.02em;
   }
 
-  /* Repasse un titre en police de corps. Nécessaire sur les h1-h6 qui ne sont
-     pas des titres d'affichage — un nom de logement en serif 15px partirait
-     en graisse synthétique et brouillerait la hiérarchie voulue :
-     serif = ville et section, sans = contenu. */
+  /* Surtitre : petites capitales espacées. C'est la seule façon dont la
+     charte emploie les capitales hors logo — un repère, pas un titre. */
+  .eyebrow {
+    font-family: var(--font-display);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.6875rem;
+    line-height: 1.2;
+  }
+
+  /* Repasse un élément en police de corps (Plus Jakarta Sans) : titres de
+     cartes, libellés, texte long. La police d'affichage reste réservée aux
+     titres de section, aux noms de ville et aux prix — au-delà, son
+     interlettrage serré fatigue la lecture. */
   .font-body {
     font-family: var(--font-primary);
+    font-weight: 500;
+    letter-spacing: normal;
   }
 
   /**

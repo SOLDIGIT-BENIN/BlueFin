@@ -160,16 +160,16 @@ const PropertyCard = ({ property, showDescription = false, onNavigate }: any) =>
       <div className="flex justify-between items-start gap-4">
         <div>
           <h3 className="font-semibold text-[#0F2940]">{property.title}</h3>
-          <p className="text-sm text-gray-500 mt-1">{property.location}</p>
+          <p className="text-sm text-[#5b6b7a] mt-1">{property.location}</p>
         </div>
-        <div className="flex items-center gap-1 text-sm text-gray-500">
+        <div className="flex items-center gap-1 text-sm text-[#5b6b7a]">
           <Star className="w-4 h-4 text-[#00c9a7] fill-current" />
           <span className="font-medium text-[#0F2940]">{property.rating}</span>
           <span>({property.reviews})</span>
         </div>
       </div>
-      {showDescription && <p className="text-sm text-gray-600 mt-2 line-clamp-2">{property.description}</p>}
-      <div className="flex flex-wrap items-center gap-3 mt-3 text-sm text-gray-500">
+      {showDescription && <p className="text-sm text-[#5b6b7a] mt-2 line-clamp-2">{property.description}</p>}
+      <div className="flex flex-wrap items-center gap-3 mt-3 text-sm text-[#5b6b7a]">
         <div className="flex items-center gap-1"><Bed className="w-4 h-4" /><span>{property.beds} lits</span></div>
         <div className="flex items-center gap-1"><Bath className="w-4 h-4" /><span>{property.baths} sdb</span></div>
       </div>
@@ -220,8 +220,8 @@ export default function City({ onNavigate }: { onNavigate?: (route: any) => void
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="max-w-xl text-center p-8">
           <h1 className="text-2xl font-semibold text-[#222222]">Ville introuvable</h1>
-          <p className="mt-4 text-gray-600">La ville demandée n'existe pas.</p>
-          <button onClick={() => navigate(-1)} className="mt-6 rounded-full bg-[#00c9a7] text-[#0F2940] px-6 py-3 font-semibold hover:bg-[#00b892] transition-colors shadow-md">
+          <p className="mt-4 text-[#5b6b7a]">La ville demandée n'existe pas.</p>
+          <button onClick={() => navigate(-1)} className="mt-6 rounded-full bg-[#00c9a7] text-[#0F2940] px-6 py-3 font-semibold hover:bg-[#00b396] transition-colors shadow-md">
             Retour
           </button>
         </div>
@@ -232,7 +232,7 @@ export default function City({ onNavigate }: { onNavigate?: (route: any) => void
   return (
     <div className="bg-white min-h-screen">
       {/* En-tête */}
-      <div className="bg-gradient-to-r from-[#00c9a7]/10 to-[#0f2940]/10 pt-8 pb-12">
+      <div className="bg-[#f4fffe] pt-8 pb-12">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <button
             onClick={() => handleNavigate({ name: 'home' })}
@@ -244,16 +244,16 @@ export default function City({ onNavigate }: { onNavigate?: (route: any) => void
             <MapPin className="w-8 h-8 text-[#00c9a7]" />
             <h1 className="text-3xl sm:text-4xl font-bold text-[#0f2940]">Logements à {category.title}</h1>
           </div>
-          <p className="text-gray-600 text-lg">Découvrez les meilleurs hébergements à {category.title}, Bénin</p>
+          <p className="text-[#5b6b7a] text-lg">Découvrez les meilleurs hébergements à {category.title}, Bénin</p>
         </div>
       </div>
 
       {/* Filtres */}
-      <div className="border-b border-gray-200 sticky top-0 bg-white z-30">
+      <div className="border-b border-[#e2f5f2] sticky top-0 bg-white z-30">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center gap-4">
             <div className="relative">
-              <button onClick={() => setShowFilterDropdown(!showFilterDropdown)} className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-300 hover:border-gray-400 transition-colors">
+              <button onClick={() => setShowFilterDropdown(!showFilterDropdown)} className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#c9f0e8] hover:border-[#9fb3c4] transition-colors">
                 <Filter className="w-4 h-4" />
                 <span className="text-sm">Filtres</span>
                 <ChevronDown className={`w-4 h-4 transition-transform ${showFilterDropdown ? 'rotate-180' : ''}`} />
@@ -261,9 +261,9 @@ export default function City({ onNavigate }: { onNavigate?: (route: any) => void
               {showFilterDropdown && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setShowFilterDropdown(false)}></div>
-                  <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 z-50 py-2">
+                  <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-[#e2f5f2] z-50 py-2">
                     {filters.map(filter => (
-                      <button key={filter} onClick={() => { setSelectedFilter(filter); setShowFilterDropdown(false); }} className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${selectedFilter === filter ? 'text-[#00c9a7] font-medium' : 'text-gray-700'}`}>
+                      <button key={filter} onClick={() => { setSelectedFilter(filter); setShowFilterDropdown(false); }} className={`w-full text-left px-4 py-2 text-sm hover:bg-[#f4fffe] ${selectedFilter === filter ? 'text-[#00c9a7] font-medium' : 'text-[#1c3b56]'}`}>
                         {filter}
                       </button>
                     ))}
@@ -271,7 +271,7 @@ export default function City({ onNavigate }: { onNavigate?: (route: any) => void
                 </>
               )}
             </div>
-            <div className="text-sm text-gray-500">{filteredProperties.length} logements disponibles</div>
+            <div className="text-sm text-[#5b6b7a]">{filteredProperties.length} logements disponibles</div>
           </div>
         </div>
       </div>

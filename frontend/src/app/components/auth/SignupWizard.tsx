@@ -195,8 +195,8 @@ export function SignupWizard({
   };
 
   const input = (hasError?: string) =>
-    `w-full pl-9 pr-3 py-2.5 border rounded-xl text-[15px] focus:outline-none focus:ring-2 focus:ring-[#00c9a7]/40 ${hasError ? 'border-red-500' : 'border-gray-200'}`;
-  const primary = 'w-full bg-gradient-to-r from-[#00c9a7] to-[#0f2940] text-white py-2.5 rounded-xl font-semibold disabled:opacity-50 transition-all hover:shadow-lg inline-flex items-center justify-center gap-2';
+    `w-full pl-9 pr-3 py-2.5 border rounded-xl text-[15px] focus:outline-none focus:ring-2 focus:ring-[#00c9a7]/40 ${hasError ? 'border-red-500' : 'border-[#e2f5f2]'}`;
+  const primary = 'w-full bg-[#00c9a7] text-white py-2.5 rounded-xl font-semibold disabled:opacity-50 transition-all hover:shadow-lg inline-flex items-center justify-center gap-2';
   const FieldError = ({ name }: { name: string }) => (errors[name] ? <p className="text-xs text-red-600 mt-1">{errors[name]}</p> : null);
 
   return (
@@ -209,10 +209,10 @@ export function SignupWizard({
           return (
             <li key={s} className="flex-1 flex flex-col items-center gap-1.5 min-w-0">
               <span
-                className={`h-1.5 w-full rounded-full ${done || active ? 'bg-[#00c9a7]' : 'bg-gray-200'}`}
+                className={`h-1.5 w-full rounded-full ${done || active ? 'bg-[#00c9a7]' : 'bg-[#e2f5f2]'}`}
                 aria-hidden="true"
               />
-              <span className={`text-[11px] truncate ${active ? 'text-[#0F2940] font-semibold' : 'text-gray-400'}`}
+              <span className={`text-[11px] truncate ${active ? 'text-[#0F2940] font-semibold' : 'text-[#5b6b7a]'}`}
                 aria-current={active ? 'step' : undefined}>
                 {done && <Check className="inline w-3 h-3 mr-0.5 -mt-0.5" />}{STEP_LABELS[s]}
               </span>
@@ -226,7 +226,7 @@ export function SignupWizard({
       )}
 
       {step !== 'method' && (
-        <button type="button" onClick={goBack} className="mb-4 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-[#0F2940]">
+        <button type="button" onClick={goBack} className="mb-4 inline-flex items-center gap-1 text-sm text-[#5b6b7a] hover:text-[#0F2940]">
           <ArrowLeft className="w-4 h-4" /> Retour
         </button>
       )}
@@ -235,15 +235,15 @@ export function SignupWizard({
         <div className="space-y-5">
           <GoogleSignInButton text="signup_with" onCredential={handleGoogle} disabled={busy} />
 
-          <div className="flex items-center gap-3 text-xs text-gray-400">
-            <span className="h-px flex-1 bg-gray-200" /> ou avec votre e-mail <span className="h-px flex-1 bg-gray-200" />
+          <div className="flex items-center gap-3 text-xs text-[#5b6b7a]">
+            <span className="h-px flex-1 bg-[#e2f5f2]" /> ou avec votre e-mail <span className="h-px flex-1 bg-[#e2f5f2]" />
           </div>
 
           <form onSubmit={submitEmail} className="space-y-4" noValidate>
             <div>
-              <label htmlFor="signup-email" className="block text-sm font-medium text-gray-700 mb-1">Adresse e-mail</label>
+              <label htmlFor="signup-email" className="block text-sm font-medium text-[#1c3b56] mb-1">Adresse e-mail</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5b6b7a]" />
                 <input id="signup-email" name="email" type="email" autoComplete="email" value={email}
                   onChange={(e) => { setEmail(e.target.value); setEmailTaken(false); clearError('email'); }}
                   placeholder="votre@email.com" className={input(errors.email)} />
@@ -267,25 +267,25 @@ export function SignupWizard({
 
       {step === 'profile' && (
         <form onSubmit={submitProfile} className="space-y-4" noValidate>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-[#5b6b7a]">
             {method === 'google'
               ? <>Compte Google <strong className="text-[#0F2940]">{email}</strong>. Vérifiez vos nom et prénom, ils restent modifiables.</>
               : <>Inscription avec <strong className="text-[#0F2940]">{email}</strong>.</>}
           </p>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label htmlFor="signup-first" className="block text-sm font-medium text-gray-700 mb-1">Prénom</label>
+              <label htmlFor="signup-first" className="block text-sm font-medium text-[#1c3b56] mb-1">Prénom</label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5b6b7a]" />
                 <input id="signup-first" name="firstName" autoComplete="given-name" value={firstName}
                   onChange={(e) => { setFirstName(e.target.value); clearError('first_name'); }} className={input(errors.first_name)} />
               </div>
               <FieldError name="first_name" />
             </div>
             <div>
-              <label htmlFor="signup-last" className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+              <label htmlFor="signup-last" className="block text-sm font-medium text-[#1c3b56] mb-1">Nom</label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5b6b7a]" />
                 <input id="signup-last" name="lastName" autoComplete="family-name" value={lastName}
                   onChange={(e) => { setLastName(e.target.value); clearError('last_name'); }} className={input(errors.last_name)} />
               </div>
@@ -293,15 +293,15 @@ export function SignupWizard({
             </div>
           </div>
           <div>
-            <label htmlFor="signup-phone" className="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
+            <label htmlFor="signup-phone" className="block text-sm font-medium text-[#1c3b56] mb-1">Téléphone</label>
             <div className="relative">
-              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5b6b7a]" />
               <input id="signup-phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" value={phone}
                 onChange={(e) => { setPhone(e.target.value); clearError('phone'); }}
                 placeholder="+229 01 97 00 00 00" className={input(errors.phone)} />
             </div>
             <FieldError name="phone" />
-            {!errors.phone && <p className="text-xs text-gray-400 mt-1">Pour vos confirmations de réservation et le paiement Mobile Money.</p>}
+            {!errors.phone && <p className="text-xs text-[#5b6b7a] mt-1">Pour vos confirmations de réservation et le paiement Mobile Money.</p>}
           </div>
           <button type="submit" disabled={busy} className={primary}>
             {busy && <Loader2 className="w-4 h-4 animate-spin" />} Continuer
@@ -312,26 +312,26 @@ export function SignupWizard({
       {step === 'security' && (
         <form onSubmit={submitSecurity} className="space-y-4" noValidate>
           <div>
-            <label htmlFor="signup-password" className="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
+            <label htmlFor="signup-password" className="block text-sm font-medium text-[#1c3b56] mb-1">Mot de passe</label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5b6b7a]" />
               <input id="signup-password" name="password" type={showPassword ? 'text' : 'password'} autoComplete="new-password"
                 value={password} onChange={(e) => { setPassword(e.target.value); clearError('password'); }}
                 className={`${input(errors.password)} pr-10`} />
               <button type="button" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#5b6b7a]">
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
             <FieldError name="password" />
-            <p className={`text-xs mt-1 ${password.length >= 8 ? 'text-emerald-600' : 'text-gray-400'}`}>
+            <p className={`text-xs mt-1 ${password.length >= 8 ? 'text-emerald-600' : 'text-[#5b6b7a]'}`}>
               {password.length >= 8 ? <><Check className="inline w-3 h-3" /> 8 caractères minimum</> : '8 caractères minimum'}
             </p>
           </div>
           <div>
-            <label htmlFor="signup-confirm" className="block text-sm font-medium text-gray-700 mb-1">Confirmer le mot de passe</label>
+            <label htmlFor="signup-confirm" className="block text-sm font-medium text-[#1c3b56] mb-1">Confirmer le mot de passe</label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5b6b7a]" />
               <input id="signup-confirm" name="confirmPassword" type={showPassword ? 'text' : 'password'} autoComplete="new-password"
                 value={confirm} onChange={(e) => { setConfirm(e.target.value); clearError('confirm'); }} className={input(errors.confirm)} />
             </div>
@@ -343,7 +343,7 @@ export function SignupWizard({
 
       {step === 'review' && (
         <div className="space-y-4">
-          <dl className="rounded-2xl border border-gray-200 divide-y divide-gray-100 text-sm">
+          <dl className="rounded-2xl border border-[#e2f5f2] divide-y divide-[#e2f5f2] text-sm">
             {[
               ['E-mail', email, 'method'],
               ['Nom', `${firstName.trim()} ${lastName.trim()}`, 'profile'],
@@ -352,7 +352,7 @@ export function SignupWizard({
             ].map(([label, value, target]) => (
               <div key={label} className="flex items-center justify-between gap-3 px-4 py-3">
                 <div className="min-w-0">
-                  <dt className="text-xs text-gray-400">{label}</dt>
+                  <dt className="text-xs text-[#5b6b7a]">{label}</dt>
                   <dd className="text-[#0F2940] font-medium truncate">{value}</dd>
                 </div>
                 {!(method === 'google' && label === 'E-mail') && (
@@ -364,7 +364,7 @@ export function SignupWizard({
             ))}
           </dl>
 
-          <label className="flex items-start gap-2.5 text-sm text-gray-600 cursor-pointer">
+          <label className="flex items-start gap-2.5 text-sm text-[#5b6b7a] cursor-pointer">
             <input type="checkbox" checked={acceptTerms} onChange={(e) => { setAcceptTerms(e.target.checked); clearError('terms'); }}
               className="mt-0.5 w-4 h-4 accent-[#00c9a7]" />
             <span>

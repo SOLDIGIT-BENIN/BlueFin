@@ -11,13 +11,16 @@ import { ImageIcon } from 'lucide-react';
  * La teinte est tirée de l'identifiant de l'annonce : stable d'un rendu à
  * l'autre (pas de scintillement), mais variée d'une carte à l'autre.
  */
+// Teintes désaturées dérivées du marine et du turquoise de la charte : assez
+// sourdes pour ne pas être prises pour une erreur, assez proches de la marque
+// pour qu'une grille sans photo reste « Bluefin » plutôt que grise.
 const TONES = [
-  '#b9a48c', // taupe chaud
-  '#8d9aa6', // bleu poussiéreux
-  '#a89a86', // sable
-  '#7f8f92', // ardoise sauge
-  '#9fb3b8', // bleu-gris pâle
-  '#a9b8a8', // sauge
+  '#bcd2d0', // menthe grisée
+  '#9fb3c4', // marine éclairci
+  '#a8c4c0', // turquoise sourd
+  '#8ba3b2', // ardoise marine
+  '#c6d9d6', // menthe pâle
+  '#7f97a6', // marine moyen
 ];
 
 function toneFor(seed: string | number): string {

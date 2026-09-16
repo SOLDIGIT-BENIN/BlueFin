@@ -63,7 +63,7 @@ export function CityCarousel({
             <span
               key={item.city}
               className={`h-1.5 rounded-full transition-all ${
-                i === active ? 'w-5 bg-[#ffc93c]' : 'w-1.5 bg-white/45'
+                i === active ? 'w-5 bg-[#00c9a7]' : 'w-1.5 bg-white/45'
               }`}
             />
           ))}

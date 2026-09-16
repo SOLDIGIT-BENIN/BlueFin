@@ -81,16 +81,16 @@ function SectionsSkeleton() {
       {[0, 1].map((row) => (
         <div key={row}>
           <div className="flex items-center justify-between px-4 mb-3">
-            <div className="h-[19px] w-32 bg-gray-200 rounded animate-pulse" />
-            <div className="w-9 h-9 rounded-full bg-gray-100 animate-pulse" />
+            <div className="h-[19px] w-32 bg-[#e2f5f2] rounded animate-pulse" />
+            <div className="w-9 h-9 rounded-full bg-[#e8faf6] animate-pulse" />
           </div>
           <div className="flex gap-4 overflow-hidden pl-4">
             {[0, 1].map((i) => (
               <div key={i} className="w-[calc(100%-72px)] max-w-[300px] sm:w-[280px] flex-shrink-0 animate-pulse">
-                <div className="aspect-[4/3] rounded-2xl bg-gray-200" />
-                <div className="h-4 bg-gray-200 rounded w-3/4 mt-2.5" />
-                <div className="h-3 bg-gray-200 rounded w-1/2 mt-1.5" />
-                <div className="h-4 bg-gray-200 rounded w-2/5 mt-2" />
+                <div className="aspect-[4/3] rounded-2xl bg-[#e2f5f2]" />
+                <div className="h-4 bg-[#e2f5f2] rounded w-3/4 mt-2.5" />
+                <div className="h-3 bg-[#e2f5f2] rounded w-1/2 mt-1.5" />
+                <div className="h-4 bg-[#e2f5f2] rounded w-2/5 mt-2" />
               </div>
             ))}
           </div>
@@ -290,7 +290,7 @@ export function HomePage({ onNavigate }: { onNavigate?: (route: any) => void }) 
             {hotelsLoading ? (
               <SectionsSkeleton />
             ) : hotelCitySections.length === 0 ? (
-              <p className="px-4 py-10 text-center text-sm text-gray-500">Aucun hôtel promu pour le moment.</p>
+              <p className="px-4 py-10 text-center text-sm text-[#5b6b7a]">Aucun hôtel promu pour le moment.</p>
             ) : (
               hotelCitySections.map(([city, listings]) => (
                 <CitySection
@@ -311,7 +311,7 @@ export function HomePage({ onNavigate }: { onNavigate?: (route: any) => void }) 
             {experiencesLoading ? (
               <SectionsSkeleton />
             ) : experienceListings.length === 0 ? (
-              <p className="px-4 py-10 text-center text-sm text-gray-500">Aucune expérience disponible pour le moment.</p>
+              <p className="px-4 py-10 text-center text-sm text-[#5b6b7a]">Aucune expérience disponible pour le moment.</p>
             ) : (
               <CitySection
                 title="Expériences à vivre"
@@ -329,7 +329,7 @@ export function HomePage({ onNavigate }: { onNavigate?: (route: any) => void }) 
             {servicesLoading ? (
               <SectionsSkeleton />
             ) : serviceListings.length === 0 ? (
-              <p className="px-4 py-10 text-center text-sm text-gray-500">Aucun service disponible pour le moment.</p>
+              <p className="px-4 py-10 text-center text-sm text-[#5b6b7a]">Aucun service disponible pour le moment.</p>
             ) : (
               <CitySection
                 title="Services disponibles"

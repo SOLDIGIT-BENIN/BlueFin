@@ -102,10 +102,10 @@ export function AdminPayments() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white rounded-2xl p-6 border border-[#e2f5f2]">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-yellow-100 rounded-xl">
-              <DollarSign className="w-5 h-5 text-yellow-600" />
+            <div className="p-2 bg-[#fff3cd] rounded-xl">
+              <DollarSign className="w-5 h-5 text-[#a87c10]" />
             </div>
-            <h3 className="text-sm font-medium text-[#6b7280]">En attente de paiement</h3>
+            <h3 className="text-sm font-medium text-[#5b6b7a]">En attente de paiement</h3>
           </div>
           <p className="text-2xl font-bold text-[#0f2940]">
             {getTotalPending().toLocaleString()} €
@@ -117,7 +117,7 @@ export function AdminPayments() {
             <div className="p-2 bg-green-100 rounded-xl">
               <CheckCircle className="w-5 h-5 text-green-600" />
             </div>
-            <h3 className="text-sm font-medium text-[#6b7280]">Déjà payé ce mois</h3>
+            <h3 className="text-sm font-medium text-[#5b6b7a]">Déjà payé ce mois</h3>
           </div>
           <p className="text-2xl font-bold text-[#0f2940]">
             {getTotalPaidThisMonth().toLocaleString()} €
@@ -126,10 +126,10 @@ export function AdminPayments() {
 
         <div className="bg-white rounded-2xl p-6 border border-[#e2f5f2]">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-blue-100 rounded-xl">
-              <Users className="w-5 h-5 text-blue-600" />
+            <div className="p-2 bg-[#e8faf6] rounded-xl">
+              <Users className="w-5 h-5 text-[#00806b]" />
             </div>
-            <h3 className="text-sm font-medium text-[#6b7280]">Hôtes actifs</h3>
+            <h3 className="text-sm font-medium text-[#5b6b7a]">Hôtes actifs</h3>
           </div>
           <p className="text-2xl font-bold text-[#0f2940]">
             {payments.length}
@@ -151,7 +151,7 @@ export function AdminPayments() {
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
                 filter === option.value
                   ? 'bg-[#00c9a7] text-white'
-                  : 'bg-white text-[#6b7280] hover:bg-gray-50'
+                  : 'bg-white text-[#5b6b7a] hover:bg-[#f4fffe]'
               }`}
             >
               {option.label}
@@ -164,7 +164,7 @@ export function AdminPayments() {
       <div className="bg-white rounded-2xl border border-[#e2f5f2] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-[#f8fffe] border-b border-[#e2f5f2]">
+            <thead className="bg-[#f4fffe] border-b border-[#e2f5f2]">
               <tr>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-[#0f2940]">Hôte</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-[#0f2940]">Méthode</th>
@@ -177,10 +177,10 @@ export function AdminPayments() {
             </thead>
             <tbody className="divide-y divide-[#e2f5f2]">
               {filteredPayments.map((payment) => (
-                <tr key={payment.id} className="hover:bg-[#f8fffe] transition-colors">
+                <tr key={payment.id} className="hover:bg-[#f4fffe] transition-colors">
                   <td className="px-6 py-4">
                     <div className="font-medium text-[#0f2940]">{payment.hostName}</div>
-                    <div className="text-xs text-[#6b7280]">{payment.id}</div>
+                    <div className="text-xs text-[#5b6b7a]">{payment.id}</div>
                   </td>
                   <td className="px-6 py-4">
                     <span className="text-sm text-[#0f2940]">
@@ -193,7 +193,7 @@ export function AdminPayments() {
                     <div className="font-semibold text-[#0f2940]">
                       {payment.totalWeekAmount.toLocaleString()} €
                     </div>
-                    <div className="text-xs text-[#6b7280]">
+                    <div className="text-xs text-[#5b6b7a]">
                       {payment.weeklyReservations} réservations
                     </div>
                   </td>
@@ -201,13 +201,13 @@ export function AdminPayments() {
                     <div className="font-semibold text-[#0f2940]">
                       {payment.totalMonthAmount.toLocaleString()} €
                     </div>
-                    <div className="text-xs text-[#6b7280]">
+                    <div className="text-xs text-[#5b6b7a]">
                       {payment.monthlyReservations} réservations
                     </div>
                   </td>
                   <td className="px-6 py-4 text-center">
                     <span className="inline-flex items-center gap-1 text-sm">
-                      <Calendar className="w-4 h-4 text-[#6b7280]" />
+                      <Calendar className="w-4 h-4 text-[#5b6b7a]" />
                       {payment.payments?.length || 0}
                     </span>
                   </td>
@@ -218,7 +218,7 @@ export function AdminPayments() {
                         Payé
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm">
+                      <span className="inline-flex items-center gap-1 px-3 py-1 bg-[#fff3cd] text-[#6b4e06] rounded-full text-sm">
                         <XCircle className="w-4 h-4" />
                         En attente
                       </span>
@@ -234,7 +234,7 @@ export function AdminPayments() {
                             if (ref) markAsPaid(historyId, ref);
                           }
                         }}
-                        className="px-4 py-2 bg-[#00c9a7] text-white rounded-xl hover:bg-[#00b898] transition-colors text-sm font-medium"
+                        className="px-4 py-2 bg-[#00c9a7] text-white rounded-xl hover:bg-[#00b396] transition-colors text-sm font-medium"
                       >
                         Marquer payé
                       </button>

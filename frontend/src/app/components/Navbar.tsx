@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Search, Menu, X, MapPin, Home, Star, Server, LogIn, Calendar, Globe, Sparkles, UserPlus, ChevronLeft, ChevronRight, Users, Plus, Minus, Baby, Dog, Info, LogOut } from 'lucide-react';
 import type { Route } from '../router';
-import Logo from '../assets/Bluefin Immo_01.jpg.jpeg';
+import { BluefinLogo } from './brand/BluefinLogo';
 import propertyService from '../../services/property.service';
 import { useAuth } from '../../contexts/AuthContext';
 import { ProfileMenu, UserAvatar, accountLinks } from './account/ProfileMenu';
@@ -75,9 +75,9 @@ export function Navbar({
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const navItems = [
-    { name: 'Logement', icon: Home, route: { name: 'home' } as Route, gradient: 'from-emerald-400 to-teal-500' },
-    { name: 'Expérience', icon: Star, route: { name: 'experience' } as Route, gradient: 'from-amber-400 to-orange-500' },
-    { name: 'Service', icon: Server, route: { name: 'services' } as Route, gradient: 'from-blue-400 to-indigo-500' },
+    { name: 'Logement', icon: Home, route: { name: 'home' } as Route, gradient: 'from-emerald-400 to-[#00c9a7]' },
+    { name: 'Expérience', icon: Star, route: { name: 'experience' } as Route, gradient: 'from-[#ffc93c] to-[#ffc93c]' },
+    { name: 'Service', icon: Server, route: { name: 'services' } as Route, gradient: 'from-[#00c9a7] to-[#00c9a7]' },
   ];
 
   const isActive = (itemName: string) => {
@@ -359,18 +359,18 @@ export function Navbar({
   };
 
   return (
-    <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 w-full">
+    <nav className="bg-white border-b border-[#e2f5f2] sticky top-0 z-50 w-full">
       <div className="w-full px-4 sm:px-6 lg:px-8 py-3 lg:py-4">
         
         {/* Première ligne - Logo et navigation */}
         <div className="flex items-center justify-between gap-4">
           {logoInSidebar && <span aria-hidden className="hidden lg:block w-px" />}
           <button onClick={onGoHome} className={`flex items-center gap-3 flex-shrink-0 group ${logoInSidebar ? 'lg:hidden' : ''}`}>
-            <img src={Logo} alt="Logo" className="w-10 h-10 lg:w-12 lg:h-12 object-contain rounded-xl shadow-md group-hover:shadow-lg transition-all" />
-            <div className="hidden sm:block">
-              <div className="font-bold text-lg lg:text-xl text-[#0f2940]">Bluefin-Immo</div>
-              <div className="text-xs text-[#00c9a7]">L'hébergement au Bénin</div>
-            </div>
+            <BluefinLogo
+              orientation="horizontal"
+              markClassName="h-8 lg:h-9 w-auto"
+              wordmarkClassName="hidden sm:block h-[0.85rem] lg:h-[0.95rem] w-auto"
+            />
           </button>
 
           {/* Navigation Desktop */}
@@ -381,8 +381,8 @@ export function Navbar({
                 onClick={() => onNavigate?.(item.route)}
                 className={`px-4 py-2 rounded-full transition-all text-sm flex items-center gap-2
                   ${isActive(item.name) 
-                    ? 'bg-gradient-to-r from-[#00c9a7] to-[#00b396] text-white shadow-md' 
-                    : 'text-[#0f2940] hover:bg-gray-50'
+                    ? 'bg-[#00c9a7] text-white shadow-md' 
+                    : 'text-[#0f2940] hover:bg-[#f4fffe]'
                   }`}
               >
                 <item.icon className="w-4 h-4" />
@@ -394,7 +394,7 @@ export function Navbar({
           {/* Actions droite */}
           <div className="hidden lg:flex items-center gap-3">
             {showBecomeHost && (
-              <button onClick={() => onNavigate?.({ name: 'become-host' })} className="px-5 py-2 rounded-full bg-[#0f2940] text-white text-sm hover:bg-[#1a3a52] transition">
+              <button onClick={() => onNavigate?.({ name: 'become-host' })} className="px-5 py-2 rounded-full bg-[#0f2940] text-white text-sm hover:bg-[#1c3b56] transition">
                 Devenir hôte
               </button>
             )}
@@ -413,10 +413,10 @@ export function Navbar({
             {/* Barre de recherche mobile simplifiée */}
             <button
               onClick={() => setMobileSearchActive(true)}
-              className="flex-1 flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-full px-4 py-2.5 shadow-sm hover:shadow-md transition-all"
+              className="flex-1 flex items-center gap-2 bg-[#f4fffe] border border-[#e2f5f2] rounded-full px-4 py-2.5 shadow-sm hover:shadow-md transition-all"
             >
               <Search className="w-4 h-4 text-[#00c9a7] flex-shrink-0" />
-              <span className="text-sm text-gray-600 truncate">
+              <span className="text-sm text-[#5b6b7a] truncate">
                 {destination || "Où allez-vous ?"}
               </span>
             </button>
@@ -426,7 +426,7 @@ export function Navbar({
               className={`relative p-2.5 rounded-full transition-all duration-300 shadow-lg flex-shrink-0 ${
                 menuOpen 
                   ? 'bg-gradient-to-r from-rose-400 to-red-500 shadow-rose-400/30' 
-                  : 'bg-gradient-to-r from-[#0f2940] to-[#1a3a52] shadow-[#0f2940]/30'
+                  : 'bg-[#0f2940] shadow-[#0f2940]/30'
               } hover:scale-105`}
             >
               {menuOpen ? (
@@ -440,17 +440,17 @@ export function Navbar({
 
         {/* Barre de recherche Desktop */}
         <div className="hidden lg:flex justify-center mt-6" ref={searchRef}>
-          <div className="bg-white rounded-full shadow-xl border border-gray-200 hover:shadow-2xl transition-all w-full max-w-3xl">
+          <div className="bg-white rounded-full shadow-xl border border-[#e2f5f2] hover:shadow-2xl transition-all w-full max-w-3xl">
             <div className="flex items-center p-1">
               
               {/* Bouton Destination */}
               <div className="relative flex-[1.3]">
                 <button
                   onClick={() => setActiveTab(activeTab === "destination" ? null : "destination")}
-                  className={`w-full text-left px-5 py-3 rounded-full transition-all ${activeTab === "destination" ? "bg-gray-50" : "hover:bg-gray-50"}`}
+                  className={`w-full text-left px-5 py-3 rounded-full transition-all ${activeTab === "destination" ? "bg-[#f4fffe]" : "hover:bg-[#f4fffe]"}`}
                 >
-                  <div className="text-xs font-medium text-gray-500">Destination</div>
-                  <div className="text-sm text-gray-900 truncate flex items-center gap-2">
+                  <div className="text-xs font-medium text-[#5b6b7a]">Destination</div>
+                  <div className="text-sm text-[#0f2940] truncate flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-[#00c9a7]" />
                     {destination || "Rechercher une destination"}
                   </div>
@@ -458,11 +458,11 @@ export function Navbar({
                 
                 {/* Popup Destination */}
                 {activeTab === "destination" && (
-                  <div ref={destinationPopupRef} className="absolute top-full left-0 mt-2 w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 z-50">
+                  <div ref={destinationPopupRef} className="absolute top-full left-0 mt-2 w-96 bg-white rounded-2xl shadow-2xl border border-[#e2f5f2] z-50">
                     <div className="p-4">
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="font-semibold">Où souhaitez-vous aller ?</h3>
-                        <button onClick={() => setActiveTab(null)} className="p-1 rounded-full hover:bg-gray-100">
+                        <button onClick={() => setActiveTab(null)} className="p-1 rounded-full hover:bg-[#e8faf6]">
                           <X className="w-4 h-4" />
                         </button>
                       </div>
@@ -470,26 +470,26 @@ export function Navbar({
                         <input
                           type="text"
                           placeholder="Rechercher une destination au Bénin"
-                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
+                          className="w-full px-4 py-3 border border-[#e2f5f2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
                           value={destination}
                           onChange={(e) => handleRealTimeSearch(e.target.value)}
                           autoFocus
                         />
                         {destination && searchSuggestions.length === 0 && (
                           <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                            <div className="animate-pulse text-xs text-gray-400">Recherche...</div>
+                            <div className="animate-pulse text-xs text-[#5b6b7a]">Recherche...</div>
                           </div>
                         )}
                       </div>
                       
                       {searchSuggestions.length > 0 && (
                         <div className="mt-4 space-y-1 max-h-64 overflow-y-auto">
-                          <div className="text-xs font-semibold text-gray-500 mb-2">Villes trouvées</div>
+                          <div className="text-xs font-semibold text-[#5b6b7a] mb-2">Villes trouvées</div>
                           {searchSuggestions.map((place) => (
                             <button
                               key={place}
                               onClick={() => selectSuggestion(place)}
-                              className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 text-sm flex items-center gap-2"
+                              className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#f4fffe] text-sm flex items-center gap-2"
                             >
                               <MapPin className="w-4 h-4 text-[#00c9a7]" />
                               <span>{place}</span>
@@ -500,12 +500,12 @@ export function Navbar({
                       
                       {!destination && (
                         <div className="mt-4 space-y-1 max-h-64 overflow-y-auto">
-                          <div className="text-xs font-semibold text-gray-500 mb-2">Destinations populaires</div>
+                          <div className="text-xs font-semibold text-[#5b6b7a] mb-2">Destinations populaires</div>
                           {destinationsList.slice(0, 10).map((place) => (
                             <button
                               key={place}
                               onClick={() => selectSuggestion(place)}
-                              className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 text-sm"
+                              className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#f4fffe] text-sm"
                             >
                               {place}
                             </button>
@@ -517,46 +517,46 @@ export function Navbar({
                 )}
               </div>
 
-              <div className="w-px h-8 bg-gray-200"></div>
+              <div className="w-px h-8 bg-[#e2f5f2]"></div>
 
               {/* Bouton Dates */}
               <div className="relative flex-1">
                 <button
                   onClick={() => setActiveTab(activeTab === "dates" ? null : "dates")}
-                  className={`w-full text-left px-5 py-3 rounded-full transition-all ${activeTab === "dates" ? "bg-gray-50" : "hover:bg-gray-50"}`}
+                  className={`w-full text-left px-5 py-3 rounded-full transition-all ${activeTab === "dates" ? "bg-[#f4fffe]" : "hover:bg-[#f4fffe]"}`}
                 >
-                  <div className="text-xs font-medium text-gray-500">Dates</div>
-                  <div className="text-sm text-gray-900 flex items-center gap-2">
+                  <div className="text-xs font-medium text-[#5b6b7a]">Dates</div>
+                  <div className="text-sm text-[#0f2940] flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-[#00c9a7]" />
                     {dateLabel()}
                   </div>
                 </button>
                 
                 {activeTab === "dates" && (
-                  <div ref={datesPopupRef} className="absolute top-full left-0 mt-2 w-[640px] bg-white rounded-2xl shadow-2xl border border-gray-200 z-50">
+                  <div ref={datesPopupRef} className="absolute top-full left-0 mt-2 w-[640px] bg-white rounded-2xl shadow-2xl border border-[#e2f5f2] z-50">
                     <div className="p-5">
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="font-semibold">Sélectionnez vos dates</h3>
-                        <button onClick={() => setActiveTab(null)} className="p-1 rounded-full hover:bg-gray-100">
+                        <button onClick={() => setActiveTab(null)} className="p-1 rounded-full hover:bg-[#e8faf6]">
                           <X className="w-4 h-4" />
                         </button>
                       </div>
                       
                       <div className="flex items-center justify-between mb-4">
-                        <button onClick={() => changeMonth(-1)} className="p-2 rounded-full hover:bg-gray-100">
+                        <button onClick={() => changeMonth(-1)} className="p-2 rounded-full hover:bg-[#e8faf6]">
                           <ChevronLeft className="w-5 h-5" />
                         </button>
                         <span className="font-semibold text-base">
                           {currentMonth.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
                         </span>
-                        <button onClick={() => changeMonth(1)} className="p-2 rounded-full hover:bg-gray-100">
+                        <button onClick={() => changeMonth(1)} className="p-2 rounded-full hover:bg-[#e8faf6]">
                           <ChevronRight className="w-5 h-5" />
                         </button>
                       </div>
                       
                       <div className="grid grid-cols-7 gap-1 mb-2">
                         {weekDays.map(day => (
-                          <div key={day} className="text-center text-xs font-medium text-gray-500 py-2">{day}</div>
+                          <div key={day} className="text-center text-xs font-medium text-[#5b6b7a] py-2">{day}</div>
                         ))}
                       </div>
                       
@@ -573,12 +573,12 @@ export function Navbar({
                               onClick={() => !isPast && handleDateSelect(day.date)}
                               disabled={isPast}
                               className={`relative aspect-square rounded-full text-sm transition-all
-                                ${isPast && 'text-gray-300 cursor-not-allowed'}
-                                ${!day.isCurrentMonth && !isPast && 'text-gray-300'}
+                                ${isPast && 'text-[#9fb3c4] cursor-not-allowed'}
+                                ${!day.isCurrentMonth && !isPast && 'text-[#9fb3c4]'}
                                 ${isSelected && 'bg-[#00c9a7] text-white shadow-md'}
                                 ${inRange && !isSelected && 'bg-[#00c9a7]/10'}
                                 ${isToday && !isSelected && !inRange && !isPast && 'border-2 border-[#00c9a7]'}
-                                ${!isSelected && !inRange && !isPast && day.isCurrentMonth && 'hover:bg-gray-100'}`}
+                                ${!isSelected && !inRange && !isPast && day.isCurrentMonth && 'hover:bg-[#e8faf6]'}`}
                             >
                               {day.date.getDate()}
                             </button>
@@ -586,10 +586,10 @@ export function Navbar({
                         })}
                       </div>
                       
-                      <div className="mt-5 pt-4 border-t border-gray-100 flex justify-between">
+                      <div className="mt-5 pt-4 border-t border-[#e2f5f2] flex justify-between">
                         <button 
                           onClick={() => { setCheckIn(""); setCheckOut(""); }}
-                          className="text-sm text-gray-500 hover:text-[#00c9a7] transition"
+                          className="text-sm text-[#5b6b7a] hover:text-[#00c9a7] transition"
                         >
                           Effacer les dates
                         </button>
@@ -605,27 +605,27 @@ export function Navbar({
                 )}
               </div>
 
-              <div className="w-px h-8 bg-gray-200"></div>
+              <div className="w-px h-8 bg-[#e2f5f2]"></div>
 
               {/* Bouton Voyageurs */}
               <div className="relative flex-1">
                 <button
                   onClick={() => setActiveTab(activeTab === "guests" ? null : "guests")}
-                  className={`w-full text-left px-5 py-3 rounded-full transition-all ${activeTab === "guests" ? "bg-gray-50" : "hover:bg-gray-50"}`}
+                  className={`w-full text-left px-5 py-3 rounded-full transition-all ${activeTab === "guests" ? "bg-[#f4fffe]" : "hover:bg-[#f4fffe]"}`}
                 >
-                  <div className="text-xs font-medium text-gray-500">Voyageurs</div>
-                  <div className="text-sm text-gray-900 flex items-center gap-2">
+                  <div className="text-xs font-medium text-[#5b6b7a]">Voyageurs</div>
+                  <div className="text-sm text-[#0f2940] flex items-center gap-2">
                     <Users className="w-4 h-4 text-[#00c9a7]" />
                     {guestLabel()}
                   </div>
                 </button>
                 
                 {activeTab === "guests" && (
-                  <div ref={guestsPopupRef} className="absolute top-full right-0 mt-2 w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 z-50">
+                  <div ref={guestsPopupRef} className="absolute top-full right-0 mt-2 w-96 bg-white rounded-2xl shadow-2xl border border-[#e2f5f2] z-50">
                     <div className="p-5">
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="font-semibold">Voyageurs</h3>
-                        <button onClick={() => setActiveTab(null)} className="p-1 rounded-full hover:bg-gray-100">
+                        <button onClick={() => setActiveTab(null)} className="p-1 rounded-full hover:bg-[#e8faf6]">
                           <X className="w-4 h-4" />
                         </button>
                       </div>
@@ -634,14 +634,14 @@ export function Navbar({
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="font-medium text-sm">Adultes</p>
-                            <p className="text-xs text-gray-500">13 ans et plus</p>
+                            <p className="text-xs text-[#5b6b7a]">13 ans et plus</p>
                           </div>
                           <div className="flex items-center gap-4">
-                            <button onClick={() => setAdults(Math.max(1, adults - 1))} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] hover:bg-[#00c9a7]/5 transition">
+                            <button onClick={() => setAdults(Math.max(1, adults - 1))} className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] hover:bg-[#00c9a7]/5 transition">
                               <Minus className="w-3 h-3" />
                             </button>
                             <span className="w-8 text-center text-base font-medium">{adults}</span>
-                            <button onClick={() => setAdults(adults + 1)} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] hover:bg-[#00c9a7]/5 transition">
+                            <button onClick={() => setAdults(adults + 1)} className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] hover:bg-[#00c9a7]/5 transition">
                               <Plus className="w-3 h-3" />
                             </button>
                           </div>
@@ -650,14 +650,14 @@ export function Navbar({
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="font-medium text-sm">Enfants</p>
-                            <p className="text-xs text-gray-500">De 2 à 12 ans</p>
+                            <p className="text-xs text-[#5b6b7a]">De 2 à 12 ans</p>
                           </div>
                           <div className="flex items-center gap-4">
-                            <button onClick={() => setChildren(Math.max(0, children - 1))} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] hover:bg-[#00c9a7]/5 transition">
+                            <button onClick={() => setChildren(Math.max(0, children - 1))} className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] hover:bg-[#00c9a7]/5 transition">
                               <Minus className="w-3 h-3" />
                             </button>
                             <span className="w-8 text-center text-base font-medium">{children}</span>
-                            <button onClick={() => setChildren(children + 1)} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] hover:bg-[#00c9a7]/5 transition">
+                            <button onClick={() => setChildren(children + 1)} className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] hover:bg-[#00c9a7]/5 transition">
                               <Plus className="w-3 h-3" />
                             </button>
                           </div>
@@ -669,14 +669,14 @@ export function Navbar({
                               <Baby className="w-4 h-4 text-[#00c9a7]" />
                               Bébés
                             </p>
-                            <p className="text-xs text-gray-500">Moins de 2 ans</p>
+                            <p className="text-xs text-[#5b6b7a]">Moins de 2 ans</p>
                           </div>
                           <div className="flex items-center gap-4">
-                            <button onClick={() => setBabies(Math.max(0, babies - 1))} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] hover:bg-[#00c9a7]/5 transition">
+                            <button onClick={() => setBabies(Math.max(0, babies - 1))} className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] hover:bg-[#00c9a7]/5 transition">
                               <Minus className="w-3 h-3" />
                             </button>
                             <span className="w-8 text-center text-base font-medium">{babies}</span>
-                            <button onClick={() => setBabies(babies + 1)} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] hover:bg-[#00c9a7]/5 transition">
+                            <button onClick={() => setBabies(babies + 1)} className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] hover:bg-[#00c9a7]/5 transition">
                               <Plus className="w-3 h-3" />
                             </button>
                           </div>
@@ -688,28 +688,28 @@ export function Navbar({
                               <Dog className="w-4 h-4 text-[#00c9a7]" />
                               Animaux domestiques
                             </p>
-                            <p className="text-xs text-gray-500">Vous voyagez avec un animal ?</p>
+                            <p className="text-xs text-[#5b6b7a]">Vous voyagez avec un animal ?</p>
                           </div>
                           <div className="flex items-center gap-4">
-                            <button onClick={() => setPets(Math.max(0, pets - 1))} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] hover:bg-[#00c9a7]/5 transition">
+                            <button onClick={() => setPets(Math.max(0, pets - 1))} className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] hover:bg-[#00c9a7]/5 transition">
                               <Minus className="w-3 h-3" />
                             </button>
                             <span className="w-8 text-center text-base font-medium">{pets}</span>
-                            <button onClick={() => setPets(pets + 1)} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#00c9a7] hover:bg-[#00c9a7]/5 transition">
+                            <button onClick={() => setPets(pets + 1)} className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#00c9a7] hover:bg-[#00c9a7]/5 transition">
                               <Plus className="w-3 h-3" />
                             </button>
                           </div>
                         </div>
                       </div>
                       
-                      <div className="mt-4 p-3 bg-blue-50 rounded-lg flex items-start gap-2">
-                        <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                        <p className="text-xs text-blue-700">
+                      <div className="mt-4 p-3 bg-[#f4fffe] rounded-lg flex items-start gap-2">
+                        <Info className="w-4 h-4 text-[#00806b] mt-0.5 flex-shrink-0" />
+                        <p className="text-xs text-[#0f2940]">
                           Les bébés et animaux n'affectent pas le nombre total de voyageurs mais sont pris en compte par certains hôtes.
                         </p>
                       </div>
                       
-                      <div className="mt-4 pt-3 border-t border-gray-100">
+                      <div className="mt-4 pt-3 border-t border-[#e2f5f2]">
                         <button onClick={() => setActiveTab(null)} className="w-full bg-[#00c9a7] text-white py-2.5 rounded-lg font-medium hover:bg-[#00b396] transition">
                           Valider
                         </button>
@@ -723,7 +723,7 @@ export function Navbar({
               <button 
                 onClick={handleSearch}
                 disabled={isSearching || isCheckingAvailability}
-                className="bg-gradient-to-r from-[#00c9a7] to-[#00a887] text-white px-6 py-3 rounded-full flex items-center gap-2 hover:shadow-lg transition-all ml-1 font-medium disabled:opacity-50"
+                className="bg-[#00c9a7] text-white px-6 py-3 rounded-full flex items-center gap-2 hover:shadow-lg transition-all ml-1 font-medium disabled:opacity-50"
               >
                 {isCheckingAvailability ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
@@ -741,7 +741,7 @@ export function Navbar({
       {mobileSearchActive && (
         <div className="fixed inset-0 z-50 bg-white overflow-y-auto">
           <div className="sticky top-0 bg-white border-b px-4 py-3 flex items-center justify-between">
-            <button onClick={() => setMobileSearchActive(false)} className="p-2 rounded-full hover:bg-gray-100">
+            <button onClick={() => setMobileSearchActive(false)} className="p-2 rounded-full hover:bg-[#e8faf6]">
               <X className="w-5 h-5" />
             </button>
             <h2 className="font-semibold text-[#0F2940]">Rechercher</h2>
@@ -750,15 +750,15 @@ export function Navbar({
           
           <div className="p-4 space-y-5 pb-20">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Destination</label>
+              <label className="block text-sm font-medium text-[#1c3b56] mb-2">Destination</label>
               <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5b6b7a]" />
                 <input
                   type="text"
                   value={destination}
                   onChange={(e) => handleRealTimeSearch(e.target.value)}
                   placeholder="Où allez-vous ?"
-                  className="w-full pl-9 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#00c9a7]"
+                  className="w-full pl-9 pr-4 py-3 border border-[#e2f5f2] rounded-xl focus:ring-2 focus:ring-[#00c9a7]"
                   autoFocus
                 />
               </div>
@@ -769,7 +769,7 @@ export function Navbar({
                     <button
                       key={place}
                       onClick={() => selectSuggestion(place)}
-                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 text-sm flex items-center gap-2"
+                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#f4fffe] text-sm flex items-center gap-2"
                     >
                       <MapPin className="w-4 h-4 text-[#00c9a7]" />
                       <span>{place}</span>
@@ -780,12 +780,12 @@ export function Navbar({
               
               {!destination && (
                 <div className="mt-2 space-y-1">
-                  <p className="text-xs text-gray-500 mt-2">Destinations populaires</p>
+                  <p className="text-xs text-[#5b6b7a] mt-2">Destinations populaires</p>
                   {destinationsList.slice(0, 5).map((place) => (
                     <button
                       key={place}
                       onClick={() => selectSuggestion(place)}
-                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 text-sm"
+                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#f4fffe] text-sm"
                     >
                       {place}
                     </button>
@@ -795,7 +795,7 @@ export function Navbar({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Dates</label>
+              <label className="block text-sm font-medium text-[#1c3b56] mb-2">Dates</label>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <input
@@ -803,10 +803,10 @@ export function Navbar({
                     value={checkIn}
                     onChange={(e) => setCheckIn(e.target.value)}
                     min={new Date().toISOString().split('T')[0]}
-                    className="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm"
+                    className="w-full px-3 py-3 border border-[#e2f5f2] rounded-xl text-sm"
                     placeholder="Arrivée"
                   />
-                  <p className="text-xs text-gray-400 mt-1">Arrivée</p>
+                  <p className="text-xs text-[#5b6b7a] mt-1">Arrivée</p>
                 </div>
                 <div>
                   <input
@@ -814,37 +814,37 @@ export function Navbar({
                     value={checkOut}
                     onChange={(e) => setCheckOut(e.target.value)}
                     min={checkIn || new Date().toISOString().split('T')[0]}
-                    className="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm"
+                    className="w-full px-3 py-3 border border-[#e2f5f2] rounded-xl text-sm"
                     placeholder="Départ"
                   />
-                  <p className="text-xs text-gray-400 mt-1">Départ</p>
+                  <p className="text-xs text-[#5b6b7a] mt-1">Départ</p>
                 </div>
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Voyageurs</label>
-              <div className="space-y-4 bg-gray-50 rounded-xl p-4">
+              <label className="block text-sm font-medium text-[#1c3b56] mb-2">Voyageurs</label>
+              <div className="space-y-4 bg-[#f4fffe] rounded-xl p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium text-sm">Adultes</p>
-                    <p className="text-xs text-gray-500">13 ans et plus</p>
+                    <p className="text-xs text-[#5b6b7a]">13 ans et plus</p>
                   </div>
                   <div className="flex items-center gap-4">
-                    <button onClick={() => setAdults(Math.max(1, adults - 1))} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center bg-white">-</button>
+                    <button onClick={() => setAdults(Math.max(1, adults - 1))} className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center bg-white">-</button>
                     <span className="w-8 text-center text-base font-medium">{adults}</span>
-                    <button onClick={() => setAdults(adults + 1)} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center bg-white">+</button>
+                    <button onClick={() => setAdults(adults + 1)} className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center bg-white">+</button>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium text-sm">Enfants</p>
-                    <p className="text-xs text-gray-500">De 2 à 12 ans</p>
+                    <p className="text-xs text-[#5b6b7a]">De 2 à 12 ans</p>
                   </div>
                   <div className="flex items-center gap-4">
-                    <button onClick={() => setChildren(Math.max(0, children - 1))} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center bg-white">-</button>
+                    <button onClick={() => setChildren(Math.max(0, children - 1))} className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center bg-white">-</button>
                     <span className="w-8 text-center text-base font-medium">{children}</span>
-                    <button onClick={() => setChildren(children + 1)} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center bg-white">+</button>
+                    <button onClick={() => setChildren(children + 1)} className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center bg-white">+</button>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
@@ -853,12 +853,12 @@ export function Navbar({
                       <Baby className="w-4 h-4 text-[#00c9a7]" />
                       Bébés
                     </p>
-                    <p className="text-xs text-gray-500">Moins de 2 ans</p>
+                    <p className="text-xs text-[#5b6b7a]">Moins de 2 ans</p>
                   </div>
                   <div className="flex items-center gap-4">
-                    <button onClick={() => setBabies(Math.max(0, babies - 1))} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center bg-white">-</button>
+                    <button onClick={() => setBabies(Math.max(0, babies - 1))} className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center bg-white">-</button>
                     <span className="w-8 text-center text-base font-medium">{babies}</span>
-                    <button onClick={() => setBabies(babies + 1)} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center bg-white">+</button>
+                    <button onClick={() => setBabies(babies + 1)} className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center bg-white">+</button>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
@@ -867,18 +867,18 @@ export function Navbar({
                       <Dog className="w-4 h-4 text-[#00c9a7]" />
                       Animaux
                     </p>
-                    <p className="text-xs text-gray-500">Vous voyagez avec un animal ?</p>
+                    <p className="text-xs text-[#5b6b7a]">Vous voyagez avec un animal ?</p>
                   </div>
                   <div className="flex items-center gap-4">
-                    <button onClick={() => setPets(Math.max(0, pets - 1))} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center bg-white">-</button>
+                    <button onClick={() => setPets(Math.max(0, pets - 1))} className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center bg-white">-</button>
                     <span className="w-8 text-center text-base font-medium">{pets}</span>
-                    <button onClick={() => setPets(pets + 1)} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center bg-white">+</button>
+                    <button onClick={() => setPets(pets + 1)} className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center bg-white">+</button>
                   </div>
                 </div>
               </div>
             </div>
 
-            <button onClick={handleMobileSearch} disabled={isSearching || isCheckingAvailability} className="w-full bg-gradient-to-r from-[#00c9a7] to-[#00a887] text-white py-3.5 rounded-xl font-semibold shadow-lg disabled:opacity-50">
+            <button onClick={handleMobileSearch} disabled={isSearching || isCheckingAvailability} className="w-full bg-[#00c9a7] text-white py-3.5 rounded-xl font-semibold shadow-lg disabled:opacity-50">
               {isCheckingAvailability ? 'Vérification...' : (isSearching ? 'Recherche...' : 'Rechercher')}
             </button>
           </div>
@@ -890,18 +890,18 @@ export function Navbar({
         <>
           <div className="lg:hidden fixed inset-y-0 right-0 w-80 bg-white shadow-2xl z-50 overflow-y-auto animate-slideInRight">
             {/* Bouton de fermeture */}
-            <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-100 px-4 py-3 flex items-center justify-between">
+            <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-[#e2f5f2] px-4 py-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-gradient-to-r from-emerald-400 to-teal-500 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-gradient-to-r from-emerald-400 to-[#00c9a7] rounded-full flex items-center justify-center">
                   <span className="text-white font-bold text-sm">B</span>
                 </div>
                 <span className="font-semibold text-sm text-[#0f2940]">Menu</span>
               </div>
               <button 
                 onClick={() => setMenuOpen(false)} 
-                className="p-2 rounded-full hover:bg-gray-100 transition-all duration-300 hover:rotate-90"
+                className="p-2 rounded-full hover:bg-[#e8faf6] transition-all duration-300 hover:rotate-90"
               >
-                <X className="w-5 h-5 text-gray-600" />
+                <X className="w-5 h-5 text-[#5b6b7a]" />
               </button>
             </div>
 
@@ -914,10 +914,10 @@ export function Navbar({
                   className={`w-full text-left py-3 px-4 rounded-xl flex items-center gap-3 transition-all duration-200 ${
                     isActive(item.name)
                       ? `bg-gradient-to-r ${item.gradient} text-white shadow-md`
-                      : 'hover:bg-gray-50 text-[#0f2940]'
+                      : 'hover:bg-[#f4fffe] text-[#0f2940]'
                   }`}
                 >
-                  <item.icon className={`w-5 h-5 ${isActive(item.name) ? 'text-white' : 'text-gray-500'}`} />
+                  <item.icon className={`w-5 h-5 ${isActive(item.name) ? 'text-white' : 'text-[#5b6b7a]'}`} />
                   <span className="font-medium text-sm">{item.name}</span>
                   {isActive(item.name) && (
                     <span className="ml-auto text-xs bg-white/20 px-2 py-0.5 rounded-full">•</span>
@@ -925,7 +925,7 @@ export function Navbar({
                 </button>
               ))}
               
-              <div className="h-px bg-gray-100 my-3"></div>
+              <div className="h-px bg-[#e8faf6] my-3"></div>
 
               {signedIn && user && (
                 <div className="mb-2">
@@ -938,8 +938,8 @@ export function Navbar({
                   </div>
                   {accountLinks(user).map(({ label, icon: Icon, route }) => (
                     <button key={label} onClick={() => { onNavigate?.(route); setMenuOpen(false); }}
-                      className="w-full text-left py-3 px-4 rounded-xl flex items-center gap-3 hover:bg-gray-50 text-[#0f2940]">
-                      <Icon className="w-5 h-5 text-gray-500" />
+                      className="w-full text-left py-3 px-4 rounded-xl flex items-center gap-3 hover:bg-[#f4fffe] text-[#0f2940]">
+                      <Icon className="w-5 h-5 text-[#5b6b7a]" />
                       <span className="font-medium text-sm">{label}</span>
                     </button>
                   ))}
@@ -949,7 +949,7 @@ export function Navbar({
               {showBecomeHost && (
               <button 
                 onClick={() => { onNavigate?.({ name: 'become-host' }); setMenuOpen(false); }} 
-                className="w-full bg-[#0f2940] text-white py-3 rounded-xl text-center font-medium text-sm hover:bg-[#1a3a52] transition-all duration-200 flex items-center justify-center gap-2"
+                className="w-full bg-[#0f2940] text-white py-3 rounded-xl text-center font-medium text-sm hover:bg-[#1c3b56] transition-all duration-200 flex items-center justify-center gap-2"
               >
                 <Sparkles className="w-4 h-4 text-emerald-400" />
                 Devenir hôte

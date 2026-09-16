@@ -46,13 +46,13 @@ export function AdminPaymentsPage() {
   const successRate = stats.total > 0 ? ((stats.success / stats.total) * 100).toFixed(1) : 0;
 
   return (
-    <div className="p-3 sm:p-4 md:p-6 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+    <div className="p-3 sm:p-4 md:p-6 bg-gradient-to-br from-[#f4fffe] to-[#e8faf6] min-h-screen">
       {/* En-tête */}
       <div className="mb-6">
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#0f2940] to-[#00c9a7] bg-clip-text text-transparent">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#0f2940]">
           Suivi des paiements
         </h1>
-        <p className="text-xs sm:text-sm text-gray-500 mt-1">Analysez et gérez toutes les transactions financières</p>
+        <p className="text-xs sm:text-sm text-[#5b6b7a] mt-1">Analysez et gérez toutes les transactions financières</p>
       </div>
 
       {/* Statistiques - ✅ CORRECTION : Passer le composant, pas un élément JSX */}
@@ -66,7 +66,7 @@ export function AdminPaymentsPage() {
       </div>
 
       {/* Résumé quotidien */}
-      <div className="bg-gradient-to-r from-[#00c9a7] to-[#0f2940] rounded-xl sm:rounded-2xl p-4 mb-6 text-white">
+      <div className="bg-[#00c9a7] rounded-xl sm:rounded-2xl p-4 mb-6 text-white">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div>
             <p className="text-white/80 text-sm">Transactions aujourd'hui</p>
@@ -89,20 +89,20 @@ export function AdminPaymentsPage() {
       <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm mb-6">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5b6b7a]" />
             <input
               type="text"
               placeholder="Rechercher par transaction ID ou réservation..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
+              className="w-full pl-9 pr-3 py-2 border border-[#e2f5f2] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
             />
           </div>
           <div className="flex gap-2">
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
+              className="px-3 py-2 border border-[#e2f5f2] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
             >
               <option value="all">Tous statuts</option>
               <option value="success">Succès</option>
@@ -111,7 +111,7 @@ export function AdminPaymentsPage() {
             </select>
             <button
               onClick={() => refetch()}
-              className="px-3 py-2 bg-gray-100 rounded-xl hover:bg-gray-200 transition"
+              className="px-3 py-2 bg-[#e8faf6] rounded-xl hover:bg-[#e2f5f2] transition"
             >
               🔄
             </button>
@@ -123,8 +123,8 @@ export function AdminPaymentsPage() {
       <div className="space-y-3">
         {filteredPayments.length === 0 ? (
           <div className="bg-white rounded-xl p-8 text-center">
-            <CreditCard className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500 text-sm">Aucune transaction trouvée</p>
+            <CreditCard className="w-12 h-12 text-[#9fb3c4] mx-auto mb-3" />
+            <p className="text-[#5b6b7a] text-sm">Aucune transaction trouvée</p>
           </div>
         ) : (
           filteredPayments.map((payment: any, idx: number) => (
@@ -166,32 +166,32 @@ const PaymentCard = ({ payment, index, onView }: any) => {
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="font-mono text-xs font-semibold bg-gray-100 px-2 py-0.5 rounded">
+              <span className="font-mono text-xs font-semibold bg-[#e8faf6] px-2 py-0.5 rounded">
                 {payment.transaction_id?.slice(-12)}
               </span>
               <span className={`text-xs px-2 py-0.5 rounded-full bg-${config.color}-100 text-${config.color}-700`}>
                 {config.label}
               </span>
             </div>
-            <p className="text-sm font-semibold text-gray-800 mt-1">
+            <p className="text-sm font-semibold text-[#0f2940] mt-1">
               {payment.booking?.property?.title || 'Réservation'}
             </p>
-            <p className="text-xs text-gray-500">Réf: {payment.booking?.booking_reference || '-'}</p>
+            <p className="text-xs text-[#5b6b7a]">Réf: {payment.booking?.booking_reference || '-'}</p>
           </div>
         </div>
         <div className="flex items-center justify-between w-full sm:w-auto gap-3">
           <div className="text-left sm:text-right">
             <p className="text-base sm:text-lg font-bold text-[#00c9a7]">{payment.amount?.toLocaleString()} FCFA</p>
             <div className="flex items-center gap-1 mt-1">
-              <Smartphone className="w-3 h-3 text-gray-400" />
-              <p className="text-xs text-gray-400">{payment.payment_method || 'Mobile Money'}</p>
+              <Smartphone className="w-3 h-3 text-[#5b6b7a]" />
+              <p className="text-xs text-[#5b6b7a]">{payment.payment_method || 'Mobile Money'}</p>
             </div>
           </div>
           <button
             onClick={onView}
-            className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
+            className="p-2 bg-[#e8faf6] rounded-lg hover:bg-[#e2f5f2] transition"
           >
-            <Eye className="w-4 h-4 text-gray-600" />
+            <Eye className="w-4 h-4 text-[#5b6b7a]" />
           </button>
         </div>
       </div>
@@ -207,14 +207,14 @@ const PaymentDetailModal = ({ payment, onClose }: any) => {
         <div className="p-5 border-b sticky top-0 bg-white">
           <div className="flex justify-between items-center">
             <h3 className="font-bold text-lg">Détails du paiement</h3>
-            <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg">✕</button>
+            <button onClick={onClose} className="p-1 hover:bg-[#e8faf6] rounded-lg">✕</button>
           </div>
         </div>
         
         <div className="p-5 space-y-4">
           {/* Montant */}
           <div className="text-center">
-            <p className="text-gray-500 text-sm">Montant total</p>
+            <p className="text-[#5b6b7a] text-sm">Montant total</p>
             <p className="text-3xl font-bold text-[#00c9a7]">{payment.amount?.toLocaleString()} FCFA</p>
           </div>
 
@@ -237,18 +237,18 @@ const PaymentDetailModal = ({ payment, onClose }: any) => {
 
 // Composant de ligne de détail
 const DetailRow = ({ label, value, status }: any) => (
-  <div className="flex justify-between items-center py-2 border-b border-gray-100">
-    <span className="text-sm text-gray-500">{label}</span>
+  <div className="flex justify-between items-center py-2 border-b border-[#e2f5f2]">
+    <span className="text-sm text-[#5b6b7a]">{label}</span>
     {status ? (
       <span className={`text-sm font-medium px-2 py-0.5 rounded-full ${
         value === 'success' ? 'bg-green-100 text-green-700' :
-        value === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+        value === 'pending' ? 'bg-[#fff3cd] text-[#6b4e06]' :
         'bg-red-100 text-red-700'
       }`}>
         {value === 'success' ? 'Succès' : value === 'pending' ? 'En attente' : 'Échoué'}
       </span>
     ) : (
-      <span className="text-sm font-medium text-gray-800">{value || '-'}</span>
+      <span className="text-sm font-medium text-[#0f2940]">{value || '-'}</span>
     )}
   </div>
 );
@@ -257,10 +257,10 @@ const DetailRow = ({ label, value, status }: any) => (
 // Accepte un composant Icon et le rend avec className
 const StatCard = ({ icon: Icon, label, value, color, subValue }: any) => {
   const colors = {
-    blue: 'from-blue-500 to-blue-600',
-    purple: 'from-purple-500 to-purple-600',
+    blue: 'from-[#00c9a7] to-[#00b396]',
+    purple: 'from-[#0f2940] to-[#1c3b56]',
     green: 'from-green-500 to-green-600',
-    yellow: 'from-yellow-500 to-yellow-600',
+    yellow: 'from-[#ffc93c] to-[#e0ac1f]',
     red: 'from-red-500 to-red-600',
     emerald: 'from-emerald-500 to-emerald-600',
   };
@@ -283,14 +283,14 @@ const StatCard = ({ icon: Icon, label, value, color, subValue }: any) => {
 const LoadingSkeleton = () => (
   <div className="p-3 sm:p-4 md:p-6">
     <div className="animate-pulse">
-      <div className="h-6 sm:h-8 bg-gray-200 rounded w-48 mb-4"></div>
+      <div className="h-6 sm:h-8 bg-[#e2f5f2] rounded w-48 mb-4"></div>
       <div className="grid grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
-        {[1, 2, 3, 4, 5, 6].map(i => <div key={i} className="bg-gray-200 rounded-xl h-20"></div>)}
+        {[1, 2, 3, 4, 5, 6].map(i => <div key={i} className="bg-[#e2f5f2] rounded-xl h-20"></div>)}
       </div>
-      <div className="bg-gray-200 rounded-xl h-20 mb-6"></div>
-      <div className="bg-gray-200 rounded-xl h-12 mb-6"></div>
+      <div className="bg-[#e2f5f2] rounded-xl h-20 mb-6"></div>
+      <div className="bg-[#e2f5f2] rounded-xl h-12 mb-6"></div>
       <div className="space-y-3">
-        {[1, 2, 3].map(i => <div key={i} className="bg-gray-200 rounded-xl h-24"></div>)}
+        {[1, 2, 3].map(i => <div key={i} className="bg-[#e2f5f2] rounded-xl h-24"></div>)}
       </div>
     </div>
   </div>

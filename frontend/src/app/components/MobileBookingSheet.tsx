@@ -172,7 +172,7 @@ export function MobileBookingSheet({
               <div className="flex items-center gap-3">
                 <Calendar className="w-5 h-5 text-[#00c9a7]" />
                 <div className="flex-1">
-                  <div className="text-xs text-[#6b7280]">Arrivée</div>
+                  <div className="text-xs text-[#5b6b7a]">Arrivée</div>
                   <input
                     type="date"
                     value={checkIn}
@@ -186,7 +186,7 @@ export function MobileBookingSheet({
               <div className="flex items-center gap-3">
                 <Calendar className="w-5 h-5 text-[#00c9a7]" />
                 <div className="flex-1">
-                  <div className="text-xs text-[#6b7280]">Départ</div>
+                  <div className="text-xs text-[#5b6b7a]">Départ</div>
                   <input
                     type="date"
                     value={checkOut}
@@ -242,11 +242,11 @@ export function MobileBookingSheet({
           ) : priceDetails && isAvailable && (
             <div className="bg-[#f4fffe] rounded-2xl p-4 space-y-3">
               <div className="flex justify-between text-sm">
-                <span className="text-[#6b7280]">{pricePerNight.toLocaleString()} XOF × {priceDetails.nights} nuits</span>
+                <span className="text-[#5b6b7a]">{pricePerNight.toLocaleString()} XOF × {priceDetails.nights} nuits</span>
                 <span className="text-[#0f2940] font-medium">{priceDetails.subtotal.toLocaleString()} XOF</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-[#6b7280]">Frais de service</span>
+                <span className="text-[#5b6b7a]">Frais de service</span>
                 <span className="text-[#0f2940] font-medium">{priceDetails.serviceFee.toLocaleString()} XOF</span>
               </div>
               <div className="h-px bg-[#e2f5f2]"></div>
@@ -265,10 +265,10 @@ export function MobileBookingSheet({
             <label className="text-sm font-medium text-[#0f2940] mb-3 block">Mode de paiement</label>
             <div className="grid grid-cols-2 gap-3">
               {[
-                { name: 'MTN MoMo', provider: 'MTN', color: 'bg-yellow-400' },
-                { name: 'Moov', provider: 'Moov', color: 'bg-blue-500 text-white' },
-                { name: 'Orange', provider: 'Orange', color: 'bg-orange-500 text-white' },
-                { name: 'Carte', provider: 'card', color: 'bg-[#6b7280] text-white' },
+                { name: 'MTN MoMo', provider: 'MTN', color: 'bg-[#ffc93c]' },
+                { name: 'Moov', provider: 'Moov', color: 'bg-[#00c9a7] text-white' },
+                { name: 'Orange', provider: 'Orange', color: 'bg-[#ffc93c] text-white' },
+                { name: 'Carte', provider: 'card', color: 'bg-[#5b6b7a] text-white' },
               ].map((payment, idx) => (
                 <button
                   key={idx}

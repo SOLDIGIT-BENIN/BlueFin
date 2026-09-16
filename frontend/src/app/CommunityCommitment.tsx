@@ -46,7 +46,7 @@ export function CommunityCommitment({ onAccept, onBack }: CommunityCommitmentPro
       icon: Award,
       title: 'Superhôte',
       description: 'Devenez éligible au statut Superhôte',
-      color: 'text-yellow-500'
+      color: 'text-[#e0ac1f]'
     },
     {
       icon: Shield,
@@ -58,7 +58,7 @@ export function CommunityCommitment({ onAccept, onBack }: CommunityCommitmentPro
       icon: Clock,
       title: 'Support 24/7',
       description: 'Assistance prioritaire',
-      color: 'text-blue-500'
+      color: 'text-[#00806b]'
     },
     {
       icon: Heart,
@@ -69,18 +69,18 @@ export function CommunityCommitment({ onAccept, onBack }: CommunityCommitmentPro
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-[#f4fffe]">
+    <div className="min-h-screen bg-gradient-to-br from-[#f4fffe] via-white to-[#f4fffe]">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-100 px-4 sm:px-5 py-4">
+      <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#e2f5f2] px-4 sm:px-5 py-4">
         <button 
           onClick={onBack} 
-          className="text-sm text-gray-500 mb-3 flex items-center gap-2 hover:text-[#00c9a7] transition-colors group"
+          className="text-sm text-[#5b6b7a] mb-3 flex items-center gap-2 hover:text-[#00c9a7] transition-colors group"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> 
           Retour
         </button>
         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#0F2940]">Engagements communautaires</h1>
-        <p className="text-xs sm:text-sm text-gray-500 mt-1">Devenir hôte, c'est rejoindre une communauté responsable</p>
+        <p className="text-xs sm:text-sm text-[#5b6b7a] mt-1">Devenir hôte, c'est rejoindre une communauté responsable</p>
       </div>
 
       <div className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8 md:py-12">
@@ -92,7 +92,7 @@ export function CommunityCommitment({ onAccept, onBack }: CommunityCommitmentPro
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#0F2940] mb-3">
             Bienvenue dans la communauté
           </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto text-sm sm:text-base">
+          <p className="text-[#5b6b7a] max-w-2xl mx-auto text-sm sm:text-base">
             En tant qu'hôte, vous vous engagez à offrir une expérience exceptionnelle 
             à vos voyageurs tout en respectant nos valeurs communautaires.
           </p>
@@ -107,10 +107,10 @@ export function CommunityCommitment({ onAccept, onBack }: CommunityCommitmentPro
             {benefits.map((benefit, index) => {
               const Icon = benefit.icon;
               return (
-                <div key={index} className="bg-white rounded-xl p-3 sm:p-4 text-center border border-slate-100 shadow-sm">
+                <div key={index} className="bg-white rounded-xl p-3 sm:p-4 text-center border border-[#e2f5f2] shadow-sm">
                   <Icon className={`w-6 h-6 sm:w-8 sm:h-8 ${benefit.color} mx-auto mb-2`} />
                   <h4 className="text-xs sm:text-sm font-semibold text-[#0F2940] mb-1">{benefit.title}</h4>
-                  <p className="text-[10px] sm:text-xs text-gray-500">{benefit.description}</p>
+                  <p className="text-[10px] sm:text-xs text-[#5b6b7a]">{benefit.description}</p>
                 </div>
               );
             })}
@@ -118,8 +118,8 @@ export function CommunityCommitment({ onAccept, onBack }: CommunityCommitmentPro
         </div>
 
         {/* Engagements */}
-        <div className="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden mb-8">
-          <div className="bg-gradient-to-r from-[#0f2940] to-[#1a3a52] px-4 sm:px-6 py-4">
+        <div className="bg-white rounded-2xl shadow-xl border border-[#e2f5f2] overflow-hidden mb-8">
+          <div className="bg-[#0f2940] px-4 sm:px-6 py-4">
             <h3 className="text-white font-semibold text-base sm:text-lg">
               Vos engagements en tant qu'hôte
             </h3>
@@ -128,7 +128,7 @@ export function CommunityCommitment({ onAccept, onBack }: CommunityCommitmentPro
             </p>
           </div>
 
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-[#e2f5f2]">
             {commitments.map((commitment) => {
               const Icon = commitment.icon;
               return (
@@ -140,7 +140,7 @@ export function CommunityCommitment({ onAccept, onBack }: CommunityCommitmentPro
                         className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-200 ${
                           commitment.accepted
                             ? 'bg-[#00c9a7] border-[#00c9a7]'
-                            : 'border-gray-300 hover:border-[#00c9a7]'
+                            : 'border-[#c9f0e8] hover:border-[#00c9a7]'
                         }`}
                       >
                         {commitment.accepted && <CheckCircle className="w-4 h-4 text-white" />}
@@ -153,7 +153,7 @@ export function CommunityCommitment({ onAccept, onBack }: CommunityCommitmentPro
                           {commitment.title}
                         </h4>
                       </div>
-                      <p className="text-gray-600 text-xs sm:text-sm">
+                      <p className="text-[#5b6b7a] text-xs sm:text-sm">
                         {commitment.description}
                       </p>
                     </div>
@@ -164,9 +164,9 @@ export function CommunityCommitment({ onAccept, onBack }: CommunityCommitmentPro
           </div>
 
           {/* Résumé */}
-          <div className="bg-slate-50 px-4 sm:px-6 py-4 border-t border-slate-100">
+          <div className="bg-[#f4fffe] px-4 sm:px-6 py-4 border-t border-[#e2f5f2]">
             <div className="flex items-center justify-between flex-wrap gap-3">
-              <div className="text-xs sm:text-sm text-gray-600">
+              <div className="text-xs sm:text-sm text-[#5b6b7a]">
                 {allAccepted ? (
                   <span className="text-green-600 flex items-center gap-2">
                     <CheckCircle className="w-4 h-4" />
@@ -184,8 +184,8 @@ export function CommunityCommitment({ onAccept, onBack }: CommunityCommitmentPro
                 disabled={!allAccepted}
                 className={`px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-semibold transition-all duration-300 ${
                   allAccepted
-                    ? 'bg-gradient-to-r from-[#00c9a7] to-[#0f2940] text-white shadow-lg hover:shadow-xl active:scale-95'
-                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    ? 'bg-[#00c9a7] text-white shadow-lg hover:shadow-xl active:scale-95'
+                    : 'bg-[#e2f5f2] text-[#5b6b7a] cursor-not-allowed'
                 }`}
               >
                 Je m'engage et je continue
@@ -195,7 +195,7 @@ export function CommunityCommitment({ onAccept, onBack }: CommunityCommitmentPro
         </div>
 
         {/* Note légale */}
-        <div className="text-center text-xs text-gray-400">
+        <div className="text-center text-xs text-[#5b6b7a]">
           <p>
             En acceptant ces engagements, vous confirmez avoir lu et compris les{' '}
             <a href="#" className="text-[#00c9a7] hover:underline">conditions générales</a>

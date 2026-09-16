@@ -86,7 +86,7 @@ export function MobileBottomNav({ active, onNavigate }: MobileBottomNavProps) {
             key={id}
             onClick={() => go(id)}
             aria-current={active ? 'page' : undefined}
-            className={`flex-1 flex flex-col items-center gap-1 py-2 rounded-xl transition-colors ${active ? 'text-[#00806b]' : 'text-slate-400 hover:text-[#0f2940]'}`}
+            className={`flex-1 flex flex-col items-center gap-1 py-2 rounded-xl transition-colors ${active ? 'text-[#00806b]' : 'text-[#5b6b7a] hover:text-[#0f2940]'}`}
           >
             {id === 'profile' && isAuthenticated && user ? (
               // Connecté : avatar (photo ou initiales) avec point vert.

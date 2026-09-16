@@ -106,7 +106,7 @@ export function BookingWidget({
           refundPercentage: 50,
           label: 'Remboursement partiel',
           description: `Annulez avant le ${partialRefundDeadline.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })} pour un remboursement de 50%. Les frais de service ne sont pas remboursés.`,
-          icon: <Clock className="w-5 h-5 text-orange-500" />
+          icon: <Clock className="w-5 h-5 text-[#e0ac1f]" />
         });
       }
       
@@ -142,7 +142,7 @@ export function BookingWidget({
           refundPercentage: 50,
           label: 'Remboursement partiel',
           description: `Annulez avant le ${partialRefundDeadline.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })} pour un remboursement de 50%. Les frais de service ne sont pas remboursés.`,
-          icon: <Clock className="w-5 h-5 text-orange-500" />
+          icon: <Clock className="w-5 h-5 text-[#e0ac1f]" />
         });
       }
       
@@ -177,7 +177,7 @@ export function BookingWidget({
           refundPercentage: 50,
           label: 'Remboursement partiel',
           description: `Annulez avant le ${partialRefundDeadline.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })} pour un remboursement de 50%. Les frais de service ne sont pas remboursés.`,
-          icon: <Clock className="w-5 h-5 text-orange-500" />
+          icon: <Clock className="w-5 h-5 text-[#e0ac1f]" />
         });
       }
       
@@ -253,8 +253,8 @@ export function BookingWidget({
   const CancellationPolicySection = () => {
     if (!checkIn) {
       return (
-        <div className="bg-gray-50 rounded-xl p-4 text-center mt-6">
-          <p className="text-gray-500 text-sm">
+        <div className="bg-[#f4fffe] rounded-xl p-4 text-center mt-6">
+          <p className="text-[#5b6b7a] text-sm">
             Sélectionnez vos dates pour voir la politique d'annulation
           </p>
         </div>
@@ -262,8 +262,8 @@ export function BookingWidget({
     }
 
     return (
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden mt-6">
-        <div className="bg-gradient-to-r from-[#0F2940] to-[#1a3a52] px-4 py-3">
+      <div className="bg-white border border-[#e2f5f2] rounded-xl overflow-hidden mt-6">
+        <div className="bg-[#0f2940] px-4 py-3">
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4 text-[#00c9a7]" />
             <h4 className="font-semibold text-white text-sm">Politique d'annulation</h4>
@@ -274,7 +274,7 @@ export function BookingWidget({
         {currentRule && (
           <div className={`p-4 border-b ${
             currentRule.refundPercentage === 100 ? 'bg-green-50 border-green-200' :
-            currentRule.refundPercentage === 50 ? 'bg-orange-50 border-orange-200' :
+            currentRule.refundPercentage === 50 ? 'bg-[#fffaeb] border-[#ffe9a8]' :
             'bg-red-50 border-red-200'
           }`}>
             <div className="flex items-start gap-3">
@@ -282,12 +282,12 @@ export function BookingWidget({
               <div>
                 <h5 className={`font-semibold text-sm ${
                   currentRule.refundPercentage === 100 ? 'text-green-700' :
-                  currentRule.refundPercentage === 50 ? 'text-orange-700' :
+                  currentRule.refundPercentage === 50 ? 'text-[#6b4e06]' :
                   'text-red-700'
                 }`}>
                   {currentRule.label}
                 </h5>
-                <p className="text-xs text-gray-600 mt-1">{currentRule.description}</p>
+                <p className="text-xs text-[#5b6b7a] mt-1">{currentRule.description}</p>
               </div>
             </div>
           </div>
@@ -295,26 +295,26 @@ export function BookingWidget({
         
         {/* Liste des règles */}
         <div className="p-4 space-y-3">
-          <p className="text-xs text-gray-500 flex items-center gap-1">
+          <p className="text-xs text-[#5b6b7a] flex items-center gap-1">
             <AlertCircle className="w-3 h-3" />
             L'heure indiquée est basée sur l'emplacement du logement
           </p>
           
           {policyRules.map((rule, index) => (
-            <div key={index} className={`pb-2 ${index < policyRules.length - 1 ? 'border-b border-gray-100' : ''}`}>
+            <div key={index} className={`pb-2 ${index < policyRules.length - 1 ? 'border-b border-[#e2f5f2]' : ''}`}>
               <div className="flex items-start gap-2">
                 <div className="flex-shrink-0 mt-0.5">
                   {rule.refundPercentage === 100 ? (
                     <CheckCircle className="w-3 h-3 text-green-500" />
                   ) : rule.refundPercentage === 50 ? (
-                    <Clock className="w-3 h-3 text-orange-500" />
+                    <Clock className="w-3 h-3 text-[#e0ac1f]" />
                   ) : (
                     <XCircle className="w-3 h-3 text-red-400" />
                   )}
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-gray-800">{rule.label}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">
+                  <p className="text-xs font-medium text-[#0f2940]">{rule.label}</p>
+                  <p className="text-xs text-[#5b6b7a] mt-0.5">
                     {rule.description.split('.')[0]}.
                   </p>
                 </div>
@@ -324,8 +324,8 @@ export function BookingWidget({
         </div>
         
         {/* Note supplémentaire */}
-        <div className="bg-gray-50 px-4 py-2 border-t border-gray-100">
-          <p className="text-xs text-gray-500 flex items-center gap-1">
+        <div className="bg-[#f4fffe] px-4 py-2 border-t border-[#e2f5f2]">
+          <p className="text-xs text-[#5b6b7a] flex items-center gap-1">
             <AlertCircle className="w-3 h-3" />
             Les frais de service (10%) ne sont pas remboursés en cas d'annulation partielle.
           </p>
@@ -356,7 +356,7 @@ export function BookingWidget({
       <div className="border border-[#e2f5f2] rounded-xl overflow-hidden mb-4">
         <div className="grid grid-cols-2 border-b border-[#e2f5f2]">
           <div className="p-3 border-r border-[#e2f5f2]">
-            <label className="text-xs font-medium text-[#6b7280] block mb-1">Arrivée</label>
+            <label className="text-xs font-medium text-[#5b6b7a] block mb-1">Arrivée</label>
             <div className="flex items-center gap-2">
               <Calendar className="w-4 h-4 text-[#00c9a7]" />
               <input
@@ -369,7 +369,7 @@ export function BookingWidget({
             </div>
           </div>
           <div className="p-3">
-            <label className="text-xs font-medium text-[#6b7280] block mb-1">Départ</label>
+            <label className="text-xs font-medium text-[#5b6b7a] block mb-1">Départ</label>
             <div className="flex items-center gap-2">
               <Calendar className="w-4 h-4 text-[#00c9a7]" />
               <input
@@ -384,7 +384,7 @@ export function BookingWidget({
           </div>
         </div>
         <div className="p-3">
-          <label className="text-xs font-medium text-[#6b7280] block mb-2">Voyageurs</label>
+          <label className="text-xs font-medium text-[#5b6b7a] block mb-2">Voyageurs</label>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4 text-[#00c9a7]" />
@@ -423,11 +423,11 @@ export function BookingWidget({
         <>
           <div className="space-y-3 mb-6 pb-6 border-b border-[#e2f5f2]">
             <div className="flex justify-between text-sm">
-              <span className="text-[#6b7280]">{pricePerNight.toLocaleString()} FCFA × {priceDetails.nights} nuits</span>
+              <span className="text-[#5b6b7a]">{pricePerNight.toLocaleString()} FCFA × {priceDetails.nights} nuits</span>
               <span className="text-[#0f2940]">{priceDetails.subtotal.toLocaleString()} FCFA</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-[#6b7280]">Frais de service Bluefin Immo (10%)</span>
+              <span className="text-[#5b6b7a]">Frais de service Bluefin Immo (10%)</span>
               <span className="text-[#0f2940]">{priceDetails.serviceFee.toLocaleString()} FCFA</span>
             </div>
           </div>
@@ -446,12 +446,12 @@ export function BookingWidget({
       <CancellationPolicySection />
 
       <div className="mb-4 mt-6">
-        <div className="text-xs font-medium text-[#6b7280] mb-2">Paiement accepté</div>
+        <div className="text-xs font-medium text-[#5b6b7a] mb-2">Paiement accepté</div>
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="px-2 py-1 bg-yellow-400 rounded text-xs font-medium">MTN MoMo</div>
-          <div className="px-2 py-1 bg-blue-500 text-white rounded text-xs font-medium">Moov</div>
-          <div className="px-2 py-1 bg-orange-500 text-white rounded text-xs font-medium">Orange</div>
-          <div className="px-2 py-1 bg-[#6b7280] text-white rounded text-xs font-medium">Carte</div>
+          <div className="px-2 py-1 bg-[#ffc93c] rounded text-xs font-medium">MTN MoMo</div>
+          <div className="px-2 py-1 bg-[#00c9a7] text-white rounded text-xs font-medium">Moov</div>
+          <div className="px-2 py-1 bg-[#ffc93c] text-white rounded text-xs font-medium">Orange</div>
+          <div className="px-2 py-1 bg-[#5b6b7a] text-white rounded text-xs font-medium">Carte</div>
         </div>
       </div>
 

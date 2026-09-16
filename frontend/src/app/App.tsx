@@ -143,11 +143,11 @@ function AdminLayoutContent({
   };
 
   return (
-    <div className={`flex h-screen ${isDark ? 'bg-slate-900' : 'bg-gray-100'} transition-colors duration-300 overflow-hidden`}>
+    <div className={`flex h-screen ${isDark ? 'bg-[#0f2940]' : 'bg-[#e8faf6]'} transition-colors duration-300 overflow-hidden`}>
       <AdminSidebar />
       <div className="flex-1 flex flex-col overflow-hidden w-full">
         <AdminHeader />
-        <main className={`flex-1 overflow-y-auto p-3 sm:p-4 md:p-6 ${isDark ? 'bg-slate-900' : 'bg-gray-100'} transition-colors duration-300`}>
+        <main className={`flex-1 overflow-y-auto p-3 sm:p-4 md:p-6 ${isDark ? 'bg-[#0f2940]' : 'bg-[#e8faf6]'} transition-colors duration-300`}>
           {renderAdminPage()}
         </main>
       </div>
@@ -461,10 +461,10 @@ function AppContent() {
   // ============================================
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f4fffe] to-[#e8fffb]">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f4fffe] to-[#f4fffe]">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-[#00c9a7] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">Chargement de votre session...</p>
+          <p className="text-[#5b6b7a] font-medium">Chargement de votre session...</p>
         </div>
       </div>
     );

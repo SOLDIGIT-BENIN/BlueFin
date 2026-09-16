@@ -4,6 +4,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { SlidersHorizontal, MapPin, ChevronLeft, Map, Loader2 } from 'lucide-react';
 import propertyService from '../services/property.service';
 import { useFavorites } from '../hooks/useFavorites';
+import { CertifiedBadge } from './brand/CertifiedBadge';
 
 interface SearchResultsProps {
   mode?: 'logements' | 'hotels';
@@ -107,12 +108,12 @@ export function SearchResults({ mode = 'logements' }: SearchResultsProps) {
           <div className={`flex-1 space-y-3 lg:space-y-4 ${showMap ? 'hidden sm:block' : 'block'}`}>
             <div className="mb-4 lg:mb-6">
               <h2 className="text-lg lg:text-2xl font-bold text-[#0f2940]">{title} à {destination || 'Cotonou'}</h2>
-              <p className="text-sm text-[#6b7280]">{total} résultat{total > 1 ? 's' : ''} · {subtitle}</p>
+              <p className="text-sm text-[#5b6b7a]">{total} résultat{total > 1 ? 's' : ''} · {subtitle}</p>
             </div>
 
             {properties.length === 0 ? (
               <div className="text-center py-10">
-                <p className="text-gray-500">Aucun logement trouvé pour ces critères</p>
+                <p className="text-[#5b6b7a]">Aucun logement trouvé pour ces critères</p>
                 <button onClick={() => navigate('/')} className="mt-4 text-[#00c9a7]">Modifier la recherche</button>
               </div>
             ) : (
@@ -120,7 +121,7 @@ export function SearchResults({ mode = 'logements' }: SearchResultsProps) {
                 <div key={property.id} onClick={() => navigate(`/listing/${property.id}`)} className="flex gap-3 lg:gap-4 bg-white rounded-xl lg:rounded-2xl overflow-hidden shadow hover:shadow-md transition-all cursor-pointer p-3 lg:p-4 border border-transparent hover:border-[#e2f5f2]">
                   <div className="relative w-28 sm:w-40 lg:w-60 h-24 sm:h-32 lg:h-40 flex-shrink-0 rounded-xl overflow-hidden bg-[#f4fffe]">
                     <img src={property.cover_photo?.photo_url || '/placeholder.jpg'} alt={property.title} className="w-full h-full object-cover" />
-                    {property.bluefin_certified && <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-xs font-medium bg-[#00c9a7] text-white">Certifié</div>}
+                    {property.bluefin_certified && <CertifiedBadge className="absolute top-2 left-2" />}
                   </div>
                   <div className="flex-1 flex flex-col justify-between">
                     <div>
@@ -128,11 +129,11 @@ export function SearchResults({ mode = 'logements' }: SearchResultsProps) {
                         <h3 className="font-bold text-sm lg:text-lg text-[#0f2940] line-clamp-2">{property.title}</h3>
                         <div className="flex items-center gap-1 px-2 py-1 bg-[#00c9a7]/10 rounded-full">
                           <span className="text-xs font-medium">★ {property.average_rating || 'Nouveau'}</span>
-                          {property.reviews_count > 0 && <span className="text-xs text-[#6b7280] hidden sm:inline">({property.reviews_count})</span>}
+                          {property.reviews_count > 0 && <span className="text-xs text-[#5b6b7a] hidden sm:inline">({property.reviews_count})</span>}
                         </div>
                       </div>
-                      <p className="text-xs text-[#6b7280] mb-2">{property.district}, {property.city}</p>
-                      <div className="flex items-center gap-1.5 text-xs text-[#6b7280]">
+                      <p className="text-xs text-[#5b6b7a] mb-2">{property.district}, {property.city}</p>
+                      <div className="flex items-center gap-1.5 text-xs text-[#5b6b7a]">
                         <MapPin className="w-3.5 h-3.5" /> {property.district}
                       </div>
                     </div>
@@ -155,7 +156,7 @@ export function SearchResults({ mode = 'logements' }: SearchResultsProps) {
           {/* Carte (simplifiée - peut être remplacée par Google Maps) */}
           <div className={`lg:w-[46%] lg:sticky lg:top-32 lg:h-[calc(100vh-8rem)] ${showMap ? 'block w-full' : 'hidden lg:block'}`}>
             <div className="w-full h-[calc(100vh-12rem)] lg:h-full bg-[#f4fffe] rounded-2xl overflow-hidden relative border border-[#e2f5f2]">
-              <div className="absolute inset-0 flex items-center justify-center text-[#6b7280]">
+              <div className="absolute inset-0 flex items-center justify-center text-[#5b6b7a]">
                 <div className="text-center">
                   <MapPin className="w-10 h-10 mx-auto mb-2 text-[#00c9a7]" />
                   <p className="font-semibold">Carte interactive</p>

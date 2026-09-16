@@ -290,10 +290,10 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
   if (showBookingForm) {
     return (
       <div className="fixed inset-0 z-50 bg-white overflow-y-auto">
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-[#f4fffe]">
           {/* Header */}
           <div className="sticky top-0 z-10 bg-white border-b px-4 py-3 flex items-center gap-4">
-            <button onClick={handleBackToDetails} className="p-2 rounded-full hover:bg-gray-100 transition-all">
+            <button onClick={handleBackToDetails} className="p-2 rounded-full hover:bg-[#e8faf6] transition-all">
               <ArrowLeft className="w-5 h-5" />
             </button>
             <h1 className="text-xl font-semibold text-[#0F2940]">Réserver cet appartement</h1>
@@ -303,12 +303,12 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
             {/* Appartement info */}
             <div className="bg-white rounded-xl p-4 mb-6 shadow-sm">
               <h2 className="font-semibold text-lg text-[#0F2940]">{property.title}</h2>
-              <p className="text-gray-500 text-sm mt-1">{property.location}</p>
+              <p className="text-[#5b6b7a] text-sm mt-1">{property.location}</p>
               <div className="flex items-center gap-2 mt-2">
                 <Star className="w-4 h-4 fill-[#00c9a7] text-[#00c9a7]" />
                 <span className="text-sm font-medium">{property.rating}</span>
-                <span className="text-gray-400">·</span>
-                <span className="text-sm text-gray-500">{property.reviews} commentaires</span>
+                <span className="text-[#5b6b7a]">·</span>
+                <span className="text-sm text-[#5b6b7a]">{property.reviews} commentaires</span>
               </div>
             </div>
 
@@ -320,66 +320,66 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-[#1c3b56] mb-1">
                       Nom complet <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent ${formErrors.fullName ? 'border-red-500' : 'border-gray-300'}`}
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent ${formErrors.fullName ? 'border-red-500' : 'border-[#c9f0e8]'}`}
                       placeholder="Jean Dupont"
                     />
                     {formErrors.fullName && <p className="text-red-500 text-xs mt-1">{formErrors.fullName}</p>}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-[#1c3b56] mb-1">
                       Email <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent ${formErrors.email ? 'border-red-500' : 'border-gray-300'}`}
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent ${formErrors.email ? 'border-red-500' : 'border-[#c9f0e8]'}`}
                       placeholder="jean.dupont@email.com"
                     />
                     {formErrors.email && <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-[#1c3b56] mb-1">
                       Téléphone <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="tel"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent ${formErrors.phone ? 'border-red-500' : 'border-gray-300'}`}
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent ${formErrors.phone ? 'border-red-500' : 'border-[#c9f0e8]'}`}
                       placeholder="+229 97 00 00 00"
                     />
                     {formErrors.phone && <p className="text-red-500 text-xs mt-1">{formErrors.phone}</p>}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Adresse</label>
+                    <label className="block text-sm font-medium text-[#1c3b56] mb-1">Adresse</label>
                     <input
                       type="text"
                       value={address}
                       onChange={(e) => setAddress(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent"
+                      className="w-full px-4 py-2 border border-[#c9f0e8] rounded-lg focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent"
                       placeholder="Votre adresse complète"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-[#1c3b56] mb-1">
                       Nationalité <span className="text-red-500">*</span>
                     </label>
                     <select
                       value={nationality}
                       onChange={(e) => setNationality(e.target.value)}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent ${formErrors.nationality ? 'border-red-500' : 'border-gray-300'}`}
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent ${formErrors.nationality ? 'border-red-500' : 'border-[#c9f0e8]'}`}
                     >
                       <option value="">Sélectionnez...</option>
                       <option value="beninoise">Béninoise</option>
@@ -392,13 +392,13 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-[#1c3b56] mb-1">
                       Type de pièce d'identité <span className="text-red-500">*</span>
                     </label>
                     <select
                       value={idType}
                       onChange={(e) => setIdType(e.target.value)}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent ${formErrors.idType ? 'border-red-500' : 'border-gray-300'}`}
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent ${formErrors.idType ? 'border-red-500' : 'border-[#c9f0e8]'}`}
                     >
                       <option value="">Sélectionnez...</option>
                       <option value="cni">Carte Nationale d'Identité</option>
@@ -410,14 +410,14 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-[#1c3b56] mb-1">
                       Numéro de pièce d'identité <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
                       value={idNumber}
                       onChange={(e) => setIdNumber(e.target.value)}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent ${formErrors.idNumber ? 'border-red-500' : 'border-gray-300'}`}
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent ${formErrors.idNumber ? 'border-red-500' : 'border-[#c9f0e8]'}`}
                       placeholder="Numéro du document"
                     />
                     {formErrors.idNumber && <p className="text-red-500 text-xs mt-1">{formErrors.idNumber}</p>}
@@ -430,7 +430,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                 <h3 className="font-semibold text-[#0F2940] mb-4 pb-2 border-b">📅 Dates de séjour</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-[#1c3b56] mb-1">
                       Date d'arrivée <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -438,12 +438,12 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                       value={checkIn}
                       onChange={(e) => setCheckIn(e.target.value)}
                       min={new Date().toISOString().split('T')[0]}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent ${formErrors.checkIn ? 'border-red-500' : 'border-gray-300'}`}
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent ${formErrors.checkIn ? 'border-red-500' : 'border-[#c9f0e8]'}`}
                     />
                     {formErrors.checkIn && <p className="text-red-500 text-xs mt-1">{formErrors.checkIn}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-[#1c3b56] mb-1">
                       Date de départ <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -451,12 +451,12 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                       value={checkOut}
                       onChange={(e) => setCheckOut(e.target.value)}
                       min={checkIn}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent ${formErrors.checkOut ? 'border-red-500' : 'border-gray-300'}`}
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#00c9a7] focus:border-transparent ${formErrors.checkOut ? 'border-red-500' : 'border-[#c9f0e8]'}`}
                     />
                     {formErrors.checkOut && <p className="text-red-500 text-xs mt-1">{formErrors.checkOut}</p>}
                   </div>
                 </div>
-                <div className="mt-2 text-sm text-gray-500">
+                <div className="mt-2 text-sm text-[#5b6b7a]">
                   {nights} nuit{nights > 1 ? 's' : ''} · {nightlyPrice.toLocaleString()} FCFA / nuit
                 </div>
               </div>
@@ -465,12 +465,12 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
               <div className="mb-6">
                 <h3 className="font-semibold text-[#0F2940] mb-4 pb-2 border-b">💰 Options de paiement</h3>
                 
-                <div className="bg-gray-50 rounded-xl p-4 mb-4">
+                <div className="bg-[#f4fffe] rounded-xl p-4 mb-4">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-gray-600">Total du séjour:</span>
+                    <span className="text-[#5b6b7a]">Total du séjour:</span>
                     <span className="text-2xl font-bold text-[#0F2940]">{total.toLocaleString()} FCFA</span>
                   </div>
-                  <div className="text-sm text-gray-500 space-y-1">
+                  <div className="text-sm text-[#5b6b7a] space-y-1">
                     <div className="flex justify-between">
                       <span>{nightlyPrice.toLocaleString()} FCFA × {nights} nuits</span>
                       <span>{subtotal.toLocaleString()} FCFA</span>
@@ -488,33 +488,33 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
 
                 <div className="space-y-3">
                   <div 
-                    className={`border rounded-xl p-4 cursor-pointer transition-all ${paymentOption === '50' ? 'border-[#00c9a7] bg-[#00c9a7]/5 shadow-md' : 'border-gray-200'}`}
+                    className={`border rounded-xl p-4 cursor-pointer transition-all ${paymentOption === '50' ? 'border-[#00c9a7] bg-[#00c9a7]/5 shadow-md' : 'border-[#e2f5f2]'}`}
                     onClick={() => setPaymentOption('50')}
                   >
                     <div className="flex justify-between items-center">
                       <div>
                         <div className="font-semibold text-[#0F2940]">💳 Payer 50% maintenant</div>
-                        <div className="text-sm text-gray-500">Solde à payer à l'arrivée</div>
+                        <div className="text-sm text-[#5b6b7a]">Solde à payer à l'arrivée</div>
                       </div>
                       <div className="text-right">
                         <div className="font-bold text-[#00c9a7]">{Math.floor(total * 0.5).toLocaleString()} FCFA</div>
-                        <div className="text-xs text-gray-400">Total: {total.toLocaleString()} FCFA</div>
+                        <div className="text-xs text-[#5b6b7a]">Total: {total.toLocaleString()} FCFA</div>
                       </div>
                     </div>
                   </div>
 
                   <div 
-                    className={`border rounded-xl p-4 cursor-pointer transition-all ${paymentOption === '100' ? 'border-[#00c9a7] bg-[#00c9a7]/5 shadow-md' : 'border-gray-200'}`}
+                    className={`border rounded-xl p-4 cursor-pointer transition-all ${paymentOption === '100' ? 'border-[#00c9a7] bg-[#00c9a7]/5 shadow-md' : 'border-[#e2f5f2]'}`}
                     onClick={() => setPaymentOption('100')}
                   >
                     <div className="flex justify-between items-center">
                       <div>
                         <div className="font-semibold text-[#0F2940]">🔒 Payer 100% maintenant</div>
-                        <div className="text-sm text-gray-500">Paiement complet sécurisé</div>
+                        <div className="text-sm text-[#5b6b7a]">Paiement complet sécurisé</div>
                       </div>
                       <div className="text-right">
                         <div className="font-bold text-[#00c9a7]">{total.toLocaleString()} FCFA</div>
-                        <div className="text-xs text-gray-400">Paiement unique</div>
+                        <div className="text-xs text-[#5b6b7a]">Paiement unique</div>
                       </div>
                     </div>
                   </div>
@@ -527,13 +527,13 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
               <div className="max-w-2xl mx-auto flex gap-3">
                 <button
                   onClick={handleBackToDetails}
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-xl font-medium hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-4 py-3 border border-[#c9f0e8] rounded-xl font-medium hover:bg-[#f4fffe] transition-colors"
                 >
                   Annuler
                 </button>
                 <button
                   onClick={handleConfirmReservation}
-                  className="flex-1 px-4 py-3 bg-[#00c9a7] text-[#0F2940] rounded-xl font-bold hover:bg-[#00b892] transition-all transform hover:scale-105 shadow-md"
+                  className="flex-1 px-4 py-3 bg-[#00c9a7] text-[#0F2940] rounded-xl font-bold hover:bg-[#00b396] transition-all transform hover:scale-105 shadow-md"
                 >
                   Confirmer la réservation
                 </button>
@@ -550,14 +550,14 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
     <div className="fixed inset-0 z-50 bg-white overflow-y-auto">
       <div className="min-h-screen">
         <div className="sticky top-0 z-10 bg-white border-b px-4 py-3 flex justify-between items-center">
-          <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100 transition-all hover:scale-110">
+          <button onClick={onClose} className="p-2 rounded-full hover:bg-[#e8faf6] transition-all hover:scale-110">
             <ArrowLeft className="w-5 h-5"/>
           </button>
           <div className="flex gap-2">
-            <button className="p-2 rounded-full hover:bg-gray-100 transition-all hover:scale-110">
+            <button className="p-2 rounded-full hover:bg-[#e8faf6] transition-all hover:scale-110">
               <Share2 className="w-5 h-5"/>
             </button>
-            <button className="p-2 rounded-full hover:bg-gray-100 transition-all hover:scale-110">
+            <button className="p-2 rounded-full hover:bg-[#e8faf6] transition-all hover:scale-110">
               <Heart className="w-5 h-5"/>
             </button>
           </div>
@@ -588,14 +588,14 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
             {/* Colonne de gauche - Informations */}
             <div className="lg:col-span-2 space-y-8">
               <div className="border-b pb-4">
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-[#5b6b7a]">
                   {property.property_type || 'Logement'} · {property.beds} chambres · {property.beds} lits · {property.baths} sdb
                 </div>
                 <h1 className="text-3xl font-semibold text-[#0F2940] mt-2">{property.title}</h1>
                 <div className="flex items-center gap-2 mt-2">
                   <Star className="w-5 h-5 fill-current text-[#00c9a7]" />
                   <span className="font-medium">{property.rating}</span>
-                  <span className="text-gray-500">· {property.reviews} commentaires</span>
+                  <span className="text-[#5b6b7a]">· {property.reviews} commentaires</span>
                   {superhost && <span className="text-[#00c9a7] font-medium">· Superhôte</span>}
                 </div>
               </div>
@@ -606,7 +606,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                   <Crown className="w-10 h-10 text-[#00c9a7]" />
                   <div>
                     <div className="font-semibold text-lg text-[#0F2940]">Coup de cœur · voyageurs</div>
-                    <div className="text-gray-600">Un des logements préférés des voyageurs au Bénin</div>
+                    <div className="text-[#5b6b7a]">Un des logements préférés des voyageurs au Bénin</div>
                   </div>
                 </div>
               )}
@@ -625,7 +625,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                       <Award className="w-4 h-4"/>Superhôte · {hostSince}
                     </div>
                   )}
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-[#5b6b7a]">
                     Taux de réponse {responseRate}% · Répond {responseTime}
                   </div>
                 </div>
@@ -633,9 +633,9 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
 
               {/* Description */}
               <div>
-                <p className="text-gray-700 leading-relaxed">{property.description}</p>
+                <p className="text-[#1c3b56] leading-relaxed">{property.description}</p>
                 {longDescription && longDescription !== property.description && (
-                  <p className="text-gray-700 mt-3 leading-relaxed">{longDescription}</p>
+                  <p className="text-[#1c3b56] mt-3 leading-relaxed">{longDescription}</p>
                 )}
               </div>
 
@@ -649,7 +649,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   {(showAllAmenities ? amenities : amenities.slice(0, 6)).map((a, i) => (
-                    <div key={i} className="flex items-center gap-3 text-gray-700">
+                    <div key={i} className="flex items-center gap-3 text-[#1c3b56]">
                       <Check className="w-5 h-5 text-[#00c9a7]"/>{a}
                     </div>
                   ))}
@@ -657,7 +657,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
               </div>
 
               {/* Témoignages */}
-              <div className="bg-gradient-to-r from-[#0F2940]/5 to-[#00c9a7]/5 rounded-2xl p-6">
+              <div className="bg-[#f4fffe] rounded-2xl p-6">
                 <h3 className="font-semibold text-xl text-[#0F2940] mb-4 flex items-center gap-2">
                   <Sparkles className="w-6 h-6 text-[#00c9a7]" />
                   Ce que nos clients disent
@@ -674,14 +674,14 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                     <div className="flex-1">
                       <div className="flex justify-between items-center flex-wrap gap-2">
                         <span className="font-bold text-lg text-[#0F2940]">{testimonials[currentTestimonial]?.name || "Client"}</span>
-                        <span className="text-sm text-gray-500">{testimonials[currentTestimonial]?.date || "récemment"}</span>
+                        <span className="text-sm text-[#5b6b7a]">{testimonials[currentTestimonial]?.date || "récemment"}</span>
                       </div>
                       <div className="flex items-center gap-1 mt-1">
                         {[...Array(5)].map((_, i) => (
-                          <Star key={i} className={`w-4 h-4 ${i < Math.floor(testimonials[currentTestimonial]?.rating || 5) ? 'fill-current text-[#00c9a7]' : 'text-gray-300'}`} />
+                          <Star key={i} className={`w-4 h-4 ${i < Math.floor(testimonials[currentTestimonial]?.rating || 5) ? 'fill-current text-[#00c9a7]' : 'text-[#9fb3c4]'}`} />
                         ))}
                       </div>
-                      <p className="text-gray-700 mt-3 leading-relaxed">"{testimonials[currentTestimonial]?.text || "Excellent séjour !"}"</p>
+                      <p className="text-[#1c3b56] mt-3 leading-relaxed">"{testimonials[currentTestimonial]?.text || "Excellent séjour !"}"</p>
                     </div>
                   </div>
                 </div>
@@ -694,9 +694,9 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                 <div className="flex justify-between items-center mb-4">
                   <div>
                     <span className="text-3xl font-bold text-[#0F2940]">{nightlyPrice.toLocaleString()} FCFA</span>
-                    <span className="text-gray-500"> / nuit</span>
+                    <span className="text-[#5b6b7a]"> / nuit</span>
                   </div>
-                  <div className="flex items-center gap-1 bg-gray-100 px-3 py-1 rounded-full">
+                  <div className="flex items-center gap-1 bg-[#e8faf6] px-3 py-1 rounded-full">
                     <Star className="w-4 h-4 fill-current text-[#00c9a7]"/>{property.rating}
                   </div>
                 </div>
@@ -704,31 +704,31 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                 <div className="border rounded-xl mb-5 overflow-hidden">
                   <div className="flex">
                     <div className="flex-1 p-3 border-r">
-                      <div className="text-xs font-bold text-gray-500 uppercase">Arrivée</div>
+                      <div className="text-xs font-bold text-[#5b6b7a] uppercase">Arrivée</div>
                       <div className="font-medium">{formattedCheckIn || 'Sélectionner'}</div>
                     </div>
                     <div className="flex-1 p-3">
-                      <div className="text-xs font-bold text-gray-500 uppercase">Départ</div>
+                      <div className="text-xs font-bold text-[#5b6b7a] uppercase">Départ</div>
                       <div className="font-medium">{formattedCheckOut || 'Sélectionner'}</div>
                     </div>
                   </div>
                   <div className="p-3 border-t">
-                    <div className="text-xs font-bold text-gray-500 uppercase">Voyageurs</div>
+                    <div className="text-xs font-bold text-[#5b6b7a] uppercase">Voyageurs</div>
                     <div className="font-medium">{guests} adulte{guests > 1 ? 's' : ''}</div>
                   </div>
                 </div>
 
                 <div className="space-y-2 mb-5">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">{nightlyPrice.toLocaleString()} FCFA × {nights} nuits</span>
+                    <span className="text-[#5b6b7a]">{nightlyPrice.toLocaleString()} FCFA × {nights} nuits</span>
                     <span>{subtotal.toLocaleString()} FCFA</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Frais de ménage</span>
+                    <span className="text-[#5b6b7a]">Frais de ménage</span>
                     <span>{cleaningFee.toLocaleString()} FCFA</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Frais de service</span>
+                    <span className="text-[#5b6b7a]">Frais de service</span>
                     <span>{serviceFee.toLocaleString()} FCFA</span>
                   </div>
                   <div className="flex justify-between font-bold pt-2 border-t">
@@ -739,7 +739,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
 
                 <button 
                   onClick={handleReserveClick}
-                  className="w-full bg-[#00c9a7] text-[#0F2940] py-3 rounded-xl font-bold text-lg hover:bg-[#00b892] transition-all hover:scale-105 transform shadow-md"
+                  className="w-full bg-[#00c9a7] text-[#0F2940] py-3 rounded-xl font-bold text-lg hover:bg-[#00b396] transition-all hover:scale-105 transform shadow-md"
                 >
                   Réserver
                 </button>
@@ -752,7 +752,7 @@ export const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({
                     Discuter avec l'hôte
                   </button>
                 )}
-                <p className="text-center text-xs text-gray-500 mt-3">Aucun débit pour le moment</p>
+                <p className="text-center text-xs text-[#5b6b7a] mt-3">Aucun débit pour le moment</p>
               </div>
             </div>
           </div>

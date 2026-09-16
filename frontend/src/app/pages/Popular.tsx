@@ -231,7 +231,7 @@ const CheckoutModal = ({ property, checkIn, checkOut, guests, totalPrice, onClos
       <div className="bg-white rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
         <div className="sticky top-0 bg-white border-b p-4 flex justify-between items-center">
           <h2 className="text-xl font-semibold">Confirmer et payer</h2>
-          <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100"><X className="w-5 h-5" /></button>
+          <button onClick={onClose} className="p-2 rounded-full hover:bg-[#e8faf6]"><X className="w-5 h-5" /></button>
         </div>
         <div className="flex flex-col lg:flex-row h-full overflow-y-auto">
           <div className="lg:w-3/5 p-6 space-y-6 border-r">
@@ -240,9 +240,9 @@ const CheckoutModal = ({ property, checkIn, checkOut, guests, totalPrice, onClos
               <div className="space-y-2">
                 <div className="border rounded-lg p-3 border-[#00c9a7] bg-[#00c9a7]/5">
                   <div className="flex justify-between"><span className="font-medium">Payez {totalPrice.toLocaleString()} FCFA maintenant</span><span>✓</span></div>
-                  <div className="text-xs text-gray-500">Paiement immédiat, non remboursable</div>
+                  <div className="text-xs text-[#5b6b7a]">Paiement immédiat, non remboursable</div>
                 </div>
-                <div className="border rounded-lg p-3 border-gray-200 opacity-50 cursor-not-allowed">
+                <div className="border rounded-lg p-3 border-[#e2f5f2] opacity-50 cursor-not-allowed">
                   <div className="flex justify-between"><span>Payer en 3 fois avec Klarna</span><span>Indisponible</span></div>
                 </div>
               </div>
@@ -250,13 +250,13 @@ const CheckoutModal = ({ property, checkIn, checkOut, guests, totalPrice, onClos
             <div>
               <h3 className="font-semibold text-lg mb-2">Ajoutez un mode de paiement</h3>
               <div className="flex gap-3 flex-wrap mb-4">
-                <button onClick={() => setPaymentMethod("mtn")} className={`flex items-center gap-2 px-4 py-2 rounded-full border ${paymentMethod === "mtn" ? "border-[#00c9a7] bg-[#00c9a7]/5" : "border-gray-300"}`}>
+                <button onClick={() => setPaymentMethod("mtn")} className={`flex items-center gap-2 px-4 py-2 rounded-full border ${paymentMethod === "mtn" ? "border-[#00c9a7] bg-[#00c9a7]/5" : "border-[#c9f0e8]"}`}>
                   <Smartphone className="w-4 h-4"/> MTN Mobile Money
                 </button>
-                <button onClick={() => setPaymentMethod("orange")} className={`flex items-center gap-2 px-4 py-2 rounded-full border ${paymentMethod === "orange" ? "border-[#00c9a7] bg-[#00c9a7]/5" : "border-gray-300"}`}>
+                <button onClick={() => setPaymentMethod("orange")} className={`flex items-center gap-2 px-4 py-2 rounded-full border ${paymentMethod === "orange" ? "border-[#00c9a7] bg-[#00c9a7]/5" : "border-[#c9f0e8]"}`}>
                   <Smartphone className="w-4 h-4"/> Orange Money
                 </button>
-                <button onClick={() => setPaymentMethod("card")} className={`flex items-center gap-2 px-4 py-2 rounded-full border ${paymentMethod === "card" ? "border-[#00c9a7] bg-[#00c9a7]/5" : "border-gray-300"}`}>
+                <button onClick={() => setPaymentMethod("card")} className={`flex items-center gap-2 px-4 py-2 rounded-full border ${paymentMethod === "card" ? "border-[#00c9a7] bg-[#00c9a7]/5" : "border-[#c9f0e8]"}`}>
                   <CreditCard className="w-4 h-4"/> Carte bancaire
                 </button>
               </div>
@@ -265,7 +265,7 @@ const CheckoutModal = ({ property, checkIn, checkOut, guests, totalPrice, onClos
                   <div>
                     <label className="block text-sm font-medium mb-1">Numéro de téléphone</label>
                     <div className="flex items-center border rounded-lg p-2">
-                      <Phone className="w-5 h-5 text-gray-400 mr-2" />
+                      <Phone className="w-5 h-5 text-[#5b6b7a] mr-2" />
                       <input type="tel" placeholder="XX XX XX XX" className="flex-1 outline-none" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required />
                     </div>
                   </div>
@@ -282,12 +282,12 @@ const CheckoutModal = ({ property, checkIn, checkOut, guests, totalPrice, onClos
                     </div>
                   </>
                 )}
-                <button type="submit" className="w-full bg-[#00c9a7] text-[#0F2940] py-3 rounded-lg font-semibold mt-4 hover:bg-[#00b892] transition-colors">Confirmer et payer</button>
+                <button type="submit" className="w-full bg-[#00c9a7] text-[#0F2940] py-3 rounded-lg font-semibold mt-4 hover:bg-[#00b396] transition-colors">Confirmer et payer</button>
               </form>
-              <p className="text-xs text-gray-500 text-center mt-3">Vos informations sont sécurisées.</p>
+              <p className="text-xs text-[#5b6b7a] text-center mt-3">Vos informations sont sécurisées.</p>
             </div>
           </div>
-          <div className="lg:w-2/5 bg-gray-50 p-6 space-y-4">
+          <div className="lg:w-2/5 bg-[#f4fffe] p-6 space-y-4">
             <div className="flex gap-4">
               <img src={property.images?.[0] || property.image || '/placeholder.jpg'} alt={property.title} className="w-20 h-20 rounded-lg object-cover" onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.jpg'; }} />
               <div>
@@ -358,10 +358,10 @@ const PropertyDetailModal = ({ property, onClose, onReserve }: { property: Popul
     <div className="fixed inset-0 z-50 bg-white overflow-y-auto">
       <div className="min-h-screen">
         <div className="sticky top-0 z-10 bg-white border-b px-4 py-3 flex justify-between items-center">
-          <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100 transition-all hover:scale-110"><ArrowLeft className="w-5 h-5"/></button>
+          <button onClick={onClose} className="p-2 rounded-full hover:bg-[#e8faf6] transition-all hover:scale-110"><ArrowLeft className="w-5 h-5"/></button>
           <div className="flex gap-2">
-            <button className="p-2 rounded-full hover:bg-gray-100 transition-all hover:scale-110"><Share2 className="w-5 h-5"/></button>
-            <button className="p-2 rounded-full hover:bg-gray-100 transition-all hover:scale-110"><Heart className="w-5 h-5"/></button>
+            <button className="p-2 rounded-full hover:bg-[#e8faf6] transition-all hover:scale-110"><Share2 className="w-5 h-5"/></button>
+            <button className="p-2 rounded-full hover:bg-[#e8faf6] transition-all hover:scale-110"><Heart className="w-5 h-5"/></button>
           </div>
         </div>
         <div className="max-w-6xl mx-auto px-4 py-6">
@@ -374,19 +374,19 @@ const PropertyDetailModal = ({ property, onClose, onReserve }: { property: Popul
                 <img src={img} className="w-full h-36 object-cover transition-transform duration-700 group-hover:scale-105" />
               </div>
             ))}
-            <button className="absolute bottom-4 right-4 bg-white rounded-lg px-4 py-2 text-sm font-medium shadow-md hover:shadow-lg transition-all hover:bg-gray-100">Afficher toutes les photos</button>
+            <button className="absolute bottom-4 right-4 bg-white rounded-lg px-4 py-2 text-sm font-medium shadow-md hover:shadow-lg transition-all hover:bg-[#e8faf6]">Afficher toutes les photos</button>
           </div>
 
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-8">
               <div className="border-b pb-4">
-                <div className="text-sm text-gray-500">Logement entier · {property.bedrooms} chambre · {property.beds} lits · {property.baths} salle de bain</div>
+                <div className="text-sm text-[#5b6b7a]">Logement entier · {property.bedrooms} chambre · {property.beds} lits · {property.baths} salle de bain</div>
                 <h1 className="text-3xl font-semibold text-[#0F2940] mt-2">{property.title}</h1>
                 <div className="flex items-center gap-2 mt-2">
                   <Star className="w-5 h-5 fill-current text-[#00c9a7]" />
                   <span className="font-medium">{property.rating}</span>
-                  <span className="text-gray-500">· {property.reviews} commentaires</span>
-                  <span className="text-gray-500">·</span>
+                  <span className="text-[#5b6b7a]">· {property.reviews} commentaires</span>
+                  <span className="text-[#5b6b7a]">·</span>
                   <span className="text-[#00c9a7] font-medium">Superhôte</span>
                 </div>
               </div>
@@ -396,7 +396,7 @@ const PropertyDetailModal = ({ property, onClose, onReserve }: { property: Popul
                 <Crown className="w-10 h-10 text-[#00c9a7] animate-bounce" />
                 <div>
                   <div className="font-semibold text-lg text-[#0F2940]">Coup de cœur · voyageurs</div>
-                  <div className="text-gray-600">Un des logements préférés des voyageurs</div>
+                  <div className="text-[#5b6b7a]">Un des logements préférés des voyageurs</div>
                 </div>
               </div>
 
@@ -409,11 +409,11 @@ const PropertyDetailModal = ({ property, onClose, onReserve }: { property: Popul
                 <div>
                   <div className="font-semibold text-xl text-[#0F2940]">Hôte : {property.host}</div>
                   <div className="flex items-center gap-1 text-[#00c9a7]"><Award className="w-4 h-4"/>Superhôte · {property.hostSince}</div>
-                  <div className="text-sm text-gray-600">Taux de réponse {property.responseRate}% · Répond {property.responseTime}</div>
+                  <div className="text-sm text-[#5b6b7a]">Taux de réponse {property.responseRate}% · Répond {property.responseTime}</div>
                 </div>
               </div>
 
-              <div><p className="text-gray-700 leading-relaxed">{property.description}</p>{property.longDescription && <p className="text-gray-700 mt-3 leading-relaxed">{property.longDescription}</p>}</div>
+              <div><p className="text-[#1c3b56] leading-relaxed">{property.description}</p>{property.longDescription && <p className="text-[#1c3b56] mt-3 leading-relaxed">{property.longDescription}</p>}</div>
 
               <div className="border-t pt-4">
                 <div className="flex justify-between items-center mb-4">
@@ -422,13 +422,13 @@ const PropertyDetailModal = ({ property, onClose, onReserve }: { property: Popul
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   {(showAllAmenities ? property.amenities : property.amenities.slice(0,6)).map((a,i)=>(
-                    <div key={i} className="flex items-center gap-3 text-gray-700"><Check className="w-5 h-5 text-[#00c9a7]"/>{a}</div>
+                    <div key={i} className="flex items-center gap-3 text-[#1c3b56]"><Check className="w-5 h-5 text-[#00c9a7]"/>{a}</div>
                   ))}
                 </div>
               </div>
 
               {testimonials.length > 0 && (
-                <div className="bg-gradient-to-r from-[#0F2940]/5 to-[#00c9a7]/5 rounded-2xl p-6 overflow-hidden">
+                <div className="bg-[#f4fffe] rounded-2xl p-6 overflow-hidden">
                   <h3 className="font-semibold text-xl text-[#0F2940] mb-4 flex items-center gap-2">
                     <Sparkles className="w-6 h-6 text-[#00c9a7] animate-pulse" />
                     Ce que nos clients disent
@@ -448,15 +448,15 @@ const PropertyDetailModal = ({ property, onClose, onReserve }: { property: Popul
                       <div className="flex-1">
                         <div className="flex justify-between items-center flex-wrap gap-2">
                           <span className="font-bold text-lg text-[#0F2940]">{testimonials[currentTestimonial].name}</span>
-                          <span className="text-sm text-gray-500">{testimonials[currentTestimonial].date}</span>
+                          <span className="text-sm text-[#5b6b7a]">{testimonials[currentTestimonial].date}</span>
                         </div>
                         <div className="flex items-center gap-1 mt-1">
                           {[...Array(5)].map((_, i) => (
-                            <Star key={i} className={`w-4 h-4 ${i < Math.floor(testimonials[currentTestimonial].rating) ? 'fill-current text-[#00c9a7]' : 'text-gray-300'}`} />
+                            <Star key={i} className={`w-4 h-4 ${i < Math.floor(testimonials[currentTestimonial].rating) ? 'fill-current text-[#00c9a7]' : 'text-[#9fb3c4]'}`} />
                           ))}
-                          <span className="text-sm text-gray-500 ml-2">{testimonials[currentTestimonial].rating}</span>
+                          <span className="text-sm text-[#5b6b7a] ml-2">{testimonials[currentTestimonial].rating}</span>
                         </div>
-                        <p className="text-gray-700 mt-3 leading-relaxed">"{testimonials[currentTestimonial].text}"</p>
+                        <p className="text-[#1c3b56] mt-3 leading-relaxed">"{testimonials[currentTestimonial].text}"</p>
                       </div>
                     </div>
                     <div className="flex justify-center gap-2 mt-6">
@@ -464,7 +464,7 @@ const PropertyDetailModal = ({ property, onClose, onReserve }: { property: Popul
                         <button 
                           key={idx} 
                           onClick={() => { setAnimate(true); setTimeout(() => { setCurrentTestimonial(idx); setAnimate(false); }, 300); }}
-                          className={`w-2 h-2 rounded-full transition-all duration-300 ${currentTestimonial === idx ? 'w-6 bg-[#00c9a7]' : 'bg-gray-300'}`}
+                          className={`w-2 h-2 rounded-full transition-all duration-300 ${currentTestimonial === idx ? 'w-6 bg-[#00c9a7]' : 'bg-[#c9f0e8]'}`}
                         />
                       ))}
                     </div>
@@ -480,40 +480,40 @@ const PropertyDetailModal = ({ property, onClose, onReserve }: { property: Popul
                 {showCalendar && (
                   <div className="mt-4 border rounded-lg p-4">
                     <div className="grid grid-cols-7 gap-1 text-center text-sm">
-                      {["L","M","M","J","V","S","D"].map(d=> <div key={d} className="font-medium text-gray-500">{d}</div>)}
+                      {["L","M","M","J","V","S","D"].map(d=> <div key={d} className="font-medium text-[#5b6b7a]">{d}</div>)}
                       {Array.from({length: 35}).map((_,i)=> <button key={i} className="aspect-square rounded-full hover:bg-[#00c9a7]/20">{i+1}</button>)}
                     </div>
                   </div>
                 )}
-                <div className="text-sm text-gray-500 mt-3"><Calendar className="inline w-4 h-4 mr-1"/>{checkIn} — {checkOut}</div>
+                <div className="text-sm text-[#5b6b7a] mt-3"><Calendar className="inline w-4 h-4 mr-1"/>{checkIn} — {checkOut}</div>
               </div>
             </div>
 
             <div className="lg:col-span-1">
               <div className="sticky top-24 border rounded-2xl p-6 shadow-xl bg-white">
                 <div className="flex justify-between items-center">
-                  <div><span className="text-3xl font-bold text-[#0F2940]">{property.priceNumber.toLocaleString()} FCFA</span><span className="text-gray-500"> / nuit</span></div>
-                  <div className="flex items-center gap-1 bg-gray-100 px-3 py-1 rounded-full"><Star className="w-4 h-4 fill-current text-[#00c9a7]"/>{property.rating}</div>
+                  <div><span className="text-3xl font-bold text-[#0F2940]">{property.priceNumber.toLocaleString()} FCFA</span><span className="text-[#5b6b7a]"> / nuit</span></div>
+                  <div className="flex items-center gap-1 bg-[#e8faf6] px-3 py-1 rounded-full"><Star className="w-4 h-4 fill-current text-[#00c9a7]"/>{property.rating}</div>
                 </div>
                 <div className="border rounded-xl my-5 overflow-hidden">
                   <div className="flex">
-                    <div className="flex-1 p-3 border-r"><div className="text-xs font-bold text-gray-500 uppercase">Arrivée</div><div className="font-medium">{checkIn}</div></div>
-                    <div className="flex-1 p-3"><div className="text-xs font-bold text-gray-500 uppercase">Départ</div><div className="font-medium">{checkOut}</div></div>
+                    <div className="flex-1 p-3 border-r"><div className="text-xs font-bold text-[#5b6b7a] uppercase">Arrivée</div><div className="font-medium">{checkIn}</div></div>
+                    <div className="flex-1 p-3"><div className="text-xs font-bold text-[#5b6b7a] uppercase">Départ</div><div className="font-medium">{checkOut}</div></div>
                   </div>
-                  <div className="p-3 border-t"><div className="text-xs font-bold text-gray-500 uppercase">Voyageurs</div><div className="font-medium">{guests} adulte</div></div>
+                  <div className="p-3 border-t"><div className="text-xs font-bold text-[#5b6b7a] uppercase">Voyageurs</div><div className="font-medium">{guests} adulte</div></div>
                 </div>
                 <div className="space-y-3 mb-5">
                   <div className={`border rounded-xl p-3 cursor-pointer transition-all ${selectedPriceOption==="non-remboursable"?"border-[#00c9a7] bg-[#00c9a7]/5 shadow-md":""}`} onClick={()=>setSelectedPriceOption("non-remboursable")}>
                     <div className="flex justify-between font-medium"><span>Non remboursable</span><span>{nonRefundableTotal.toLocaleString()} FCFA</span></div>
-                    <div className="text-xs text-gray-500">Paiement immédiat</div>
+                    <div className="text-xs text-[#5b6b7a]">Paiement immédiat</div>
                   </div>
                   <div className="border rounded-xl p-3 cursor-not-allowed opacity-50">
                     <div className="flex justify-between"><span>Remboursable</span><span>{refundableTotal.toLocaleString()} FCFA</span></div>
-                    <div className="text-xs text-gray-500">Annulation gratuite avant le 10 mai</div>
+                    <div className="text-xs text-[#5b6b7a]">Annulation gratuite avant le 10 mai</div>
                   </div>
                 </div>
-                <button onClick={onReserve} className="w-full bg-[#00c9a7] text-[#0F2940] py-3 rounded-xl font-bold text-lg hover:bg-[#00b892] transition-all hover:scale-105 transform shadow-md">Réserver</button>
-                <p className="text-center text-xs text-gray-500 mt-3">Aucun débit pour le moment</p>
+                <button onClick={onReserve} className="w-full bg-[#00c9a7] text-[#0F2940] py-3 rounded-xl font-bold text-lg hover:bg-[#00b396] transition-all hover:scale-105 transform shadow-md">Réserver</button>
+                <p className="text-center text-xs text-[#5b6b7a] mt-3">Aucun débit pour le moment</p>
               </div>
             </div>
           </div>
@@ -571,7 +571,7 @@ export default function Popular({ onNavigate }: PopularPageProps) {
     <div className="min-h-screen bg-white">
       {/* En-tête fixe */}
       <div className="sticky top-0 bg-white border-b px-4 py-3 flex items-center gap-4 z-20">
-        <button onClick={() => handleNavigate({ name: 'home' })} className="p-2 rounded-full hover:bg-gray-100 transition-all hover:scale-110">
+        <button onClick={() => handleNavigate({ name: 'home' })} className="p-2 rounded-full hover:bg-[#e8faf6] transition-all hover:scale-110">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-xl font-semibold text-[#0F2940]">Logements populaires · Bénin</h1>
@@ -580,7 +580,7 @@ export default function Popular({ onNavigate }: PopularPageProps) {
       {/* Barre de filtres */}
       <div className="sticky top-[73px] bg-white border-b px-4 py-2 z-10">
         <div className="relative inline-block">
-          <button onClick={()=>setShowFilterDropdown(!showFilterDropdown)} className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-300 hover:border-[#00c9a7] transition-colors">
+          <button onClick={()=>setShowFilterDropdown(!showFilterDropdown)} className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#c9f0e8] hover:border-[#00c9a7] transition-colors">
             <Filter className="w-4 h-4 text-[#00c9a7]"/><span className="text-sm">Trier : {selectedFilter}</span><ChevronDown className="w-4 h-4"/>
           </button>
           {showFilterDropdown && (
@@ -612,14 +612,14 @@ export default function Popular({ onNavigate }: PopularPageProps) {
                 </div>
                 <div className="mt-3">
                   <div className="flex justify-between">
-                    <div><h3 className="font-semibold text-[#0F2940] text-lg">{property.title}</h3><p className="text-sm text-gray-500">{property.location}</p></div>
-                    <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-full"><Star className="w-3 h-3 fill-current text-[#00c9a7]"/><span className="text-sm font-medium">{property.rating}</span></div>
+                    <div><h3 className="font-semibold text-[#0F2940] text-lg">{property.title}</h3><p className="text-sm text-[#5b6b7a]">{property.location}</p></div>
+                    <div className="flex items-center gap-1 bg-[#e8faf6] px-2 py-1 rounded-full"><Star className="w-3 h-3 fill-current text-[#00c9a7]"/><span className="text-sm font-medium">{property.rating}</span></div>
                   </div>
-                  <p className="text-sm text-gray-600 mt-2 line-clamp-2">{property.description}</p>
-                  <div className="flex gap-3 text-sm text-gray-500 mt-2"><Bed className="w-4 h-4"/>{property.beds} lits <Bath className="w-4 h-4"/>{property.baths} sdb</div>
+                  <p className="text-sm text-[#5b6b7a] mt-2 line-clamp-2">{property.description}</p>
+                  <div className="flex gap-3 text-sm text-[#5b6b7a] mt-2"><Bed className="w-4 h-4"/>{property.beds} lits <Bath className="w-4 h-4"/>{property.baths} sdb</div>
                   <div className="mt-3 flex justify-between items-center">
                     <span className="font-bold text-[#0F2940] text-lg">{property.price}</span>
-                    <button className="p-2 rounded-full hover:bg-gray-100 transition-colors"><Heart className="w-5 h-5 text-gray-500 hover:text-[#00c9a7]" /></button>
+                    <button className="p-2 rounded-full hover:bg-[#e8faf6] transition-colors"><Heart className="w-5 h-5 text-[#5b6b7a] hover:text-[#00c9a7]" /></button>
                   </div>
                 </div>
               </div>
@@ -628,7 +628,7 @@ export default function Popular({ onNavigate }: PopularPageProps) {
         </div>
 
         {/* Droite : Carte Maps */}
-        <div className="lg:w-1/2 h-96 lg:h-auto bg-gray-100 relative">
+        <div className="lg:w-1/2 h-96 lg:h-auto bg-[#e8faf6] relative">
           <iframe title="Carte" src={getMapUrl()} width="100%" height="100%" style={{ border: 0 }} allowFullScreen loading="lazy" className="w-full h-full" />
           <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur rounded-lg px-3 py-1 text-xs shadow">📍 Cotonou, Bénin</div>
         </div>

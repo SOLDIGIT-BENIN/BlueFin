@@ -16,10 +16,10 @@ import { PropertyDetailModal } from '../../components/PropertyDetailModal';
 // ============================================
 const StatCard = ({ icon: Icon, label, value, color }: any) => {
   const colors = {
-    yellow: 'from-yellow-500 to-yellow-600',
-    blue: 'from-blue-500 to-blue-600',
+    yellow: 'from-[#ffc93c] to-[#e0ac1f]',
+    blue: 'from-[#00c9a7] to-[#00b396]',
     green: 'from-green-500 to-green-600',
-    purple: 'from-purple-500 to-purple-600',
+    purple: 'from-[#0f2940] to-[#1c3b56]',
   };
 
   return (
@@ -41,12 +41,12 @@ const StatCard = ({ icon: Icon, label, value, color }: any) => {
 const LoadingSkeleton = ({ isDark }: { isDark: boolean }) => (
   <div className="p-3 sm:p-4 md:p-6">
     <div className="animate-pulse">
-      <div className={`h-6 sm:h-8 ${isDark ? 'bg-slate-700' : 'bg-gray-200'} rounded w-48 mb-4`}></div>
-      <div className={`${isDark ? 'bg-slate-700' : 'bg-gray-200'} rounded-xl h-12 mb-6`}></div>
+      <div className={`h-6 sm:h-8 ${isDark ? 'bg-[#1c3b56]' : 'bg-[#e2f5f2]'} rounded w-48 mb-4`}></div>
+      <div className={`${isDark ? 'bg-[#1c3b56]' : 'bg-[#e2f5f2]'} rounded-xl h-12 mb-6`}></div>
       <div className="grid grid-cols-4 gap-4 mb-6">
-        {[...Array(4)].map((_, i) => <div key={i} className={`${isDark ? 'bg-slate-700' : 'bg-gray-200'} rounded-xl h-20`}></div>)}
+        {[...Array(4)].map((_, i) => <div key={i} className={`${isDark ? 'bg-[#1c3b56]' : 'bg-[#e2f5f2]'} rounded-xl h-20`}></div>)}
       </div>
-      <div className={`${isDark ? 'bg-slate-700' : 'bg-gray-200'} rounded-xl h-80 mb-6`}></div>
+      <div className={`${isDark ? 'bg-[#1c3b56]' : 'bg-[#e2f5f2]'} rounded-xl h-80 mb-6`}></div>
     </div>
   </div>
 );
@@ -70,10 +70,10 @@ const AdminPropertyCard = ({ property, isDark, onView, onApprove, onReject }: an
   const imageUrl = getFirstImage();
 
   return (
-    <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-xl sm:rounded-2xl p-4 shadow-sm hover:shadow-md transition-all border`}>
+    <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-xl sm:rounded-2xl p-4 shadow-sm hover:shadow-md transition-all border`}>
       <div className="flex flex-col sm:flex-row gap-4">
         {/* Image */}
-        <div className="w-full sm:w-32 h-48 sm:h-32 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
+        <div className="w-full sm:w-32 h-48 sm:h-32 rounded-xl overflow-hidden bg-[#e8faf6] flex-shrink-0">
           {imageUrl ? (
             <img 
               src={imageUrl} 
@@ -83,30 +83,30 @@ const AdminPropertyCard = ({ property, isDark, onView, onApprove, onReject }: an
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <Home className={`w-8 h-8 ${isDark ? 'text-slate-600' : 'text-gray-400'}`} />
+              <Home className={`w-8 h-8 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`} />
             </div>
           )}
         </div>
 
         {/* Infos */}
         <div className="flex-1 min-w-0">
-          <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-800'} text-lg`}>{property.title}</h3>
+          <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-[#0f2940]'} text-lg`}>{property.title}</h3>
           <div className="flex flex-wrap items-center gap-2 mt-1">
-            <span className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-yellow-900/30 text-yellow-400' : 'bg-yellow-100 text-yellow-700'}`}>
+            <span className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-[#4a3400]/30 text-[#ffc93c]' : 'bg-[#fff3cd] text-[#6b4e06]'}`}>
               En attente
             </span>
-            <span className={`text-xs ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>• {property.city}, {property.district}</span>
+            <span className={`text-xs ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>• {property.city}, {property.district}</span>
           </div>
           <div className="flex flex-wrap items-center gap-3 mt-2 text-sm">
-            <div className={`flex items-center gap-1 ${isDark ? 'text-slate-300' : 'text-gray-600'}`}>
+            <div className={`flex items-center gap-1 ${isDark ? 'text-[#9fb3c4]' : 'text-[#5b6b7a]'}`}>
               <User className="w-4 h-4" />
               <span>{property.user?.full_name || 'Hôte'}</span>
             </div>
-            <div className={`flex items-center gap-1 ${isDark ? 'text-slate-300' : 'text-gray-600'}`}>
+            <div className={`flex items-center gap-1 ${isDark ? 'text-[#9fb3c4]' : 'text-[#5b6b7a]'}`}>
               <DollarSign className="w-4 h-4" />
               <span>{property.price_per_night?.toLocaleString()} FCFA/nuit</span>
             </div>
-            <div className={`flex items-center gap-1 ${isDark ? 'text-slate-300' : 'text-gray-600'}`}>
+            <div className={`flex items-center gap-1 ${isDark ? 'text-[#9fb3c4]' : 'text-[#5b6b7a]'}`}>
               <CalendarIcon className="w-4 h-4" />
               <span>Soumis le {new Date(property.created_at).toLocaleDateString()}</span>
             </div>
@@ -117,7 +117,7 @@ const AdminPropertyCard = ({ property, isDark, onView, onApprove, onReject }: an
         <div className="flex flex-row sm:flex-col gap-2 justify-end">
           <button
             onClick={onView}
-            className={`p-2 ${isDark ? 'bg-slate-700 hover:bg-slate-600 text-slate-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'} rounded-lg transition`}
+            className={`p-2 ${isDark ? 'bg-[#1c3b56] hover:bg-[#5b6b7a] text-[#9fb3c4]' : 'bg-[#e8faf6] hover:bg-[#e2f5f2] text-[#5b6b7a]'} rounded-lg transition`}
             title="Voir les détails"
           >
             <Eye className="w-4 h-4" />
@@ -211,13 +211,13 @@ export function AdminPropertiesPage({ onNavigate }: { onNavigate?: (route: any) 
   };
 
   return (
-    <div className={`p-3 sm:p-4 md:p-6 ${isDark ? 'bg-slate-900' : 'bg-gradient-to-br from-gray-50 to-gray-100'} min-h-screen transition-colors duration-300`}>
+    <div className={`p-3 sm:p-4 md:p-6 ${isDark ? 'bg-[#0f2940]' : 'bg-gradient-to-br from-[#f4fffe] to-[#e8faf6]'} min-h-screen transition-colors duration-300`}>
       {/* En-tête */}
       <div className="mb-6">
-        <h1 className={`text-xl sm:text-2xl md:text-3xl font-bold ${isDark ? 'text-white' : 'bg-gradient-to-r from-[#0f2940] to-[#00c9a7] bg-clip-text text-transparent'}`}>
+        <h1 className={`text-xl sm:text-2xl md:text-3xl font-bold ${isDark ? 'text-white' : 'text-[#0f2940]'}`}>
           Modération des propriétés
         </h1>
-        <p className={`text-xs sm:text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>
+        <p className={`text-xs sm:text-sm mt-1 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>
           Validez ou rejetez les annonces en attente
         </p>
       </div>
@@ -251,9 +251,9 @@ export function AdminPropertiesPage({ onNavigate }: { onNavigate?: (route: any) 
       </div>
 
       {/* Barre de recherche */}
-      <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm border mb-6 transition-colors duration-300`}>
+      <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm border mb-6 transition-colors duration-300`}>
         <div className="relative">
-          <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isDark ? 'text-slate-500' : 'text-gray-400'}`} />
+          <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`} />
           <input
             type="text"
             placeholder="Rechercher par titre, ville ou hôte..."
@@ -261,8 +261,8 @@ export function AdminPropertiesPage({ onNavigate }: { onNavigate?: (route: any) 
             onChange={(e) => setSearchTerm(e.target.value)}
             className={`w-full pl-9 pr-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9a7] transition-colors duration-300 ${
               isDark 
-                ? 'bg-slate-700 border-slate-600 text-white placeholder-slate-400' 
-                : 'bg-white border-gray-200 text-gray-800 placeholder-gray-400'
+                ? 'bg-[#1c3b56] border-[#5b6b7a] text-white placeholder-[#5b6b7a]' 
+                : 'bg-white border-[#e2f5f2] text-[#0f2940] placeholder-[#5b6b7a]'
             }`}
           />
         </div>
@@ -271,9 +271,9 @@ export function AdminPropertiesPage({ onNavigate }: { onNavigate?: (route: any) 
       {/* Liste des propriétés */}
       <div className="space-y-4">
         {filteredProperties.length === 0 ? (
-          <div className={`${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'} rounded-xl sm:rounded-2xl p-8 sm:p-12 text-center border transition-colors duration-300`}>
-            <Home className={`w-12 h-12 sm:w-16 sm:h-16 ${isDark ? 'text-slate-600' : 'text-gray-300'} mx-auto mb-3`} />
-            <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>Aucune propriété en attente de modération</p>
+          <div className={`${isDark ? 'bg-[#0f2940] border-[#1c3b56]' : 'bg-white border-[#e2f5f2]'} rounded-xl sm:rounded-2xl p-8 sm:p-12 text-center border transition-colors duration-300`}>
+            <Home className={`w-12 h-12 sm:w-16 sm:h-16 ${isDark ? 'text-[#5b6b7a]' : 'text-[#9fb3c4]'} mx-auto mb-3`} />
+            <p className={`text-sm ${isDark ? 'text-[#5b6b7a]' : 'text-[#5b6b7a]'}`}>Aucune propriété en attente de modération</p>
           </div>
         ) : (
           filteredProperties.map((property: any) => (

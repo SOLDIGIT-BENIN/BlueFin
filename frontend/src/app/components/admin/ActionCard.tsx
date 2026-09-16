@@ -9,22 +9,22 @@ export function ActionCard({
   action: () => void;
 }) {
   const colors = {
-    yellow: 'border-yellow-200 hover:border-yellow-400',
+    yellow: 'border-[#ffe9a8] hover:border-[#ffc93c]',
     red: 'border-red-200 hover:border-red-400',
     green: 'border-green-200 hover:border-green-400',
-    orange: 'border-orange-200 hover:border-orange-400',
+    orange: 'border-[#ffe9a8] hover:border-[#ffc93c]',
   };
 
   return (
     <button
       onClick={action}
-      className={`w-full flex items-center justify-between p-3 rounded-xl border ${colors[color]} hover:bg-gray-50 transition`}
+      className={`w-full flex items-center justify-between p-3 rounded-xl border ${colors[color]} hover:bg-[#f4fffe] transition`}
     >
       <div className="flex items-center gap-3">
         {icon}
         <span className="text-sm font-medium">{title}</span>
       </div>
-      <span className={`text-sm font-bold ${count > 0 ? 'text-red-500' : 'text-gray-400'}`}>
+      <span className={`text-sm font-bold ${count > 0 ? 'text-red-500' : 'text-[#5b6b7a]'}`}>
         {count}
       </span>
     </button>

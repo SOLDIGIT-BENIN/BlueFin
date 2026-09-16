@@ -27,7 +27,7 @@ export function WhatsAppButton() {
       />
       
       {/* Tooltip au survol (desktop seulement) */}
-      <span className="hidden md:block absolute right-full mr-3 bg-gray-900 text-white 
+      <span className="hidden md:block absolute right-full mr-3 bg-[#0f2940] text-white 
                      text-sm px-4 py-2 rounded-lg opacity-0 
                      group-hover:opacity-100 transition-all duration-300
                      whitespace-nowrap pointer-events-none

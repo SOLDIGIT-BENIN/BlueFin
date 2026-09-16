@@ -111,8 +111,8 @@ export function FedapayCallbackPage({ onNavigate }: FedapayCallbackPageProps) {
       <div className="min-h-screen flex items-center justify-center bg-[#f4fffe]">
         <div className="text-center">
           <Loader2 className="w-16 h-16 text-[#00c9a7] animate-spin mx-auto mb-4" />
-          <p className="text-gray-600 text-lg font-medium">Vérification du paiement en cours...</p>
-          <p className="text-gray-400 text-sm mt-2">Veuillez patienter</p>
+          <p className="text-[#5b6b7a] text-lg font-medium">Vérification du paiement en cours...</p>
+          <p className="text-[#5b6b7a] text-sm mt-2">Veuillez patienter</p>
         </div>
       </div>
     );
@@ -127,8 +127,8 @@ export function FedapayCallbackPage({ onNavigate }: FedapayCallbackPageProps) {
               <CheckCircle className="w-12 h-12 text-green-600" />
             </div>
             <h2 className="text-2xl font-bold text-[#0F2940] mb-2">✅ Paiement réussi !</h2>
-            <p className="text-gray-600 mb-2">Votre réservation est confirmée.</p>
-            <p className="text-gray-400 text-sm">Redirection vers l'accueil dans quelques secondes...</p>
+            <p className="text-[#5b6b7a] mb-2">Votre réservation est confirmée.</p>
+            <p className="text-[#5b6b7a] text-sm">Redirection vers l'accueil dans quelques secondes...</p>
             
             <div className="mt-6 flex justify-center gap-3">
               <button
@@ -139,7 +139,7 @@ export function FedapayCallbackPage({ onNavigate }: FedapayCallbackPageProps) {
                     navigate('/');
                   }
                 }}
-                className="px-6 py-2 bg-[#00c9a7] text-white rounded-xl hover:bg-[#00b892] transition flex items-center gap-2"
+                className="px-6 py-2 bg-[#00c9a7] text-white rounded-xl hover:bg-[#00b396] transition flex items-center gap-2"
               >
                 <Home className="w-4 h-4" />
                 Accueil
@@ -152,7 +152,7 @@ export function FedapayCallbackPage({ onNavigate }: FedapayCallbackPageProps) {
               <XCircle className="w-12 h-12 text-red-600" />
             </div>
             <h2 className="text-2xl font-bold text-[#0F2940] mb-2">❌ Paiement échoué</h2>
-            <p className="text-gray-600 mb-4">{error || 'Une erreur est survenue lors du paiement'}</p>
+            <p className="text-[#5b6b7a] mb-4">{error || 'Une erreur est survenue lors du paiement'}</p>
             
             <div className="flex flex-col gap-3">
               <button
@@ -163,7 +163,7 @@ export function FedapayCallbackPage({ onNavigate }: FedapayCallbackPageProps) {
                     navigate('/payment/fedapay');
                   }
                 }}
-                className="w-full px-6 py-3 bg-[#00c9a7] text-white rounded-xl hover:bg-[#00b892] transition flex items-center justify-center gap-2"
+                className="w-full px-6 py-3 bg-[#00c9a7] text-white rounded-xl hover:bg-[#00b396] transition flex items-center justify-center gap-2"
               >
                 Réessayer
               </button>
@@ -175,7 +175,7 @@ export function FedapayCallbackPage({ onNavigate }: FedapayCallbackPageProps) {
                     navigate('/');
                   }
                 }}
-                className="w-full px-6 py-3 border border-gray-300 text-gray-600 rounded-xl hover:bg-gray-50 transition flex items-center justify-center gap-2"
+                className="w-full px-6 py-3 border border-[#c9f0e8] text-[#5b6b7a] rounded-xl hover:bg-[#f4fffe] transition flex items-center justify-center gap-2"
               >
                 <Home className="w-4 h-4" />
                 Retour à l'accueil
@@ -184,11 +184,11 @@ export function FedapayCallbackPage({ onNavigate }: FedapayCallbackPageProps) {
           </>
         ) : (
           <>
-            <div className="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Loader2 className="w-12 h-12 text-yellow-600 animate-spin" />
+            <div className="w-20 h-20 bg-[#fff3cd] rounded-full flex items-center justify-center mx-auto mb-4">
+              <Loader2 className="w-12 h-12 text-[#a87c10] animate-spin" />
             </div>
             <h2 className="text-2xl font-bold text-[#0F2940] mb-2">⏳ En cours...</h2>
-            <p className="text-gray-600">Le statut du paiement est en attente de confirmation.</p>
+            <p className="text-[#5b6b7a]">Le statut du paiement est en attente de confirmation.</p>
             <button
               onClick={() => {
                 if (onNavigate) {
@@ -197,7 +197,7 @@ export function FedapayCallbackPage({ onNavigate }: FedapayCallbackPageProps) {
                   navigate('/');
                 }
               }}
-              className="mt-6 px-6 py-2 bg-[#00c9a7] text-white rounded-xl hover:bg-[#00b892] transition flex items-center gap-2"
+              className="mt-6 px-6 py-2 bg-[#00c9a7] text-white rounded-xl hover:bg-[#00b396] transition flex items-center gap-2"
             >
               <Home className="w-4 h-4" />
               Accueil

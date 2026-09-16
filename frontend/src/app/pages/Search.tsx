@@ -329,16 +329,16 @@ export default function Search() {
         <div className="flex justify-between items-start">
           <div>
             <h3 className="font-semibold text-[#0F2940]">{property.title}</h3>
-            <p className="text-sm text-gray-500 mt-1">{property.location}</p>
+            <p className="text-sm text-[#5b6b7a] mt-1">{property.location}</p>
           </div>
           <div className="flex items-center gap-1">
             <Star className="w-4 h-4 fill-current text-[#00c9a7]" />
             <span className="text-sm font-medium">{property.rating}</span>
-            <span className="text-sm text-gray-500">({property.reviews})</span>
+            <span className="text-sm text-[#5b6b7a]">({property.reviews})</span>
           </div>
         </div>
-        {showDescription && <p className="text-sm text-gray-600 mt-2 line-clamp-2">{property.description}</p>}
-        <div className="flex items-center gap-3 mt-2 text-sm text-gray-500">
+        {showDescription && <p className="text-sm text-[#5b6b7a] mt-2 line-clamp-2">{property.description}</p>}
+        <div className="flex items-center gap-3 mt-2 text-sm text-[#5b6b7a]">
           <div className="flex items-center gap-1"><Bed className="w-4 h-4" /><span>{property.beds} lits</span></div>
           <div className="flex items-center gap-1"><Bath className="w-4 h-4" /><span>{property.baths} sdb</span></div>
         </div>
@@ -350,13 +350,13 @@ export default function Search() {
   return (
     <div className="bg-white">
       {/* Hero Section avec barre de recherche (inchangée) */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#00c9a7]/5 to-[#0F2940]/5">
+      <section className="relative overflow-hidden bg-[#f4fffe]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-24 pb-10 md:pt-28 md:pb-10">
           <div className="text-center mb-4 md:mb-5">
             <h1 className="text-3xl md:text-4xl font-semibold text-[#0F2940] mb-3">
               Trouvez votre prochain séjour au Bénin
             </h1>
-            <p className="text-base text-gray-600">
+            <p className="text-base text-[#5b6b7a]">
               Des logements premium et des expériences authentiques au Bénin
             </p>
           </div>
@@ -365,49 +365,49 @@ export default function Search() {
           <div className="h-20" />
           <div className="fixed inset-x-0 top-[80px] z-40 px-4">
             <div className="mx-auto w-full max-w-5xl">
-              <div className="bg-white rounded-full shadow-xl border border-gray-200 hover:shadow-2xl transition-all duration-300">
+              <div className="bg-white rounded-full shadow-xl border border-[#e2f5f2] hover:shadow-2xl transition-all duration-300">
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-1 p-2">
                   {/* Destination */}
                   <div className="relative flex-[1.5]">
                     <button
                       onClick={() => setActiveTab(activeTab === "destination" ? null : "destination")}
                       className={`w-full text-left px-5 sm:px-7 py-3.5 rounded-full transition-all ${
-                        activeTab === "destination" ? "bg-gray-50 shadow-inner" : "hover:bg-gray-50"
+                        activeTab === "destination" ? "bg-[#f4fffe] shadow-inner" : "hover:bg-[#f4fffe]"
                       }`}
                     >
-                      <div className="text-xs font-medium text-gray-700">Destination</div>
-                      <div className="text-sm text-gray-900 truncate">
+                      <div className="text-xs font-medium text-[#1c3b56]">Destination</div>
+                      <div className="text-sm text-[#0f2940] truncate">
                         {destination || "Rechercher une destination"}
                       </div>
                     </button>
                     {activeTab === "destination" && (
                       <>
                         <div className="fixed inset-0 z-40" onClick={() => setActiveTab(null)}></div>
-                        <div className="absolute top-full left-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 z-50">
+                        <div className="absolute top-full left-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-[#e2f5f2] z-50">
                           <div className="p-4">
                             <div className="flex items-center justify-between mb-4">
                               <h3 className="text-lg font-semibold">Où souhaitez-vous aller ?</h3>
-                              <button onClick={() => setActiveTab(null)} className="p-1 rounded-full hover:bg-gray-100">
+                              <button onClick={() => setActiveTab(null)} className="p-1 rounded-full hover:bg-[#e8faf6]">
                                 <X className="w-5 h-5" />
                               </button>
                             </div>
                             <input
                               type="text"
                               placeholder="Rechercher une destination au Bénin"
-                              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
+                              className="w-full px-4 py-3 border border-[#e2f5f2] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c9a7]"
                               value={destination}
                               onChange={(e) => setDestination(e.target.value)}
                             />
                             <div className="mt-4 space-y-2 max-h-96 overflow-y-auto">
-                              <div className="font-semibold text-sm text-gray-500 mb-2">Villes du Bénin</div>
+                              <div className="font-semibold text-sm text-[#5b6b7a] mb-2">Villes du Bénin</div>
                               {destinationsList.map((place) => (
                                 <button
                                   key={place}
                                   onClick={() => { setDestination(place); setActiveTab(null); }}
-                                  className="w-full text-left px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors"
+                                  className="w-full text-left px-4 py-3 rounded-xl hover:bg-[#f4fffe] transition-colors"
                                 >
                                   <div className="font-medium">{place}</div>
-                                  <div className="text-sm text-gray-500">Bénin</div>
+                                  <div className="text-sm text-[#5b6b7a]">Bénin</div>
                                 </button>
                               ))}
                             </div>
@@ -417,19 +417,19 @@ export default function Search() {
                     )}
                   </div>
 
-                  <div className="hidden sm:block w-px h-8 bg-gray-200"></div>
-                  <div className="sm:hidden h-px w-full bg-gray-200"></div>
+                  <div className="hidden sm:block w-px h-8 bg-[#e2f5f2]"></div>
+                  <div className="sm:hidden h-px w-full bg-[#e2f5f2]"></div>
 
                   {/* Dates */}
                   <div className="relative flex-1">
                     <button
                       onClick={() => setActiveTab(activeTab === "dates" ? null : "dates")}
                       className={`w-full text-left px-5 sm:px-7 py-3.5 rounded-full transition-all ${
-                        activeTab === "dates" ? "bg-gray-50 shadow-inner" : "hover:bg-gray-50"
+                        activeTab === "dates" ? "bg-[#f4fffe] shadow-inner" : "hover:bg-[#f4fffe]"
                       }`}
                     >
-                      <div className="text-xs font-medium text-gray-700">Dates</div>
-                      <div className="text-sm text-gray-900">
+                      <div className="text-xs font-medium text-[#1c3b56]">Dates</div>
+                      <div className="text-sm text-[#0f2940]">
                         {checkIn && checkOut 
                           ? `${new Date(checkIn).toLocaleDateString('fr-BJ', { day: 'numeric', month: 'short' })} - ${new Date(checkOut).toLocaleDateString('fr-BJ', { day: 'numeric', month: 'short' })}`
                           : "Quand ?"}
@@ -438,19 +438,19 @@ export default function Search() {
                     {activeTab === "dates" && (
                       <>
                         <div className="fixed inset-0 z-40" onClick={() => setActiveTab(null)}></div>
-                        <div className="absolute top-full left-0 sm:left-auto sm:right-0 mt-2 w-full sm:w-[640px] bg-white rounded-2xl shadow-2xl border border-gray-200 z-50">
+                        <div className="absolute top-full left-0 sm:left-auto sm:right-0 mt-2 w-full sm:w-[640px] bg-white rounded-2xl shadow-2xl border border-[#e2f5f2] z-50">
                           <div className="p-4 sm:p-6">
                             <div className="flex items-center justify-between mb-4">
                               <h3 className="text-lg font-semibold">Sélectionnez vos dates</h3>
-                              <button onClick={() => setActiveTab(null)} className="p-1 rounded-full hover:bg-gray-100"><X className="w-5 h-5" /></button>
+                              <button onClick={() => setActiveTab(null)} className="p-1 rounded-full hover:bg-[#e8faf6]"><X className="w-5 h-5" /></button>
                             </div>
                             <div className="flex items-center justify-between mb-6">
-                              <button onClick={() => changeMonth(-1)} className="p-2 rounded-full hover:bg-gray-100"><ChevronLeft className="w-5 h-5" /></button>
+                              <button onClick={() => changeMonth(-1)} className="p-2 rounded-full hover:bg-[#e8faf6]"><ChevronLeft className="w-5 h-5" /></button>
                               <span className="font-semibold">{currentMonth.toLocaleDateString('fr-BJ', { month: 'long', year: 'numeric' })}</span>
-                              <button onClick={() => changeMonth(1)} className="p-2 rounded-full hover:bg-gray-100"><ChevronRight className="w-5 h-5" /></button>
+                              <button onClick={() => changeMonth(1)} className="p-2 rounded-full hover:bg-[#e8faf6]"><ChevronRight className="w-5 h-5" /></button>
                             </div>
                             <div className="grid grid-cols-7 gap-1 mb-2">
-                              {weekDays.map(day => (<div key={day} className="text-center text-xs sm:text-sm font-medium text-gray-500 py-2">{day}</div>))}
+                              {weekDays.map(day => (<div key={day} className="text-center text-xs sm:text-sm font-medium text-[#5b6b7a] py-2">{day}</div>))}
                             </div>
                             <div className="grid grid-cols-7 gap-1">
                               {days.map((day, index) => {
@@ -463,18 +463,18 @@ export default function Search() {
                                     onClick={() => handleDateSelect(day.date)}
                                     disabled={!day.isCurrentMonth}
                                     className={`relative aspect-square rounded-full text-sm transition-all
-                                      ${!day.isCurrentMonth && 'text-gray-300 cursor-not-allowed'}
-                                      ${isSelected && 'bg-[#00c9a7] text-white hover:bg-[#00b892]'}
+                                      ${!day.isCurrentMonth && 'text-[#9fb3c4] cursor-not-allowed'}
+                                      ${isSelected && 'bg-[#00c9a7] text-white hover:bg-[#00b396]'}
                                       ${inRange && !isSelected && 'bg-[#00c9a7]/10'}
                                       ${isToday && !isSelected && 'border-2 border-[#00c9a7]'}
-                                      ${!isSelected && !inRange && day.isCurrentMonth && 'hover:bg-gray-100'}`}
+                                      ${!isSelected && !inRange && day.isCurrentMonth && 'hover:bg-[#e8faf6]'}`}
                                   >
                                     {day.date.getDate()}
                                   </button>
                                 );
                               })}
                             </div>
-                            <div className="mt-6 pt-4 border-t border-gray-200 flex justify-end">
+                            <div className="mt-6 pt-4 border-t border-[#e2f5f2] flex justify-end">
                               <button onClick={() => setActiveTab(null)} className="px-6 py-2 bg-[#00c9a7] text-[#0F2940] rounded-lg font-semibold">Fermer</button>
                             </div>
                           </div>
@@ -482,28 +482,28 @@ export default function Search() {
                       </>
                     )}
                   </div>
-                  <div className="hidden sm:block w-px h-8 bg-gray-200"></div>
-                  <div className="sm:hidden h-px w-full bg-gray-200"></div>
+                  <div className="hidden sm:block w-px h-8 bg-[#e2f5f2]"></div>
+                  <div className="sm:hidden h-px w-full bg-[#e2f5f2]"></div>
 
                   {/* Voyageurs */}
                   <div className="relative flex-1">
                     <button
                       onClick={() => setActiveTab(activeTab === "guests" ? null : "guests")}
                       className={`w-full text-left px-5 sm:px-7 py-3.5 rounded-full transition-all ${
-                        activeTab === "guests" ? "bg-gray-50 shadow-inner" : "hover:bg-gray-50"
+                        activeTab === "guests" ? "bg-[#f4fffe] shadow-inner" : "hover:bg-[#f4fffe]"
                       }`}
                     >
-                      <div className="text-xs font-medium text-gray-700">Voyageurs</div>
-                      <div className="text-sm text-gray-900 truncate">{guestLabel()}</div>
+                      <div className="text-xs font-medium text-[#1c3b56]">Voyageurs</div>
+                      <div className="text-sm text-[#0f2940] truncate">{guestLabel()}</div>
                     </button>
                     {activeTab === "guests" && (
                       <>
                         <div className="fixed inset-0 z-40" onClick={() => setActiveTab(null)}></div>
-                        <div className="absolute top-full right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 z-50">
+                        <div className="absolute top-full right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-[#e2f5f2] z-50">
                           <div className="p-4 sm:p-6">
                             <div className="flex items-center justify-between mb-4">
                               <h3 className="text-lg font-semibold">Voyageurs</h3>
-                              <button onClick={() => setActiveTab(null)} className="p-1 rounded-full hover:bg-gray-100"><X className="w-5 h-5" /></button>
+                              <button onClick={() => setActiveTab(null)} className="p-1 rounded-full hover:bg-[#e8faf6]"><X className="w-5 h-5" /></button>
                             </div>
                             <div className="space-y-6">
                               {[
@@ -513,16 +513,16 @@ export default function Search() {
                                 { label: "Animaux domestiques", description: "Vous voyagez avec un animal ?", key: "pets" },
                               ].map(({ label, description, key }) => (
                                 <div key={key} className="flex items-center justify-between">
-                                  <div><p className="font-semibold text-[#0F2940]">{label}</p><p className="text-sm text-gray-500">{description}</p></div>
+                                  <div><p className="font-semibold text-[#0F2940]">{label}</p><p className="text-sm text-[#5b6b7a]">{description}</p></div>
                                   <div className="flex items-center gap-4">
-                                    <button onClick={() => setGuestCounts(prev => ({ ...prev, [key]: Math.max(0, (prev[key as keyof typeof prev] as number) - 1) }))} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-gray-400">-</button>
+                                    <button onClick={() => setGuestCounts(prev => ({ ...prev, [key]: Math.max(0, (prev[key as keyof typeof prev] as number) - 1) }))} className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#9fb3c4]">-</button>
                                     <span className="w-6 text-center text-[#0F2940]">{guestCounts[key as keyof typeof guestCounts]}</span>
-                                    <button onClick={() => setGuestCounts(prev => ({ ...prev, [key]: (prev[key as keyof typeof prev] as number) + 1 }))} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-gray-400">+</button>
+                                    <button onClick={() => setGuestCounts(prev => ({ ...prev, [key]: (prev[key as keyof typeof prev] as number) + 1 }))} className="w-8 h-8 rounded-full border border-[#c9f0e8] flex items-center justify-center hover:border-[#9fb3c4]">+</button>
                                   </div>
                                 </div>
                               ))}
                             </div>
-                            <div className="mt-6 pt-4 border-t border-gray-200">
+                            <div className="mt-6 pt-4 border-t border-[#e2f5f2]">
                               <button onClick={() => setActiveTab(null)} className="w-full bg-[#00c9a7] text-[#0F2940] py-3 rounded-lg font-semibold">Fermer</button>
                             </div>
                           </div>
@@ -532,7 +532,7 @@ export default function Search() {
                   </div>
 
                   {/* Bouton recherche avec appel à performSearch */}
-                  <button onClick={() => { performSearch(); navigate("/s/logements"); }} className="bg-[#00c9a7] text-[#0F2940] rounded-full p-4 hover:bg-[#00b892] transition-colors ml-0 sm:ml-2 mt-2 sm:mt-0">
+                  <button onClick={() => { performSearch(); navigate("/s/logements"); }} className="bg-[#00c9a7] text-[#0F2940] rounded-full p-4 hover:bg-[#00b396] transition-colors ml-0 sm:ml-2 mt-2 sm:mt-0">
                     <SearchIcon className="w-5 h-5" />
                   </button>
                 </div>
@@ -545,12 +545,12 @@ export default function Search() {
             {heroCards.map((card, index) => {
               const Icon = card.icon;
               return (
-                <div key={index} className="rounded-2xl bg-white/80 backdrop-blur-sm p-6 shadow-sm border border-gray-100">
+                <div key={index} className="rounded-2xl bg-white/80 backdrop-blur-sm p-6 shadow-sm border border-[#e2f5f2]">
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#00c9a7]/10 mb-4">
                     <Icon className="w-6 h-6 text-[#00c9a7]" />
                   </div>
                   <h2 className="text-lg font-semibold text-[#0F2940]">{card.title}</h2>
-                  <p className="mt-2 text-sm text-gray-600">{card.description}</p>
+                  <p className="mt-2 text-sm text-[#5b6b7a]">{card.description}</p>
                 </div>
               );
             })}
@@ -559,12 +559,12 @@ export default function Search() {
       </section>
 
       {/* Section Filtres */}
-      <div className="border-b border-gray-200 sticky top-0 bg-white z-30">
+      <div className="border-b border-[#e2f5f2] sticky top-0 bg-white z-30">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4 overflow-x-auto pb-2">
               <div className="relative">
-                <button onClick={() => setShowFilterDropdown(!showFilterDropdown)} className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-300 hover:border-gray-400 transition-colors">
+                <button onClick={() => setShowFilterDropdown(!showFilterDropdown)} className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#c9f0e8] hover:border-[#9fb3c4] transition-colors">
                   <Filter className="w-4 h-4" />
                   <span className="text-sm">Filtres</span>
                   <ChevronDown className={`w-4 h-4 transition-transform ${showFilterDropdown ? 'rotate-180' : ''}`} />
@@ -572,9 +572,9 @@ export default function Search() {
                 {showFilterDropdown && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setShowFilterDropdown(false)}></div>
-                    <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 z-50 py-2">
+                    <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-[#e2f5f2] z-50 py-2">
                       {filters.map(filter => (
-                        <button key={filter} onClick={() => { setSelectedFilter(filter); setShowFilterDropdown(false); }} className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${selectedFilter === filter ? 'text-[#00c9a7] font-medium' : 'text-gray-700'}`}>
+                        <button key={filter} onClick={() => { setSelectedFilter(filter); setShowFilterDropdown(false); }} className={`w-full text-left px-4 py-2 text-sm hover:bg-[#f4fffe] ${selectedFilter === filter ? 'text-[#00c9a7] font-medium' : 'text-[#1c3b56]'}`}>
                           {filter}
                         </button>
                       ))}
@@ -582,7 +582,7 @@ export default function Search() {
                   </>
                 )}
               </div>
-              <div className="text-sm text-gray-600">{allProperties.length} logements disponibles</div>
+              <div className="text-sm text-[#5b6b7a]">{allProperties.length} logements disponibles</div>
             </div>
           </div>
         </div>
@@ -598,7 +598,7 @@ export default function Search() {
                   Logements populaires · Bénin
                   <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
                 </button>
-                <p className="text-gray-600 mt-1">Les plus réservés par nos voyageurs</p>
+                <p className="text-[#5b6b7a] mt-1">Les plus réservés par nos voyageurs</p>
               </div>
             </div>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -616,7 +616,7 @@ export default function Search() {
                   De superbes hôtels pour votre prochain voyage
                   <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
                 </button>
-                <p className="text-gray-600 mt-1">Hôtels de qualité supérieure</p>
+                <p className="text-[#5b6b7a] mt-1">Hôtels de qualité supérieure</p>
               </div>
             </div>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -634,7 +634,7 @@ export default function Search() {
                   Logements {category.title}
                   <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
                 </button>
-                <p className="text-gray-600 mt-1">Découvrez les meilleurs logements à {category.title}</p>
+                <p className="text-[#5b6b7a] mt-1">Découvrez les meilleurs logements à {category.title}</p>
               </div>
             </div>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

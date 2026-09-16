@@ -71,12 +71,12 @@ export function PropertyList({ initialFilters = {}, onPropertyClick }: PropertyL
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {[...Array(6)].map((_, i) => (
           <div key={i} className="bg-white rounded-2xl overflow-hidden shadow animate-pulse">
-            <div className="h-64 bg-gray-200"></div>
+            <div className="h-64 bg-[#e2f5f2]"></div>
             <div className="p-4 space-y-3">
-              <div className="h-5 bg-gray-200 rounded w-3/4"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-              <div className="h-4 bg-gray-200 rounded w-full"></div>
-              <div className="h-6 bg-gray-200 rounded w-1/3"></div>
+              <div className="h-5 bg-[#e2f5f2] rounded w-3/4"></div>
+              <div className="h-4 bg-[#e2f5f2] rounded w-1/2"></div>
+              <div className="h-4 bg-[#e2f5f2] rounded w-full"></div>
+              <div className="h-6 bg-[#e2f5f2] rounded w-1/3"></div>
             </div>
           </div>
         ))}
@@ -90,7 +90,7 @@ export function PropertyList({ initialFilters = {}, onPropertyClick }: PropertyL
         <p className="text-red-500">{error}</p>
         <button 
           onClick={() => fetchProperties()}
-          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          className="mt-4 bg-[#00b396] text-white px-4 py-2 rounded-lg hover:bg-[#009c84]"
         >
           Réessayer
         </button>
@@ -101,8 +101,8 @@ export function PropertyList({ initialFilters = {}, onPropertyClick }: PropertyL
   if (properties.length === 0) {
     return (
       <div className="text-center py-10">
-        <p className="text-gray-500">Aucune propriété trouvée</p>
-        <p className="text-sm text-gray-400 mt-2">Essayez de modifier vos critères de recherche</p>
+        <p className="text-[#5b6b7a]">Aucune propriété trouvée</p>
+        <p className="text-sm text-[#5b6b7a] mt-2">Essayez de modifier vos critères de recherche</p>
       </div>
     );
   }
@@ -110,7 +110,7 @@ export function PropertyList({ initialFilters = {}, onPropertyClick }: PropertyL
   return (
     <div>
       {/* Résultats */}
-      <div className="mb-4 text-sm text-gray-500">
+      <div className="mb-4 text-sm text-[#5b6b7a]">
         {pagination.total} propriété(s) trouvée(s)
       </div>
 
@@ -131,7 +131,7 @@ export function PropertyList({ initialFilters = {}, onPropertyClick }: PropertyL
           <button
             onClick={() => handlePageChange(pagination.current_page - 1)}
             disabled={pagination.current_page === 1}
-            className="px-3 py-1 rounded border disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            className="px-3 py-1 rounded border disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#f4fffe]"
           >
             ← Précédent
           </button>
@@ -154,8 +154,8 @@ export function PropertyList({ initialFilters = {}, onPropertyClick }: PropertyL
                 onClick={() => handlePageChange(pageNum)}
                 className={`px-3 py-1 rounded border ${
                   pagination.current_page === pageNum
-                    ? 'bg-blue-600 text-white border-blue-600'
-                    : 'hover:bg-gray-50'
+                    ? 'bg-[#00b396] text-white border-[#00b396]'
+                    : 'hover:bg-[#f4fffe]'
                 }`}
               >
                 {pageNum}
@@ -166,7 +166,7 @@ export function PropertyList({ initialFilters = {}, onPropertyClick }: PropertyL
           <button
             onClick={() => handlePageChange(pagination.current_page + 1)}
             disabled={pagination.current_page === pagination.last_page}
-            className="px-3 py-1 rounded border disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            className="px-3 py-1 rounded border disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#f4fffe]"
           >
             Suivant →
           </button>

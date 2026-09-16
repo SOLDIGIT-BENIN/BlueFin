@@ -122,7 +122,7 @@ export function PaymentInfoModal({
         À jour
       </span>
     ) : (
-      <span className="inline-flex items-center gap-1 px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm">
+      <span className="inline-flex items-center gap-1 px-3 py-1 bg-[#fff3cd] text-[#6b4e06] rounded-full text-sm">
         <Clock className="w-4 h-4" />
         En attente
       </span>
@@ -137,11 +137,11 @@ export function PaymentInfoModal({
         <div className="flex justify-between items-start mb-6">
           <div>
             <h2 className="text-2xl font-bold text-[#0f2940]">Mes informations de paiement</h2>
-            <p className="text-sm text-[#6b7280]">Gérez vos coordonnées bancaires et suivez vos paiements</p>
+            <p className="text-sm text-[#5b6b7a]">Gérez vos coordonnées bancaires et suivez vos paiements</p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition"
+            className="p-2 hover:bg-[#e8faf6] rounded-full transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -149,25 +149,25 @@ export function PaymentInfoModal({
 
         {/* Statistiques rapides */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-          <div className="bg-[#f0fdfb] rounded-xl p-4 border border-[#00c9a7]/20">
+          <div className="bg-[#f4fffe] rounded-xl p-4 border border-[#00c9a7]/20">
             <div className="flex items-center gap-2 mb-1">
               <DollarSign className="w-4 h-4 text-[#00c9a7]" />
-              <span className="text-xs text-[#6b7280]">Total reçu</span>
+              <span className="text-xs text-[#5b6b7a]">Total reçu</span>
             </div>
             <p className="text-xl font-bold text-[#0f2940]">{formatCurrency(paymentInfo.totalAllTime)} FCFA</p>
           </div>
-          <div className="bg-[#f0fdfb] rounded-xl p-4 border border-[#00c9a7]/20">
+          <div className="bg-[#f4fffe] rounded-xl p-4 border border-[#00c9a7]/20">
             <div className="flex items-center gap-2 mb-1">
               <TrendingUp className="w-4 h-4 text-[#00c9a7]" />
-              <span className="text-xs text-[#6b7280]">Cette semaine</span>
+              <span className="text-xs text-[#5b6b7a]">Cette semaine</span>
             </div>
             <p className="text-xl font-bold text-[#0f2940]">{formatCurrency(paymentInfo.totalWeekAmount)} FCFA</p>
-            <p className="text-xs text-[#6b7280]">{paymentInfo.weeklyReservations || 0} réservations</p>
+            <p className="text-xs text-[#5b6b7a]">{paymentInfo.weeklyReservations || 0} réservations</p>
           </div>
-          <div className="bg-[#f0fdfb] rounded-xl p-4 border border-[#00c9a7]/20">
+          <div className="bg-[#f4fffe] rounded-xl p-4 border border-[#00c9a7]/20">
             <div className="flex items-center gap-2 mb-1">
               <Calendar className="w-4 h-4 text-[#00c9a7]" />
-              <span className="text-xs text-[#6b7280]">Prochain paiement</span>
+              <span className="text-xs text-[#5b6b7a]">Prochain paiement</span>
             </div>
             <p className="text-xl font-bold text-[#0f2940]">
               {safeFormatDate(paymentInfo.nextPayoutDate)}
@@ -177,7 +177,7 @@ export function PaymentInfoModal({
         </div>
 
         {/* Informations de paiement */}
-        <div className="bg-gray-50 rounded-xl p-4 mb-6">
+        <div className="bg-[#f4fffe] rounded-xl p-4 mb-6">
           <h3 className="font-semibold text-[#0f2940] mb-3 flex items-center gap-2">
             <Wallet className="w-4 h-4 text-[#00c9a7]" />
             Coordonnées bancaires
@@ -185,22 +185,22 @@ export function PaymentInfoModal({
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <p className="text-xs text-[#6b7280]">Méthode</p>
+              <p className="text-xs text-[#5b6b7a]">Méthode</p>
               <p className="font-medium">{getMethodIcon(paymentInfo.paymentMethod)} {getMethodLabel(paymentInfo.paymentMethod)}</p>
             </div>
             <div>
-              <p className="text-xs text-[#6b7280]">Bénéficiaire</p>
+              <p className="text-xs text-[#5b6b7a]">Bénéficiaire</p>
               <p className="font-medium">{paymentInfo.fullName || 'N/A'}</p>
             </div>
             
             {paymentInfo.paymentMethod === 'MOBILE_MONEY' && (
               <>
                 <div>
-                  <p className="text-xs text-[#6b7280]">Numéro de téléphone</p>
+                  <p className="text-xs text-[#5b6b7a]">Numéro de téléphone</p>
                   <p className="font-medium">{paymentInfo.phoneNumber || 'N/A'}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-[#6b7280]">Opérateur</p>
+                  <p className="text-xs text-[#5b6b7a]">Opérateur</p>
                   <p className="font-medium">{getProviderLabel(paymentInfo.mobileProvider || '') || 'N/A'}</p>
                 </div>
               </>
@@ -209,19 +209,19 @@ export function PaymentInfoModal({
             {paymentInfo.paymentMethod === 'BANK_TRANSFER' && (
               <>
                 <div>
-                  <p className="text-xs text-[#6b7280]">Nom de la banque</p>
+                  <p className="text-xs text-[#5b6b7a]">Nom de la banque</p>
                   <p className="font-medium">{paymentInfo.bankName || 'N/A'}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-[#6b7280]">Titulaire du compte</p>
+                  <p className="text-xs text-[#5b6b7a]">Titulaire du compte</p>
                   <p className="font-medium">{paymentInfo.accountHolder || 'N/A'}</p>
                 </div>
                 <div className="col-span-2">
-                  <p className="text-xs text-[#6b7280]">IBAN</p>
+                  <p className="text-xs text-[#5b6b7a]">IBAN</p>
                   <p className="font-medium font-mono text-sm">{paymentInfo.iban || 'N/A'}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-[#6b7280]">BIC / SWIFT</p>
+                  <p className="text-xs text-[#5b6b7a]">BIC / SWIFT</p>
                   <p className="font-medium font-mono">{paymentInfo.bic || 'N/A'}</p>
                 </div>
               </>
@@ -229,7 +229,7 @@ export function PaymentInfoModal({
 
             {paymentInfo.paymentMethod === 'PAYPAL' && (
               <div className="col-span-2">
-                <p className="text-xs text-[#6b7280]">Email PayPal</p>
+                <p className="text-xs text-[#5b6b7a]">Email PayPal</p>
                 <p className="font-medium">{paymentInfo.paypalEmail || 'N/A'}</p>
               </div>
             )}
@@ -240,7 +240,7 @@ export function PaymentInfoModal({
         <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={onEdit}
-            className="flex-1 px-4 py-3 bg-[#00c9a7] text-white rounded-xl hover:bg-[#00b898] transition flex items-center justify-center gap-2"
+            className="flex-1 px-4 py-3 bg-[#00c9a7] text-white rounded-xl hover:bg-[#00b396] transition flex items-center justify-center gap-2"
           >
             <Pencil className="w-4 h-4" />
             Modifier mes coordonnées
@@ -253,7 +253,7 @@ export function PaymentInfoModal({
                 await loadHistory();
               }
             }}
-            className="flex-1 px-4 py-3 border border-[#e2f5f2] rounded-xl text-[#0f2940] hover:bg-gray-50 transition flex items-center justify-center gap-2"
+            className="flex-1 px-4 py-3 border border-[#e2f5f2] rounded-xl text-[#0f2940] hover:bg-[#f4fffe] transition flex items-center justify-center gap-2"
           >
             <Calendar className="w-4 h-4" />
             {showHistory ? 'Cacher l\'historique' : 'Voir l\'historique'}
@@ -282,7 +282,7 @@ export function PaymentInfoModal({
             {loadingHistory ? (
               <div className="flex items-center justify-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00c9a7]"></div>
-                <span className="ml-3 text-sm text-[#6b7280]">Chargement...</span>
+                <span className="ml-3 text-sm text-[#5b6b7a]">Chargement...</span>
               </div>
             ) : history.length > 0 ? (
               <div className="space-y-2 max-h-60 overflow-y-auto">
@@ -292,16 +292,16 @@ export function PaymentInfoModal({
                   const isDateValid = weekStart && !isNaN(weekStart.getTime());
                   
                   return (
-                    <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                    <div key={idx} className="flex items-center justify-between p-3 bg-[#f4fffe] rounded-xl">
                       <div>
                         <p className="text-sm font-medium text-[#0f2940]">
                           Semaine du {isDateValid ? format(weekStart, 'dd/MM/yyyy') : 'Date inconnue'}
                         </p>
-                        <p className="text-xs text-[#6b7280]">{historyItem.reservationsCount || 0} réservations</p>
+                        <p className="text-xs text-[#5b6b7a]">{historyItem.reservationsCount || 0} réservations</p>
                       </div>
                       <div className="text-right">
                         <p className="font-semibold">{formatCurrency(historyItem.amount)} FCFA</p>
-                        <span className={`text-xs ${historyItem.isPaid ? 'text-green-600' : 'text-yellow-600'}`}>
+                        <span className={`text-xs ${historyItem.isPaid ? 'text-green-600' : 'text-[#a87c10]'}`}>
                           {historyItem.isPaid ? '✅ Payé' : '⏳ En attente'}
                         </span>
                       </div>
@@ -310,14 +310,14 @@ export function PaymentInfoModal({
                 })}
               </div>
             ) : (
-              <p className="text-center text-[#6b7280] py-4 text-sm">
+              <p className="text-center text-[#5b6b7a] py-4 text-sm">
                 Aucun historique de paiement disponible
               </p>
             )}
           </div>
         )}
 
-        <p className="text-xs text-[#6b7280] text-center mt-4">
+        <p className="text-xs text-[#5b6b7a] text-center mt-4">
           🔒 Vos informations sont sécurisées et ne seront utilisées que pour les paiements.
         </p>
       </div>
