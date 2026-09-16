@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\EmailVerificationController;
 use App\Http\Controllers\Api\GoogleAuthController;
 use App\Http\Controllers\Api\NeedController;
 use App\Http\Controllers\Api\InquiryMessageController;
@@ -96,6 +97,11 @@ Route::prefix('auth')->group(function () {
         Route::post('/google/register', [GoogleAuthController::class, 'register']);
     });
     Route::post('/availability', [GoogleAuthController::class, 'availability'])->middleware('throttle:availability');
+
+    // Vérification de l'adresse par code à six chiffres (inscription par
+    // e-mail uniquement — le parcours Google n'en a pas besoin).
+    Route::post('/email/send-code', [EmailVerificationController::class, 'send'])->middleware('throttle:email-code');
+    Route::post('/email/verify-code', [EmailVerificationController::class, 'verify'])->middleware('throttle:email-code');
 });
 
 // Authentification voyageur

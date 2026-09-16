@@ -43,5 +43,17 @@ class AppServiceProvider extends ServiceProvider
         // Vérification « e-mail / téléphone déjà utilisé » pendant
         // l'inscription par étapes : bornée pour limiter l'énumération.
         RateLimiter::for('availability', fn ($request) => Limit::perMinute(20)->by($request->ip()));
+
+        /*
+         * Codes de vérification par e-mail. Deux garde-fous se cumulent : ce
+         * limiteur par adresse IP, et le délai d'une minute entre deux envois
+         * pour une même adresse (voir EmailVerificationCode). Sans cela, le
+         * formulaire d'inscription devient un moyen d'envoyer du courrier
+         * indésirable à des tiers, depuis notre domaine.
+         */
+        RateLimiter::for('email-code', fn ($request) => [
+            Limit::perMinute(10)->by($request->ip()),
+            Limit::perMinute(5)->by(mb_strtolower((string) $request->input('email'))),
+        ]);
     }
 }

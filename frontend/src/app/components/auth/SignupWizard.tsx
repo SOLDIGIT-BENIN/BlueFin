@@ -1,17 +1,21 @@
 // Inscription en étapes (parcours défini avec le client) :
 //   1. Méthode         — e-mail, ou Google
-//   2. Infos perso     — prénom et nom (pré-remplis par Google, modifiables) + téléphone
-//   3. Sécurité        — mot de passe (inscription par e-mail uniquement)
-//   4. Validation      — récapitulatif, acceptation des conditions, création
+//   2. Vérification    — code à six chiffres reçu par e-mail. Cette étape
+//                        n'existe QUE pour l'inscription par e-mail : avec
+//                        Google, l'adresse est déjà vérifiée par Google et son
+//                        jeton le prouve au backend.
+//   3. Infos perso     — prénom et nom (pré-remplis par Google, modifiables) + téléphone
+//   4. Sécurité        — mot de passe (inscription par e-mail uniquement)
+//   5. Validation      — récapitulatif, acceptation des conditions, création
 //
 // Avec Google, si un compte existe déjà pour cette adresse, le visiteur est
 // connecté directement dès l'étape 1.
-import { useState } from 'react';
-import { ArrowLeft, Check, Eye, EyeOff, Lock, Mail, Phone, User, Loader2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { ArrowLeft, Check, Eye, EyeOff, Lock, Mail, Phone, User, Loader2, MailCheck } from 'lucide-react';
 import { useAuth, type User as AuthUser } from '../../../contexts/AuthContext';
 import { GoogleSignInButton } from './GoogleSignInButton';
 
-type Step = 'method' | 'profile' | 'security' | 'review';
+type Step = 'method' | 'code' | 'profile' | 'security' | 'review';
 type Method = 'password' | 'google';
 
 export interface PendingGoogleSignup {
@@ -21,6 +25,7 @@ export interface PendingGoogleSignup {
 
 const STEP_LABELS: Record<Step, string> = {
   method: 'Méthode',
+  code: 'Vérification',
   profile: 'Infos perso',
   security: 'Sécurité',
   review: 'Validation',
@@ -51,7 +56,7 @@ export function SignupWizard({
   onSignedIn: (user: AuthUser) => void;
   onSwitchToLogin: (email?: string) => void;
 }) {
-  const { register, googleAuthenticate, googleRegister, checkAvailability } = useAuth();
+  const { register, googleAuthenticate, googleRegister, checkAvailability, sendEmailCode, verifyEmailCode } = useAuth();
 
   const [step, setStep] = useState<Step>(initialGoogle ? 'profile' : 'method');
   const [method, setMethod] = useState<Method | null>(initialGoogle ? 'google' : null);
@@ -68,10 +73,26 @@ export function SignupWizard({
   const [emailTaken, setEmailTaken] = useState(false);
   const [busy, setBusy] = useState(false);
 
-  const steps: Step[] = method === 'google' ? ['method', 'profile', 'review'] : ['method', 'profile', 'security', 'review'];
+  // Étape « Vérification » (inscription par e-mail uniquement)
+  const [code, setCode] = useState('');
+  const [resendIn, setResendIn] = useState(0);
+  const codeInputRef = useRef<HTMLInputElement>(null);
+
+  const steps: Step[] =
+    method === 'google'
+      ? ['method', 'profile', 'review']
+      : ['method', 'code', 'profile', 'security', 'review'];
   const currentIndex = steps.indexOf(step);
   const goBack = () => { setErrors({}); setStep(steps[Math.max(0, currentIndex - 1)]); };
   const clearError = (field: string) => errors[field] && setErrors((e) => ({ ...e, [field]: '' }));
+
+  // Décompte avant de pouvoir redemander un code. Le backend applique le même
+  // délai de son côté : ce n'est pas qu'un confort d'affichage.
+  useEffect(() => {
+    if (resendIn <= 0) return;
+    const timer = setTimeout(() => setResendIn((v) => v - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [resendIn]);
 
   // ---------- Étape 1 : méthode ----------
   const handleGoogle = async (credential: string) => {
@@ -108,7 +129,10 @@ export function SignupWizard({
       setEmail(value);
       setMethod('password');
       setGoogle(null);
-      setStep('profile');
+      const { resend_in } = await sendEmailCode(value);
+      setCode('');
+      setResendIn(resend_in);
+      setStep('code');
     } catch (e) {
       setErrors({ email: errorFromServer(e).message });
     } finally {
@@ -116,7 +140,44 @@ export function SignupWizard({
     }
   };
 
-  // ---------- Étape 2 : infos perso ----------
+  // ---------- Étape 2 : vérification de l'adresse ----------
+  const submitCode = async (event?: React.FormEvent, value?: string) => {
+    event?.preventDefault();
+    const entered = (value ?? code).trim();
+    if (entered.length !== 6) return setErrors({ code: 'Saisissez les six chiffres du code.' });
+    setBusy(true);
+    try {
+      await verifyEmailCode(email.trim(), entered);
+      setErrors({});
+      setStep('profile');
+    } catch (e) {
+      setCode('');
+      setErrors({ code: errorFromServer(e).message });
+      codeInputRef.current?.focus();
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const resendCode = async () => {
+    if (resendIn > 0 || busy) return;
+    setBusy(true);
+    setErrors({});
+    try {
+      const { resend_in } = await sendEmailCode(email.trim());
+      setCode('');
+      setResendIn(resend_in);
+    } catch (e: any) {
+      // 429 : le backend impose son propre délai, on s'y aligne.
+      const wait = Number(e?.response?.data?.resend_in);
+      if (Number.isFinite(wait) && wait > 0) setResendIn(wait);
+      setErrors({ code: errorFromServer(e).message });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  // ---------- Étape 3 : infos perso ----------
   const submitProfile = async (event: React.FormEvent) => {
     event.preventDefault();
     const next: Record<string, string> = {};
@@ -139,7 +200,7 @@ export function SignupWizard({
     }
   };
 
-  // ---------- Étape 3 : sécurité ----------
+  // ---------- Étape 4 : sécurité ----------
   const submitSecurity = (event: React.FormEvent) => {
     event.preventDefault();
     const next: Record<string, string> = {};
@@ -150,7 +211,7 @@ export function SignupWizard({
     setStep('review');
   };
 
-  // ---------- Étape 4 : validation ----------
+  // ---------- Étape 5 : validation ----------
   const submitAll = async () => {
     if (!acceptTerms) return setErrors({ terms: 'Acceptez les conditions pour créer votre compte.' });
     setBusy(true);
@@ -263,6 +324,73 @@ export function SignupWizard({
             </button>
           </form>
         </div>
+      )}
+
+      {step === 'code' && (
+        <form onSubmit={submitCode} className="space-y-5" noValidate>
+          <div className="text-center">
+            <span className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-[#e8faf6] mb-3">
+              <MailCheck className="w-6 h-6 text-[#00806b]" />
+            </span>
+            <h3 className="font-display text-[19px] text-[#0F2940]">Vérifiez votre adresse</h3>
+            <p className="text-sm text-[#5b6b7a] mt-1">
+              Nous avons envoyé un code à six chiffres à<br />
+              <strong className="text-[#0F2940] font-semibold">{email}</strong>
+            </p>
+          </div>
+
+          <div>
+            <label htmlFor="signup-code" className="sr-only">Code de vérification</label>
+            <input
+              id="signup-code"
+              ref={codeInputRef}
+              name="one-time-code"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              autoFocus
+              maxLength={6}
+              value={code}
+              onChange={(e) => {
+                const digits = e.target.value.replace(/\D/g, '').slice(0, 6);
+                setCode(digits);
+                clearError('code');
+                // Six chiffres saisis ou collés : on vérifie sans attendre un clic.
+                if (digits.length === 6) submitCode(undefined, digits);
+              }}
+              placeholder="000000"
+              className={`w-full text-center tracking-[0.5em] text-2xl font-semibold py-3 border rounded-xl
+                focus:outline-none focus:ring-2 focus:ring-[#00c9a7]/40 placeholder:text-[#c9f0e8]
+                ${errors.code ? 'border-red-500' : 'border-[#e2f5f2]'}`}
+            />
+            <FieldError name="code" />
+          </div>
+
+          <button type="submit" disabled={busy || code.length !== 6} className={primary}>
+            {busy && <Loader2 className="w-4 h-4 animate-spin" />} Vérifier
+          </button>
+
+          <div className="flex items-center justify-between text-sm">
+            <button
+              type="button"
+              onClick={() => { setStep('method'); setCode(''); setErrors({}); }}
+              className="text-[#5b6b7a] hover:text-[#0F2940]"
+            >
+              Modifier l'adresse
+            </button>
+            <button
+              type="button"
+              onClick={resendCode}
+              disabled={resendIn > 0 || busy}
+              className="font-semibold text-[#00806b] disabled:text-[#5b6b7a] disabled:font-normal"
+            >
+              {resendIn > 0 ? `Renvoyer dans ${resendIn} s` : 'Renvoyer le code'}
+            </button>
+          </div>
+
+          <p className="text-xs text-[#5b6b7a] text-center">
+            Rien reçu ? Regardez dans les indésirables. Le code expire au bout de dix minutes.
+          </p>
+        </form>
       )}
 
       {step === 'profile' && (

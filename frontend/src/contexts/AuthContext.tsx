@@ -64,6 +64,8 @@ interface AuthContextType {
     googleAuthenticate: (credential: string) => Promise<GoogleAuthResult>;
     googleRegister: (data: GoogleRegisterData) => Promise<any>;
     checkAvailability: (fields: { email?: string; phone?: string }) => Promise<{ email_taken: boolean; phone_taken: boolean }>;
+    sendEmailCode: (email: string) => Promise<{ expires_in: number; resend_in: number }>;
+    verifyEmailCode: (email: string, code: string) => Promise<boolean>;
     // Passage d'un compte voyageur connecté en compte hôte.
     becomeHost: (hostType: 'logement' | 'experience' | 'service') => Promise<User>;
 }
@@ -835,6 +837,28 @@ const login = async (email: string, password: string, userType: string = 'travel
         }
     };
 
+    /**
+     * Envoie un code à six chiffres à l'adresse saisie (inscription par e-mail).
+     *
+     * Le parcours Google ne passe jamais par ici : Google a déjà vérifié
+     * l'adresse, et son jeton en fait foi côté backend.
+     */
+    const sendEmailCode = async (email: string) => {
+        await refreshCsrfToken();
+        const response = await publicApi.post('/api/auth/email/send-code', { email: email.trim() });
+        return {
+            expires_in: Number(response.data?.expires_in ?? 600),
+            resend_in: Number(response.data?.resend_in ?? 60),
+        };
+    };
+
+    /** Vérifie le code reçu. Lève une erreur (message lisible) si le code est refusé. */
+    const verifyEmailCode = async (email: string, code: string) => {
+        await refreshCsrfToken();
+        const response = await publicApi.post('/api/auth/email/verify-code', { email: email.trim(), code });
+        return Boolean(response.data?.success);
+    };
+
     const checkAvailability = async (fields: { email?: string; phone?: string }) => {
         await refreshCsrfToken();
         const response = await publicApi.post('/api/auth/availability', fields);
@@ -867,6 +891,8 @@ const login = async (email: string, password: string, userType: string = 'travel
         googleAuthenticate,
         googleRegister,
         checkAvailability,
+        sendEmailCode,
+        verifyEmailCode,
         becomeHost,
     };
 

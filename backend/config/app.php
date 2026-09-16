@@ -54,6 +54,17 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+
+    /*
+
+     | URL publique du site (React), distincte de l'API : sert aux liens et
+
+     | aux images des e-mails, qui doivent pointer vers le site, pas vers l'API.
+
+     */
+
+    'frontend_url' => env('FRONTEND_URL', 'https://bluefin-immo.com'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

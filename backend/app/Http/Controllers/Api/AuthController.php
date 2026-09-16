@@ -50,6 +50,21 @@ class AuthController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
+        // L'adresse doit avoir été prouvée par le code à six chiffres envoyé à
+        // l'étape précédente (voir EmailVerificationCode). Sans ce contrôle,
+        // l'écran de saisie du code ne serait qu'un décor : il suffirait
+        // d'appeler cette route directement pour créer un compte avec
+        // l'adresse de quelqu'un d'autre. Le parcours Google passe par
+        // GoogleAuthController, où c'est le jeton Google qui fait foi.
+        if (! app(\App\Services\EmailVerificationCode::class)->isVerified($request->email)) {
+            return response()->json([
+                'success' => false,
+                'message' => "Vérifiez d'abord votre adresse e-mail avec le code reçu.",
+                'errors' => ['email' => ["Vérifiez d'abord votre adresse e-mail avec le code reçu."]],
+            ], 422);
+        }
+
+
         $user = User::create([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
@@ -58,6 +73,15 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
             'user_type' => $request->user_type ?? 'voyageur',
         ]);
+
+        // L'adresse vient d'être prouvée par le code : on l'acte sur le compte.
+        // forceFill car email_verified_at n'est pas dans $fillable, et ne doit
+        // surtout pas y entrer — ce serait une élévation de privilège offerte
+        // à n'importe quel formulaire.
+        $user->forceFill(['email_verified_at' => now()])->save();
+
+        // La preuve ne doit pas resservir pour une seconde inscription.
+        app(\App\Services\EmailVerificationCode::class)->consume($user->email);
 
         $token = $user->createToken('auth_token')->plainTextToken;
         $this->startWebSession($request, $user, $request->boolean('remember'));
